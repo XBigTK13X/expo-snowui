@@ -23,7 +23,6 @@ const AppConfig = {
 
 export function StyleContextProvider(props) {
     let style = createStyle(props.snowStyle)
-    console.log({ style })
     let config = AppConfig
     if (props.snowConfig) {
         config = { ...config, ...props.snowConfig }
