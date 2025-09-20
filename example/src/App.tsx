@@ -15,6 +15,14 @@ const imageItems = [
   }
 ]
 
+const styleOverrides = {
+  color: {
+    hover: 'rgba(44, 219, 175, 1)',
+    core: 'rgba(91, 34, 184, 1)',
+    coreDark: 'rgba(62, 32, 110, 1)',
+  }
+}
+
 export default function App() {
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
   const [inputValue, setInputValue] = React.useState('')
@@ -34,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <Snow.App>
+    <Snow.App snowStyle={styleOverrides}>
       <Snow.Label>App Level entities</Snow.Label>
       <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
 

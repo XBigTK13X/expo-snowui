@@ -1,6 +1,6 @@
 {
   "name": "react-native-snowui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GUI components and contexts shared by the snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -153,6 +153,7 @@
   },
   "dependencies": {
     "expo-image": "^3.0.8",
+    "lodash": "^4.17.21",
     "use-debounce": "^10.0.6"
   }
 }

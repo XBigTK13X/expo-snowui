@@ -1,5 +1,5 @@
 import React from 'react';
-import Style from '../snow-style'
+import { createStyle } from '../snow-style'
 
 const StyleContext = React.createContext({});
 
@@ -22,10 +22,8 @@ const AppConfig = {
 }
 
 export function StyleContextProvider(props) {
-    let style = Style
-    if (props.snowStyle) {
-        style = { ...style, ...props.snowStyle }
-    }
+    let style = createStyle(props.snowStyle)
+    console.log({ style })
     let config = AppConfig
     if (props.snowConfig) {
         config = { ...config, ...props.snowConfig }

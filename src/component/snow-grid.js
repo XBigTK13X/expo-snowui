@@ -9,7 +9,6 @@ import { useStyleContext } from '../context/snow-style-context'
 import SnowFillView from './snow-fill-view'
 
 export function SnowGrid(props) {
-
     if (!props.items && !props.children) {
         return null
     }
