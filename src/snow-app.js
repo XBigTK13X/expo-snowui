@@ -4,7 +4,6 @@ import { FocusContextProvider } from './context/snow-focus-context'
 
 function SnowWrapper(props) {
     const { SnowStyle } = useStyleContext(props)
-    console.log({ SnowStyle })
     return (
         <ScrollView contentContainerStyle={SnowStyle.page}>
             {props.children}
