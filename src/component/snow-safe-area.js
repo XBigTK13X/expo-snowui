@@ -1,4 +1,4 @@
-import { Platform, View } from 'react-native'
+import { Platform, View, TVFocusGuideView } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 
 function AppView(props) {
