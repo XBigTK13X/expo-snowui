@@ -47,6 +47,10 @@ export function SnowTextButton(props) {
         textStyle.push(SnowStyle.component.textButton.smallText)
     }
 
+    if (props.fade) {
+        textStyle.push(SnowStyle.component.textButton.fadeText)
+    }
+
     if (props.short) {
         wrapperStyle.push(SnowStyle.component.textButton.shortWrapper)
         textStyle.push(SnowStyle.component.textButton.smallText)

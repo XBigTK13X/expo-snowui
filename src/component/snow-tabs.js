@@ -29,7 +29,7 @@ export function SnowTabs(props) {
                                 fade: {
                                     backgroundColor: SnowStyle.color.panel
                                 },
-                                text: {
+                                fadeText: {
                                     color: SnowStyle.color.text
                                 }
                             }

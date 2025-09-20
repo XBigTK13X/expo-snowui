@@ -367,6 +367,9 @@ export function createStyle(overrides) {
             },
             smallText: {
                 fontSize: AppStyle.textButton.fontSize.small
+            },
+            fadeText: {
+
             }
         },
         text: {
