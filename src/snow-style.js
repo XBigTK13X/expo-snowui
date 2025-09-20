@@ -419,10 +419,5 @@ export function createStyle(overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)
     }
 
-    AppStyle.window = {
-        height,
-        width
-    }
-
     return AppStyle
 }
