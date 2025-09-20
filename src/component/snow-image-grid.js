@@ -11,7 +11,14 @@ export function SnowImageGrid(props) {
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
     const renderItem = (item, itemIndex) => {
-        const imageUrl = props.getItemImage(item)
+        let imageUrl = null
+        if (props.getItemImageUrl) {
+            imageUrl = props.getItemImageUrl(item)
+        }
+        let imageSource = null
+        if (props.getItemImageSource) {
+            imageSource = props.getItemImageSource(item)
+        }
         const itemName = props.getItemName(item)
 
         let toggled = toggledItems.hasOwnProperty(item.id)
@@ -28,6 +35,7 @@ export function SnowImageGrid(props) {
             dull={isDull}
             shouldFocus={props.shouldFocus && itemIndex === 0}
             imageUrl={imageUrl}
+            imageSource={imageSource}
             onPress={() => { if (props.onPress) { props.onPress(item) } }}
             onLongPress={() => {
                 if (props.onLongPress) {

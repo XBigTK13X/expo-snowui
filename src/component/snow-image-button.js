@@ -56,7 +56,7 @@ export function SnowImageButton(props) {
         imageSource = { uri: props.imageUrl }
     }
     if (props.imageSource) {
-        imageSource = imageSource
+        imageSource = props.imageSource
     }
 
     return (
