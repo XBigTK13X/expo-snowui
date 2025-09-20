@@ -16,6 +16,14 @@ const scaled = (input) => {
     return Math.round(input * scaleMultiplier)
 }
 
+const height = () => {
+    return Dimensions.get('window').height
+}
+
+const width = () => {
+    return Dimensions.get('window').width
+}
+
 export function createStyle(overrides) {
     let AppStyle = {
         color: {
@@ -33,14 +41,6 @@ export function createStyle(overrides) {
         fontSize: {
             header: 40,
             label: 26
-        },
-        window: {
-            height: () => {
-                return Dimensions.get('window').height
-            },
-            width: () => {
-                return Dimensions.get('window').width
-            }
         },
         surface: {
             uhd: {
@@ -402,11 +402,11 @@ export function createStyle(overrides) {
 
     if (isWeb) {
         AppStyle.page = {
-            height: AppStyle.window.height() - 50
+            height: height() - 50
         }
     } else {
         AppStyle.page = {
-            height: AppStyle.window.height() - 25
+            height: height() - 25
         }
     }
 
@@ -417,6 +417,11 @@ export function createStyle(overrides) {
 
     if (overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)
+    }
+
+    AppStyle.window = {
+        height,
+        width
     }
 
     return AppStyle
