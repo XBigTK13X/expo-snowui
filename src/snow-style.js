@@ -140,7 +140,7 @@ export function createStyle(overrides) {
                 flex: 1
             },
             item: {
-                flexBasis: '20%'
+                flex: 1
             },
             list: {
                 justifyContent: 'space-evenly',
@@ -312,7 +312,7 @@ export function createStyle(overrides) {
         tabs: {
             panel: {
                 backgroundColor: AppStyle.color.panel,
-                marginTop: isWeb ? -16 : -25,
+                marginTop: isWeb ? -16 : (isTV ? -25 : -18),
                 marginLeft: 15,
                 marginRight: 24,
                 borderRadius: AppStyle.button.borderRadius,
@@ -407,20 +407,10 @@ export function createStyle(overrides) {
         }
     }
 
-    if (isWeb) {
-        AppStyle.page = {
-            height: getWindowHeight() - 50
-        }
-    } else {
-        AppStyle.page = {
-            height: getWindowHeight() - 25
-        }
-    }
-
     AppStyle.isTV = isTV
-    AppStyle.isPortrait = isPortrait
     AppStyle.isWeb = isWeb
     AppStyle.isAndroid = isAndroid
+    AppStyle.isPortrait = isPortrait
 
     if (overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)

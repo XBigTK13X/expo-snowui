@@ -6,26 +6,20 @@ import {
 
 import { useStyleContext } from '../context/snow-style-context'
 
-import SnowFillView from './snow-fill-view'
-
 export function SnowGrid(props) {
     if (!props.items && !props.children) {
         return null
     }
     const { SnowStyle } = useStyleContext(props)
-
-    let itemStyle = [SnowStyle.component.grid.item]
     let itemsPerRow = 5
     if (props.itemsPerRow) {
         itemsPerRow = props.itemsPerRow
-        itemStyle.push({ flexBasis: `${100 / props.itemsPerRow}%` })
     }
+
+    let itemStyle = [SnowStyle.component.grid.item]
     let gridStyle = [SnowStyle.component.grid.grid]
     if (props.gridStyle) {
         gridStyle.push(props.gridStyle)
-    }
-    if (props.mainGrid) {
-        gridStyle.push(SnowStyle.component.grid.main)
     }
 
     if (props.short) {
@@ -53,7 +47,6 @@ export function SnowGrid(props) {
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
                 contentContainerStyle={SnowStyle.component.grid.list}
-                columnWrapperStyle={itemsPerRow === 1 ? null : SnowStyle.component.grid.listColumn}
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     return (

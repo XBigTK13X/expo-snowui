@@ -1,5 +1,5 @@
 import React from 'react'
-import SnowFillView from './snow-fill-view'
+import { View } from 'react-native'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
 import SnowLabel from './snow-label'
@@ -60,19 +60,18 @@ export function SnowImageGrid(props) {
         />
     }
     return (
-        <SnowFillView>
+        <View>
             {props.title ?
                 <SnowLabel>
                     {props.title} ({props.items.length})
                 </SnowLabel>
                 : null}
             <SnowGrid
-                mainGrid={props.isMainGrid}
                 items={props.items}
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}
             />
-        </SnowFillView>
+        </View>
     )
 }
 

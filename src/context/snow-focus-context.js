@@ -25,8 +25,9 @@ export function FocusContextProvider(props) {
     }
     return (
         <FocusContext.Provider
+            style={{ flex: 1 }}
             value={focusContext}>
-            <SnowSafeArea>
+            <SnowSafeArea style={{ flex: 1 }} >
                 {props.children}
             </SnowSafeArea>
         </FocusContext.Provider>

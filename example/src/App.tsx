@@ -214,17 +214,17 @@ export default function App() {
 
   return (
     <Snow.App snowStyle={styleOverrides}>
-      <Snow.Label>App Level entities</Snow.Label>
-      <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
       <View>
+        <Snow.Label>App Level entities</Snow.Label>
+        <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
         <Snow.Grid items={components} renderItem={(item: any, itemIndex: number) => {
           return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
         }} />
-        <Snow.Break />
       </View>
-      <Snow.FillView>
+      <Snow.Break />
+      <View>
         {components[tabIndex]?.[1]}
-      </Snow.FillView>
+      </View>
     </Snow.App>
   );
 }

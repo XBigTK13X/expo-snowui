@@ -1,23 +1,25 @@
-import { ScrollView } from 'react-native'
+import { View, ScrollView, Platform } from 'react-native'
 import { StyleContextProvider, useStyleContext } from './context/snow-style-context'
 import { FocusContextProvider } from './context/snow-focus-context'
 
-function SnowWrapper(props) {
-    const { SnowStyle } = useStyleContext(props)
-    return (
-        <ScrollView contentContainerStyle={SnowStyle.page}>
-            {props.children}
-        </ScrollView>
-    )
-}
+const fill = { flex: 1 }
 
 export function SnowApp(props) {
+    const { SnowStyle } = useStyleContext(props)
+    let rootInnerStyle = []
+    if (Platform.OS === 'web') {
+        rootInnerStyle.push(fill)
+    }
     return (
-        <StyleContextProvider snowStyle={props.snowStyle} snowConfig={props.snowConfig}>
-            <FocusContextProvider>
-                <SnowWrapper children={props.children} />
-            </FocusContextProvider>
-        </StyleContextProvider>
+        <ScrollView style={fill} contentContainerStyle={rootInnerStyle}>
+            <StyleContextProvider snowStyle={props.snowStyle} snowConfig={props.snowConfig}>
+                <FocusContextProvider>
+                    <View style={{ flex: 1, marginBottom: 50 }}>
+                        {props.children}
+                    </View>
+                </FocusContextProvider>
+            </StyleContextProvider>
+        </ScrollView>
     )
 }
 

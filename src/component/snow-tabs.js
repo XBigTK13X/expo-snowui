@@ -2,7 +2,6 @@ import React from 'react'
 import { View } from 'react-native';
 
 import SnowDropdown from './snow-dropdown'
-import SnowFillView from './snow-fill-view'
 import { useStyleContext } from '../context/snow-style-context'
 
 export function SnowTabs(props) {
@@ -45,19 +44,17 @@ export function SnowTabs(props) {
 
     return (
         <View>
-            <View>
-                <SnowDropdown
-                    snowStyle={tabStyle}
-                    short
-                    fade
-                    options={props.headers}
-                    onValueChange={setTabIndex}
-                    valueIndex={tabIndex}
-                    itemsPerRow={props.headers.length} />
-            </View>
-            <SnowFillView style={SnowStyle.component.tabs.panel}>
+            <SnowDropdown
+                snowStyle={tabStyle}
+                short
+                fade
+                options={props.headers}
+                onValueChange={setTabIndex}
+                valueIndex={tabIndex}
+                itemsPerRow={props.headers.length} />
+            <View style={SnowStyle.component.tabs.panel}>
                 {tabs[tabIndex]}
-            </SnowFillView>
+            </View>
         </View>
     )
 

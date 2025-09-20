@@ -37,7 +37,7 @@ export function StyleContextProvider(props) {
         getWindowWidth,
     }
     return (
-        <StyleContext.Provider value={context}>
+        <StyleContext.Provider style={{ flex: 1 }} value={context}>
             {props.children}
         </StyleContext.Provider>
     )
