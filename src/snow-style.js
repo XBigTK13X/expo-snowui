@@ -354,6 +354,7 @@ export function createStyle(overrides) {
                 backgroundColor: AppStyle.color.fade
             },
             text: {
+                color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.normal,
                 padding: 0,
                 margin: 0,

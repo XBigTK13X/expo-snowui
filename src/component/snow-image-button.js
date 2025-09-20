@@ -51,6 +51,14 @@ export function SnowImageButton(props) {
         textWrapperStyle.push(SnowStyle.component.imageButton.focused)
     }
 
+    let imageSource = null
+    if (props.imageUrl) {
+        imageSource = { uri: props.imageUrl }
+    }
+    if (props.imageSource) {
+        imageSource = imageSource
+    }
+
     return (
         <View>
             <TouchableOpacity
@@ -66,7 +74,7 @@ export function SnowImageButton(props) {
                 <Image
                     style={imageStyle}
                     contentFit="contain"
-                    source={{ uri: props.imageUrl }}
+                    source={imageSource}
                     placeholder={props.placeholder}
                 />
                 <View style={textWrapperStyle}>
