@@ -1,6 +1,6 @@
 {
   "name": "react-native-snowui",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "GUI components and contexts shared by the snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

@@ -3,7 +3,7 @@ import { useStyleContext } from '../context/snow-style-context'
 
 function AppView(props) {
     return (
-        <View style={props.style.component.safeArea}>
+        <View style={props.snowStyle.component.safeArea}>
             {props.children}
         </View>
     )
@@ -12,7 +12,7 @@ function AppView(props) {
 function TvFocusView(props) {
     return (
         <TVFocusGuideView
-            style={props.style.component.safeArea}>
+            style={props.snowStyle.component.safeArea}>
             {props.children}
         </TVFocusGuideView>
     )
@@ -22,9 +22,9 @@ export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
     const allowFocusing = Platform.isTV
     if (allowFocusing) {
-        return <TvFocusView style={SnowStyle} {...props} />
+        return <TvFocusView snowStyle={SnowStyle} {...props} />
     }
-    return <AppView style={SnowStyle} {...props} />
+    return <AppView snowStyle={SnowStyle} {...props} />
 }
 
 export default SnowSafeArea
