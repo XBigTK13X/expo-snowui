@@ -8,10 +8,10 @@ export function useStyleContext(componentProps) {
     if (!value) {
         throw new Error('useStyleContext must be wrapped in a <StyleContextProvider />');
     }
-    if (componentProps.snowStyle) {
+    if (componentProps && componentProps.snowStyle) {
         value.SnowStyle = { ...value.SnowStyle, ...componentProps.snowStyle }
     }
-    if (componentProps.snowConfig) {
+    if (componentProps && componentProps.snowConfig) {
         value.SnowConfig = { ...value.SnowConfig, ...componentProps.snowConfig }
     }
     return value;
