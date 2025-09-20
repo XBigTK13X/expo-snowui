@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyle } from '../snow-style'
+import { createStyle, getWindowHeight, getWindowWidth } from '../snow-style'
 
 const StyleContext = React.createContext({});
 
@@ -29,7 +29,9 @@ export function StyleContextProvider(props) {
     }
     const context = {
         SnowStyle: style,
-        SnowConfig: config
+        SnowConfig: config,
+        getWindowHeight,
+        getWindowWidth,
     }
     return (
         <StyleContext.Provider value={context}>

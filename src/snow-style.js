@@ -16,11 +16,11 @@ const scaled = (input) => {
     return Math.round(input * scaleMultiplier)
 }
 
-const height = () => {
+export function getWindowHeight() {
     return Dimensions.get('window').height
 }
 
-const width = () => {
+export function getWindowWidth() {
     return Dimensions.get('window').width
 }
 
@@ -403,11 +403,11 @@ export function createStyle(overrides) {
 
     if (isWeb) {
         AppStyle.page = {
-            height: height() - 50
+            height: getWindowHeight() - 50
         }
     } else {
         AppStyle.page = {
-            height: height() - 25
+            height: getWindowHeight() - 25
         }
     }
 
