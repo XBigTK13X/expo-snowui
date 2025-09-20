@@ -1,20 +1,9 @@
-import { Text, View, StyleSheet } from 'react-native';
-import { multiply } from 'react-native-snowui';
-
-const result = multiply(3, 7);
+import { SnowApp, SnowText } from 'react-native-snowui';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-    </View>
+    <SnowApp>
+      <SnowText>Hello there snowui</SnowText>
+    </SnowApp>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
