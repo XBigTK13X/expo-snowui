@@ -47,9 +47,8 @@ export function SnowGrid(props) {
     if (props.renderItem) {
         renderItem = props.renderItem
     }
-    const GridView = props.shrink ? View : SnowFillView
     return (
-        <GridView style={gridStyle}>
+        <View style={gridStyle}>
             <FlatList
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
@@ -64,7 +63,7 @@ export function SnowGrid(props) {
                     )
                 }}
             />
-        </GridView>
+        </View>
     )
 }
 

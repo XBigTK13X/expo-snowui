@@ -1,6 +1,6 @@
 {
   "name": "react-native-snowui",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "GUI components and contexts shared by the snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -64,9 +64,9 @@
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "@evilmartians/lefthook": "^1.12.3",
+    "@react-native-tvos/config-tv": "0.1.4",
     "@react-native/babel-preset": "0.81.1",
     "@react-native/eslint-config": "^0.81.1",
-    "@react-native-tvos/config-tv": "0.1.4",
     "@release-it/conventional-changelog": "^10.0.1",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.1.12",

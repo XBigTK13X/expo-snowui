@@ -168,7 +168,6 @@ export function createStyle(overrides) {
                 marginRight: 'auto',
                 borderColor: AppStyle.color.background,
                 borderWidth: AppStyle.button.borderRadius,
-                borderRadius: AppStyle.button.borderRadius,
             },
             wrapperWide: {
                 height: AppStyle.imageButton.wrapper.wide.height,
@@ -316,7 +315,7 @@ export function createStyle(overrides) {
                 marginTop: isWeb ? -16 : -25,
                 marginLeft: 15,
                 marginRight: 24,
-                borderRadius: 10,
+                borderRadius: AppStyle.button.borderRadius,
                 borderWidth: 1,
                 borderColor: 'transparent',
                 paddingTop: 30,

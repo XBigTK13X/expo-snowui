@@ -1,5 +1,6 @@
-import { Platform, View, TVFocusGuideView } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
+import { SnowFillView } from './snow-fill-view'
 
 function AppView(props) {
     return (
@@ -9,21 +10,9 @@ function AppView(props) {
     )
 }
 
-function TvFocusView(props) {
-    return (
-        <TVFocusGuideView
-            style={props.snowStyle.component.safeArea}>
-            {props.children}
-        </TVFocusGuideView>
-    )
-}
-
 export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
     const allowFocusing = Platform.isTV
-    if (allowFocusing) {
-        return <TvFocusView snowStyle={SnowStyle} {...props} />
-    }
     return <AppView snowStyle={SnowStyle} {...props} />
 }
 

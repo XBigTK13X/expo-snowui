@@ -6,11 +6,8 @@ export function SnowFillView(props) {
     // This commonly happens when any parent container is not set to flex: 1
     const { SnowStyle } = useStyleContext(props)
     if (props.scroll) {
-        let viewStyle = []
+        let viewStyle = [SnowStyle.component.fillView.default]
         let scrollStyle = []
-        if (!props.shrink) {
-            viewStyle = [SnowStyle.component.fillView.default]
-        }
         if (props.flexStart) {
             scrollStyle = [SnowStyle.component.fillView.flexStart]
         }
@@ -24,10 +21,7 @@ export function SnowFillView(props) {
         />
     }
 
-    let style = []
-    if (!props.shrink) {
-        style = [SnowStyle.component.fillView.default]
-    }
+    let style = [SnowStyle.component.fillView.default]
     if (props.flexStart) {
         style.push(SnowStyle.component.fillView.flexStart)
     }

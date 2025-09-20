@@ -3203,6 +3203,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-tvos/config-tv@npm:0.1.4":
+  version: 0.1.4
+  resolution: "@react-native-tvos/config-tv@npm:0.1.4"
+  dependencies:
+    getenv: ^1.0.0
+  peerDependencies:
+    expo: ">=52.0.0"
+  checksum: b7081421578df0c20fcfd8af179c2ce8f9c833820d66e35ca44541890fc2c1e45b49ae58b2809733ebe8df1aba778bf25c2b4f478e0154483f698e0680967afd
+  languageName: node
+  linkType: hard
+
+"@react-native-tvos/virtualized-lists@npm:0.81.4-0":
+  version: 0.81.4-0
+  resolution: "@react-native-tvos/virtualized-lists@npm:0.81.4-0"
+  dependencies:
+    invariant: ^2.2.4
+    nullthrows: ^1.1.1
+  peerDependencies:
+    "@types/react": ^19.1.0
+    react: "*"
+    react-native: "*"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 7d73ed9817127c66edcce116a407fb7dda2b790e18cdfb2bc309b8aacaedb82d1c803ec266bbbd928f9a2fd88af2b3246dd20b65151ba948eb55047bda511e44
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:0.81.4":
   version: 0.81.4
   resolution: "@react-native/assets-registry@npm:0.81.4"
@@ -7114,6 +7142,13 @@ __metadata:
     data-uri-to-buffer: ^6.0.2
     debug: ^4.3.4
   checksum: aef94dbecde44bc9cd23f5c1b6af5bf772a3d16612c0fc37d3a4056ffd202f2cdd329746d4fdc2124813ea6c8b1c5279f3749d27226a2b161df43dbcb70082e3
+  languageName: node
+  linkType: hard
+
+"getenv@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "getenv@npm:1.0.0"
+  checksum: 19ae5cad603a1cf1bcb8fa3bed48e00d062eb0572a4404c02334b67f3b3499f238383082b064bb42515e9e25c2b08aef1a3e3d2b6852347721aa8b174825bd56
   languageName: node
   linkType: hard
 
@@ -11234,6 +11269,7 @@ __metadata:
   dependencies:
     "@expo/metro-runtime": ~6.1.2
     expo: ~54.0.9
+    expo-image: ^3.0.8
     expo-status-bar: ~3.0.8
     react: 19.1.0
     react-dom: 19.1.0
@@ -11253,6 +11289,7 @@ __metadata:
     "@eslint/eslintrc": ^3.3.1
     "@eslint/js": ^9.35.0
     "@evilmartians/lefthook": ^1.12.3
+    "@react-native-tvos/config-tv": 0.1.4
     "@react-native/babel-preset": 0.81.1
     "@react-native/eslint-config": ^0.81.1
     "@release-it/conventional-changelog": ^10.0.1
@@ -11268,7 +11305,7 @@ __metadata:
     lodash: ^4.17.21
     prettier: ^3.6.2
     react: 19.1.0
-    react-native: 0.81.4
+    react-native: "npm:react-native-tvos@0.81.4-0"
     react-native-builder-bob: ^0.40.13
     release-it: ^19.0.4
     typescript: ^5.9.2
@@ -11345,6 +11382,56 @@ __metadata:
   bin:
     react-native: cli.js
   checksum: f5d3f726722b37c948ead0ac7971b5daa484e3533184238e7cc12ae36a7cadd74f125f06bee6e2940cce13c4fddcd1e3137532ec5a6f0fbef07b1c03443fa637
+  languageName: node
+  linkType: hard
+
+"react-native@npm:react-native-tvos@0.81.4-0":
+  version: 0.81.4-0
+  resolution: "react-native-tvos@npm:0.81.4-0"
+  dependencies:
+    "@jest/create-cache-key-function": ^29.7.0
+    "@react-native-tvos/virtualized-lists": 0.81.4-0
+    "@react-native/assets-registry": 0.81.4
+    "@react-native/codegen": 0.81.4
+    "@react-native/community-cli-plugin": 0.81.4
+    "@react-native/gradle-plugin": 0.81.4
+    "@react-native/js-polyfills": 0.81.4
+    "@react-native/normalize-colors": 0.81.4
+    abort-controller: ^3.0.0
+    anser: ^1.4.9
+    ansi-regex: ^5.0.0
+    babel-jest: ^29.7.0
+    babel-plugin-syntax-hermes-parser: 0.29.1
+    base64-js: ^1.5.1
+    commander: ^12.0.0
+    flow-enums-runtime: ^0.0.6
+    glob: ^7.1.1
+    invariant: ^2.2.4
+    jest-environment-node: ^29.7.0
+    memoize-one: ^5.0.0
+    metro-runtime: ^0.83.1
+    metro-source-map: ^0.83.1
+    nullthrows: ^1.1.1
+    pretty-format: ^29.7.0
+    promise: ^8.3.0
+    react-devtools-core: ^6.1.5
+    react-refresh: ^0.14.0
+    regenerator-runtime: ^0.13.2
+    scheduler: 0.26.0
+    semver: ^7.1.3
+    stacktrace-parser: ^0.1.10
+    whatwg-fetch: ^3.0.0
+    ws: ^6.2.3
+    yargs: ^17.6.2
+  peerDependencies:
+    "@types/react": ^19.1.0
+    react: ^19.1.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  bin:
+    react-native: cli.js
+  checksum: 6cdfce36ee8367d2c231dc9a7979e370f527a5b2fa6e78965ae8022e525a3d278227aa0d64d4a05ba430f7647394632550807fa2e1bf8b2b9b5f09678535d249
   languageName: node
   linkType: hard
 
