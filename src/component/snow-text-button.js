@@ -33,6 +33,7 @@ export function SnowTextButton(props) {
         wrapperStyle.push(SnowStyle.component.textButton.fade)
     }
 
+
     if (props.tall && SnowStyle.isWeb) {
         wrapperStyle.push(SnowStyle.component.textButton.tallWrapper)
     }

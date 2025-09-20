@@ -14,6 +14,9 @@ export function SnowFillView(props) {
         if (props.flexStart) {
             scrollStyle = [SnowStyle.component.fillView.flexStart]
         }
+        if (props.style) {
+            viewStyle.push(props.style)
+        }
         return <ScrollView
             style={viewStyle}
             contentContainerStyle={scrollStyle}
@@ -27,6 +30,9 @@ export function SnowFillView(props) {
     }
     if (props.flexStart) {
         style.push(SnowStyle.component.fillView.flexStart)
+    }
+    if (props.style) {
+        style.push(props.style)
     }
     return (
         <View style={style} children={props.children} />

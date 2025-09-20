@@ -58,7 +58,7 @@ export function SnowGrid(props) {
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     return (
-                        <View key={index} style={itemStyle}>
+                        <View style={itemStyle}>
                             {renderItem(item, index)}
                         </View>
                     )

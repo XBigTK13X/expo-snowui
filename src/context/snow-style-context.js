@@ -1,18 +1,21 @@
 import React from 'react';
+import _ from 'lodash'
 import { createStyle, getWindowHeight, getWindowWidth } from '../snow-style'
 
 const StyleContext = React.createContext({});
 
 export function useStyleContext(componentProps) {
-    const value = React.useContext(StyleContext);
+    let value = React.useContext(StyleContext);
     if (!value) {
         throw new Error('useStyleContext must be wrapped in a <StyleContextProvider />');
     }
     if (componentProps && componentProps.snowStyle) {
-        value.SnowStyle = { ...value.SnowStyle, ...componentProps.snowStyle }
+        value = { ...value }
+        value.SnowStyle = _.merge({}, value.SnowStyle, componentProps.snowStyle)
     }
     if (componentProps && componentProps.snowConfig) {
-        value.SnowConfig = { ...value.SnowConfig, ...componentProps.snowConfig }
+        value = { ...value }
+        value.SnowConfig = _.merge({}, value.SnowConfig, componentProps.snowConfig)
     }
     return value;
 }

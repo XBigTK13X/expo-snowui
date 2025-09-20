@@ -25,6 +25,7 @@ export function SnowDropdown(props) {
             }
         }
         return <SnowTextButton
+            snowStyle={props.snowStyle}
             tall={!props.short}
             fade={selected && props.fade}
             selected={selected}

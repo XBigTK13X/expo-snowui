@@ -36,7 +36,8 @@ export function createStyle(overrides) {
             coreDark: 'rgb(136, 98, 27)',
             outlineDark: 'rgb(63, 63, 63)',
             fade: 'rgb(23, 23, 23)',
-            transparentDark: 'rgba(0,0,0,0.6)'
+            transparentDark: 'rgba(0,0,0,0.6)',
+            panel: 'rgb(50, 50, 50)',
         },
         fontSize: {
             header: 40,
@@ -51,6 +52,9 @@ export function createStyle(overrides) {
                 width: 1920,
                 height: 1080
             }
+        },
+        button: {
+            borderRadius: 6
         },
         imageButton: {
             wrapper: {
@@ -163,8 +167,8 @@ export function createStyle(overrides) {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 borderColor: AppStyle.color.background,
-                borderWidth: 2,
-                borderRadius: 2,
+                borderWidth: AppStyle.button.borderRadius,
+                borderRadius: AppStyle.button.borderRadius,
             },
             wrapperWide: {
                 height: AppStyle.imageButton.wrapper.wide.height,
@@ -220,7 +224,7 @@ export function createStyle(overrides) {
                 height: 41,
                 backgroundColor: AppStyle.color.core,
                 borderColor: AppStyle.color.core,
-                borderRadius: 2,
+                borderRadius: AppStyle.button.borderRadius,
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: 2
@@ -308,8 +312,8 @@ export function createStyle(overrides) {
         },
         tabs: {
             panel: {
-                backgroundColor: AppStyle.color.fade,
-                marginTop: -25,
+                backgroundColor: AppStyle.color.panel,
+                marginTop: isWeb ? -16 : -25,
                 marginLeft: 15,
                 marginRight: 24,
                 borderRadius: 10,
@@ -329,9 +333,9 @@ export function createStyle(overrides) {
                 alignContent: 'center', // Multiline vertical center of parent
                 textAlign: 'center', // Ensure text objects are horizontally centered
                 backgroundColor: AppStyle.color.core,
-                borderWidth: 5,
+                borderWidth: AppStyle.button.borderRadius,
                 borderColor: AppStyle.color.core,
-                borderRadius: 5
+                borderRadius: AppStyle.button.borderRadius
             },
             tallWrapper: {
                 height: 80,

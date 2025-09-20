@@ -20,6 +20,21 @@ export function SnowTabs(props) {
         <View>
             <View>
                 <SnowDropdown
+                    snowStyle={{
+                        color: {
+                            fade: SnowStyle.color.panel
+                        },
+                        component: {
+                            textButton: {
+                                fade: {
+                                    backgroundColor: SnowStyle.color.panel
+                                },
+                                text: {
+                                    color: SnowStyle.color.text
+                                }
+                            }
+                        }
+                    }}
                     short
                     fade
                     options={props.headers}
