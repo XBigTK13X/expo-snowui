@@ -5,6 +5,8 @@ import { useStyleContext } from '../context/snow-style-context'
 export function SnowModal(props) {
     const { SnowStyle } = useStyleContext(props)
 
+    console.log({ SnowStyle })
+
     let style = [SnowStyle.component.modal.prompt]
     if (props.transparent) {
         style.push(SnowStyle.component.modal.transparent)

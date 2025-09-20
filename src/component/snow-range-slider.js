@@ -31,7 +31,7 @@ const step = 0.01
 
 // After a handful of other libraries still had problems, I rolled my own
 export function SnowRangeSlider(props) {
-    const { SnowStyle, SnowConfig } = useStyleContext()
+    const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { allowFocusing, setLockedElement, lockedElement } = useFocusContext()
 
     const isDraggingRef = React.useRef(false)
@@ -40,6 +40,11 @@ export function SnowRangeSlider(props) {
     const [thumbFocus, setThumbFocus] = React.useState(false)
     const elementRef = React.useRef(null)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
+
+    let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
+    if (props.width) {
+        sliderWidth = props.width
+    }
 
     let onValueChange = props.onValueChange
     if (props.debounce) {
@@ -50,10 +55,10 @@ export function SnowRangeSlider(props) {
         if (positionX < 0) {
             positionX = 0
         }
-        if (positionX > props.width) {
-            positionX = props.width
+        if (positionX > sliderWidth) {
+            positionX = sliderWidth
         }
-        let newPercent = positionX / props.width
+        let newPercent = positionX / sliderWidth
         if (newPercent < 0) {
             newPercent = 0
         }
@@ -174,11 +179,11 @@ export function SnowRangeSlider(props) {
     const trackWrapperStyle = [
         SnowStyle.component.rangeSlider.trackWrapper,
         {
-            width: props.width
+            width: sliderWidth
         }
     ]
 
-    const thumbX = percent * props.width
+    const thumbX = percent * sliderWidth
 
     const leftTrackStyle = [
         SnowStyle.component.rangeSlider.leftTrack,

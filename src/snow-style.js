@@ -269,6 +269,7 @@ AppStyle.component = {
             flexDirection: "row",
             alignItems: "center",
             backgroundColor: "transparent",
+            width: 400
         },
         leftTrack: {
             height: "100%",

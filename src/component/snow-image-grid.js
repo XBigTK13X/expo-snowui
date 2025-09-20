@@ -18,7 +18,7 @@ export function SnowImageGrid(props) {
 
         let isDull = false
         if (!props.disableToggle) {
-            if (props.getItemToggleStatus(item)) {
+            if (props.getItemToggleStatus && props.getItemToggleStatus(item)) {
                 isDull = true
             }
         }
