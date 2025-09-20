@@ -13,28 +13,41 @@ export function SnowTabs(props) {
     if (!props.children) {
         return null
     }
-    let tabs = React.Children.toArray(props.children)
-    tabs = tabs.filter(child => child !== null)
+
     const [tabIndex, setTabIndex] = React.useState(0)
+    const tabStyle = {
+        color: {
+            fade: SnowStyle.color.panel
+        },
+        component: {
+            textButton: {
+                fade: {
+                    backgroundColor: SnowStyle.color.panel
+                },
+                fadeText: {
+                    color: SnowStyle.color.text
+                }
+            },
+            imageButton: {
+                wrapper: {
+                    borderColor: SnowStyle.color.panel
+                }
+            }
+        }
+    }
+
+    const tabs = React.Children.toArray(props.children).map(child => {
+        if (React.isValidElement(child)) {
+            return React.cloneElement(child, { snowStyle: tabStyle });
+        }
+        return child;
+    }).filter(child => child !== null);
+
     return (
         <View>
             <View>
                 <SnowDropdown
-                    snowStyle={{
-                        color: {
-                            fade: SnowStyle.color.panel
-                        },
-                        component: {
-                            textButton: {
-                                fade: {
-                                    backgroundColor: SnowStyle.color.panel
-                                },
-                                fadeText: {
-                                    color: SnowStyle.color.text
-                                }
-                            }
-                        }
-                    }}
+                    snowStyle={tabStyle}
                     short
                     fade
                     options={props.headers}

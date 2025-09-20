@@ -137,7 +137,12 @@ function TabsTab() {
       <Snow.Tabs headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
         <Snow.Text>You have reached the second tab.</Snow.Text>
-        <Snow.Text>Finally, the third tab.</Snow.Text>
+        <Snow.ImageGrid
+          items={imageItems}
+          getItemImageUrl={(item: any) => { return item.imageUrl }}
+          getItemImageSource={(item: any) => { return item.imageSource }}
+          getItemName={(item: any) => { return item.title }}
+        />
       </Snow.Tabs>
     </View>
   )
