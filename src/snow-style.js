@@ -138,8 +138,7 @@ export function createStyle(overrides) {
                 flex: 1
             },
             list: {
-                justifyContent: 'center',
-                alignItems: 'space-evenly'
+                justifyContent: 'space-evenly'
             },
             short: {
                 padding: 0
