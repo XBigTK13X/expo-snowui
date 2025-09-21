@@ -16,8 +16,8 @@ export function SnowText(props) {
     }
     if (props.center) {
         return (
-            <View style={SnowStyle.component.text.center}>
-                <Text style={style} selectable={!props.noSelect} children={props.children} />
+            <View focusable={false} style={SnowStyle.component.text.center}>
+                <Text focusable={false} style={style} selectable={!props.noSelect} children={props.children} />
             </View>
         )
     }

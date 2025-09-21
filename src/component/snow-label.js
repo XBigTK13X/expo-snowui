@@ -5,12 +5,12 @@ export function SnowLabel(props) {
     const { SnowStyle } = useStyleContext(props)
     if (props.center) {
         return (
-            <View style={SnowStyle.component.label.center}>
-                <Text style={SnowStyle.component.label.default} children={props.children} />
+            <View focusable={false} style={SnowStyle.component.label.center}>
+                <Text focusable={false} style={SnowStyle.component.label.default} children={props.children} />
             </View>
         )
     }
-    return <Text style={SnowStyle.component.label.default} children={props.children} />
+    return <Text focusable={false} style={SnowStyle.component.label.default} children={props.children} />
 }
 
 export default SnowLabel

@@ -26,10 +26,7 @@ export function SnowGrid(props) {
     }
 
     let itemStyle = [
-        SnowStyle.component.grid.item,
-        {
-            flex: 1
-        }
+        { flexBasis: `${100 / itemsPerRow}%` }
     ]
     let gridStyle = []
     if (props.gridStyle) {
@@ -52,6 +49,7 @@ export function SnowGrid(props) {
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
                 contentContainerStyle={SnowStyle.component.grid.list}
+                columnWrapperStyle={SnowStyle.component.grid.list}
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     return (

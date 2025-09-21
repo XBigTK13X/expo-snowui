@@ -96,8 +96,7 @@ export function createStyle(overrides) {
         textButton: {
             wrapper: {
                 normal: {
-                    height: 35,
-                    width: scaled(260)
+                    height: 35
                 }
             },
             fontSize: {
@@ -134,10 +133,8 @@ export function createStyle(overrides) {
             }
         },
         grid: {
-            item: {
-            },
             list: {
-                justifyContent: 'space-around'
+                justifyContent: 'space-evenly'
             },
             short: {
                 padding: 0
@@ -316,7 +313,6 @@ export function createStyle(overrides) {
             wrapper: {
                 margin: 10,
                 padding: 10,
-                width: AppStyle.textButton.wrapper.normal.width,
                 height: AppStyle.textButton.wrapper.normal.height,
                 justifyContent: 'center', // Horizontally center each line
                 alignItems: 'center', // Vertically center each line
