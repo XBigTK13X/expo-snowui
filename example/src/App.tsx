@@ -112,11 +112,26 @@ function LabelTab() {
 }
 
 
-function ModalTab(props: any) {
+function ModalTab() {
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => { setShowModal(!showModal) }
+  if (showModal) {
+    return (
+      <Snow.Modal scroll>
+        <Snow.Text>Hi, I am a modal.</Snow.Text>
+        <View style={{ height: 1000 }}>
+          <Snow.Text>There should be scrolling.</Snow.Text>
+        </View>
+        <Snow.Text>And then the end</Snow.Text>
+
+        <Snow.TextButton title="Close" onPress={toggleModal} />
+      </Snow.Modal>
+    )
+  }
   return (
     <View>
       <Snow.Label>Component: Modal</Snow.Label>
-      <Snow.TextButton title="Show Modal" onPress={props.toggleModal} />
+      <Snow.TextButton title="Show Modal" onPress={toggleModal} />
     </View>
   )
 }
@@ -180,20 +195,10 @@ export default function App() {
 
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
   const [inputValue, setInputValue] = React.useState('')
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => { setShowModal(!showModal) }
   const [rangeSliderValue, setRangeSliderValue] = React.useState(0.5)
   const [toggleValue, setToggleValue] = React.useState(false)
   const togglePermitted = () => { setToggleValue(!toggleValue) }
 
-  if (showModal) {
-    return (
-      <Snow.Modal>
-        <Snow.Text>Hi, I am a modal.</Snow.Text>
-        <Snow.TextButton title="Close" onPress={toggleModal} />
-      </Snow.Modal>
-    )
-  }
 
   let components = [
     ['Break', <BreakTab />],
@@ -228,3 +233,4 @@ export default function App() {
     </Snow.App>
   );
 }
+
