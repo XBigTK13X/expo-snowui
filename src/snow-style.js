@@ -135,10 +135,9 @@ export function createStyle(overrides) {
         },
         grid: {
             item: {
-                flex: 1
             },
             list: {
-                justifyContent: 'space-evenly'
+                justifyContent: 'space-around'
             },
             short: {
                 padding: 0
