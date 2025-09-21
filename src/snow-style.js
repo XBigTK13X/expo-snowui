@@ -133,21 +133,11 @@ export function createStyle(overrides) {
             }
         },
         grid: {
-            default: {
-                padding: 5
-            },
-            fill: {
-                flex: 1
-            },
             item: {
                 flex: 1
             },
             list: {
-                justifyContent: 'space-evenly',
                 marginRight: 10
-            },
-            listColumn: {
-                justifyContent: 'space-evenly',
             },
             short: {
                 padding: 0
@@ -312,7 +302,7 @@ export function createStyle(overrides) {
         tabs: {
             panel: {
                 backgroundColor: AppStyle.color.panel,
-                marginTop: isWeb ? -16 : (isTV ? -25 : -18),
+                marginTop: isWeb ? -16 : -18,
                 marginLeft: 15,
                 marginRight: 24,
                 borderRadius: AppStyle.button.borderRadius,

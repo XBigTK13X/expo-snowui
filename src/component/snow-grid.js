@@ -10,22 +10,6 @@ export function SnowGrid(props) {
     if (!props.items && !props.children) {
         return null
     }
-    const { SnowStyle } = useStyleContext(props)
-    let itemsPerRow = 5
-    if (props.itemsPerRow) {
-        itemsPerRow = props.itemsPerRow
-    }
-
-    let itemStyle = [SnowStyle.component.grid.item]
-    let gridStyle = [SnowStyle.component.grid.grid]
-    if (props.gridStyle) {
-        gridStyle.push(props.gridStyle)
-    }
-
-    if (props.short) {
-        gridStyle.push(SnowStyle.component.grid.short)
-    }
-
     let items = props.items
     if (!props.items) {
         // Without this, if a ternary `{x?x:null}` nullable component will leave a gap in the grid
@@ -35,6 +19,27 @@ export function SnowGrid(props) {
     if (!items || !items.length) {
         return null
     }
+    const { SnowStyle } = useStyleContext(props)
+    let itemsPerRow = 5
+    if (props.itemsPerRow) {
+        itemsPerRow = props.itemsPerRow
+    }
+
+    let itemStyle = [
+        SnowStyle.component.grid.item,
+        {
+            flex: 1
+        }
+    ]
+    let gridStyle = []
+    if (props.gridStyle) {
+        gridStyle.push(props.gridStyle)
+    }
+
+    if (props.short) {
+        gridStyle.push(SnowStyle.component.grid.short)
+    }
+
     let renderItem = (item, itemIndex) => {
         return item
     }
