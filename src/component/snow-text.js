@@ -1,10 +1,17 @@
 import { View, Text } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
+import SnowNoFocus from './snow-no-focus'
 
 export function SnowText(props) {
     const { SnowStyle } = useStyleContext(props)
 
-    let style = [SnowStyle.component.text.text]
+    let style = []
+    if (!props.style) {
+        style = [SnowStyle.component.text.text]
+    }
+    else {
+        style = [props.style]
+    }
     if (!props.shrink) {
         style.push(SnowStyle.component.text.normal)
     }
@@ -14,14 +21,20 @@ export function SnowText(props) {
     if (props.style) {
         style.push(props.style)
     }
+    let wrapperStyle = null
     if (props.center) {
-        return (
-            <View focusable={false} style={SnowStyle.component.text.center}>
-                <Text focusable={false} style={style} selectable={!props.noSelect} children={props.children} />
-            </View>
-        )
+        wrapperStyle = SnowStyle.component.text.center
     }
-    return <Text style={style} selectable={!props.noSelect} children={props.children} />
+    // Without this View wrapper, Android remote buttons try to focus the Text element.
+    return (
+        <SnowNoFocus style={wrapperStyle}>
+            <Text
+                {...SnowNoFocus.noFocusProps}
+                style={style}
+                selectable={!props.noSelect}
+                children={props.children} />
+        </SnowNoFocus>
+    )
 }
 
 export default SnowText

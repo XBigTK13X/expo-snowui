@@ -10,12 +10,6 @@ export function SnowTextButton(props) {
     const [focused, setFocused] = React.useState(false)
     const touchRef = React.useRef(null)
 
-    React.useEffect(() => {
-        if (props.shouldFocus && !Keyboard.isVisible()) {
-            touchRef.current.focus()
-        }
-    })
-
     const wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.disabled) {
         wrapperStyle.push(SnowStyle.component.textButton.disabled)
@@ -88,9 +82,10 @@ export function SnowTextButton(props) {
             focusable={allowFocus || focused}
             onFocus={() => { changeFocus(true) }}
             onBlur={() => { changeFocus(false) }}
+            hasTVPreferredFocus={props.shouldFocus}
             disabled={props.disabled}>
             <SnowText noSelect style={textStyle}>{props.title}</SnowText>
-        </Pressable>
+        </Pressable >
     )
 }
 

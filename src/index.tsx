@@ -27,6 +27,8 @@ export { SnowLabel } from './component/snow-label'
 import { SnowLabel } from './component/snow-label'
 export { SnowModal } from './component/snow-modal'
 import { SnowModal } from './component/snow-modal'
+export { SnowNoFocus } from './component/snow-no-focus'
+import { SnowNoFocus } from './component/snow-no-focus'
 export { SnowRangeSlider } from './component/snow-range-slider'
 import { SnowRangeSlider } from './component/snow-range-slider'
 export { SnowSafeArea } from './component/snow-safe-area'
@@ -54,6 +56,7 @@ export default {
   Input: SnowInput,
   Label: SnowLabel,
   Modal: SnowModal,
+  NoFocus: SnowNoFocus,
   RangeSlider: SnowRangeSlider,
   SafeArea: SnowSafeArea,
   Tabs: SnowTabs,

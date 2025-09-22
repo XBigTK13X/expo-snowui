@@ -19,6 +19,13 @@ export function SnowGrid(props) {
     if (!items || !items.length) {
         return null
     }
+
+    let shouldFocus = true
+    if (props.shouldFocus === false) {
+        shouldFocus = false
+    }
+
+
     const { SnowStyle } = useStyleContext(props)
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -43,23 +50,32 @@ export function SnowGrid(props) {
     if (props.renderItem) {
         renderItem = props.renderItem
     }
+    let columnStyle = null
+    if (itemsPerRow > 1) {
+        // If you try to style the column when 1 item per row, flat list throws an error
+        columnStyle = SnowStyle.component.grid.list
+    }
     return (
         <View style={gridStyle}>
             <FlatList
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
                 contentContainerStyle={SnowStyle.component.grid.list}
-                columnWrapperStyle={SnowStyle.component.grid.list}
+                columnWrapperStyle={columnStyle}
                 data={items}
                 renderItem={({ item, index, separators }) => {
+                    let child = renderItem(item, index)
+                    if (index === 0 && React.isValidElement(child)) {
+                        child = React.cloneElement(child, { shouldFocus })
+                    }
                     return (
                         <View style={itemStyle}>
-                            {renderItem(item, index)}
+                            {child}
                         </View>
                     )
                 }}
             />
-        </View>
+        </View >
     )
 }
 

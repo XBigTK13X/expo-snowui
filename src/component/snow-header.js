@@ -1,9 +1,19 @@
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
+import SnowText from './snow-text'
+import SnowNoFocus from './snow-no-focus'
 
 export function SnowHeader(props) {
     const { SnowStyle } = useStyleContext(props)
-    return <Text focusable={false} style={SnowStyle.component.header}>{props.children}</Text>
+    return (
+        <SnowText
+            {...SnowNoFocus.noFocusProps}
+            center={props.center}
+            noSelect={props.noSelect}
+            style={SnowStyle.component.header}
+            children={props.children}
+        />
+    )
 }
 
 export default SnowHeader

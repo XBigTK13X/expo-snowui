@@ -8,7 +8,7 @@ export function SnowSafeArea(props) {
         Wrapper = TVFocusGuideView
     }
     return (
-        <Wrapper snowStyle={SnowStyle} style={SnowStyle.component.safeArea}>
+        <Wrapper autoFocus snowStyle={SnowStyle} style={SnowStyle.component.safeArea}>
             {props.children}
         </Wrapper>
     )
