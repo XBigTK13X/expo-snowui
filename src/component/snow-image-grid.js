@@ -34,7 +34,6 @@ export function SnowImageGrid(props) {
             snowStyle={props.snowStyle}
             wide={props.wideImage}
             dull={isDull}
-            shouldFocus={props.shouldFocus && itemIndex === 0}
             imageUrl={imageUrl}
             imageSource={imageSource}
             onPress={() => { if (props.onPress) { props.onPress(item) } }}
