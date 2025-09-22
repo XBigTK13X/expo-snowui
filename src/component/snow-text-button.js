@@ -10,6 +10,12 @@ export function SnowTextButton(props) {
     const [focused, setFocused] = React.useState(false)
     const touchRef = React.useRef(null)
 
+    React.useEffect(() => {
+        if (props.shouldFocus && !Keyboard.isVisible()) {
+            touchRef.current.focus()
+        }
+    })
+
     const wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.disabled) {
         wrapperStyle.push(SnowStyle.component.textButton.disabled)
@@ -26,7 +32,6 @@ export function SnowTextButton(props) {
     if (props.fade) {
         wrapperStyle.push(SnowStyle.component.textButton.fade)
     }
-
 
     if (props.tall && SnowStyle.isWeb) {
         wrapperStyle.push(SnowStyle.component.textButton.tallWrapper)
