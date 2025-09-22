@@ -36,10 +36,10 @@ export function SnowDropdown(props) {
     if (props.title) {
         return <View>
             <SnowLabel center>{props.title}</SnowLabel>
-            <SnowGrid itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
+            <SnowGrid shouldFocus={props.shouldFocus} itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
         </View>
     }
-    return <SnowGrid itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
+    return <SnowGrid shouldFocus={props.shouldFocus} itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
 }
 
 export default SnowDropdown

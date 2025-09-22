@@ -8,6 +8,7 @@ export function SnowHeader(props) {
     return (
         <SnowText
             {...SnowNoFocus.noFocusProps}
+            skipDefault
             center={props.center}
             noSelect={props.noSelect}
             style={SnowStyle.component.header}

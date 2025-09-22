@@ -9,10 +9,7 @@ export function SnowText(props) {
     if (!props.style) {
         style = [SnowStyle.component.text.text]
     }
-    else {
-        style = [props.style]
-    }
-    if (!props.shrink) {
+    if (!props.shrink && !props.skipDefault) {
         style.push(SnowStyle.component.text.normal)
     }
     if (props.noSelect) {

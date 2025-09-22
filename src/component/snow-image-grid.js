@@ -59,6 +59,7 @@ export function SnowImageGrid(props) {
             title={itemName}
         />
     }
+
     return (
         <View>
             {props.title ?
@@ -67,6 +68,7 @@ export function SnowImageGrid(props) {
                 </SnowLabel>
                 : null}
             <SnowGrid
+                shouldFocus={props.shouldFocus}
                 items={props.items}
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}
