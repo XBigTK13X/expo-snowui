@@ -11,11 +11,12 @@
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
     "expo": "~54.0.9",
+    "expo-build-properties": "^1.0.9",
     "expo-image": "^3.0.8",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-native": "0.81.4",
+    "react-native": "npm:react-native-tvos@0.81.4-0",
     "react-native-web": "~0.21.0"
   },
   "private": true,

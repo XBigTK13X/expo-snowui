@@ -9,29 +9,8 @@ GUI components and contexts shared by the snowsuite apps
 npm install react-native-snowui
 ```
 
+Note that your app needs to use `react-native-tvos` as a dep, not `react-native`.
+
 
 ## Usage
-
-
-```js
-import { multiply } from 'react-native-snowui';
-
-// ...
-
-const result = await multiply(3, 7);
-```
-
-
-## Contributing
-
-- [Development workflow](CONTRIBUTING.md#development-workflow)
-- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
-- [Code of conduct](CODE_OF_CONDUCT.md)
-
-## License
-
-MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
+See the example app for how the components work.
