@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 
-export const noFocusProps = {
+export const noFocusContainer = {
     focusable: false,
     isTVSelectable: false,
     tvParallaxProperties: false,
@@ -8,10 +8,18 @@ export const noFocusProps = {
     pointerEvents: "none"
 }
 
+export const noFocusElement = {
+    focusable: false,
+    isTVSelectable: false,
+    tvParallaxProperties: false,
+    importantForAccessibility: "no",
+    pointerEvents: "none"
+}
+
 export function SnowNoFocus(props) {
     return (
         <View
-            {...noFocusProps}
+            {...noFocusContainer}
             style={props.style}
             children={props.children}
         />

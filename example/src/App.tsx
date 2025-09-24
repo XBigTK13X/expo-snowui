@@ -221,8 +221,8 @@ export default function App() {
     <Snow.App snowStyle={styleOverrides}>
       <View>
         <Snow.NoFocus>
-          <Snow.Label {...Snow.NoFocus.noFocusProps}>App Level entities</Snow.Label>
-          <Snow.Text {...Snow.NoFocus.noFocusProps}>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
+          <Snow.Label {...Snow.NoFocus.noFocusElement}>App Level entities</Snow.Label>
+          <Snow.Text {...Snow.NoFocus.noFocusElement}>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
         </Snow.NoFocus>
         <Snow.Grid shouldFocus items={components} renderItem={(item: any, itemIndex: number) => {
           return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />

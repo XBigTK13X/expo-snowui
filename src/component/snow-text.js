@@ -26,7 +26,7 @@ export function SnowText(props) {
     return (
         <SnowNoFocus style={wrapperStyle}>
             <Text
-                {...SnowNoFocus.noFocusProps}
+                {...SnowNoFocus.noFocusElement}
                 style={style}
                 selectable={!props.noSelect}
                 children={props.children} />

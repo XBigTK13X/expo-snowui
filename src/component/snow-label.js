@@ -6,7 +6,7 @@ import SnowNoFocus from './snow-no-focus'
 export function SnowLabel(props) {
     const { SnowStyle } = useStyleContext(props)
     return (<SnowText
-        {...SnowNoFocus.noFocusProps}
+        {...SnowNoFocus.noFocusElement}
         skipDefault
         center={props.center}
         noSelect={props.noSelect}
