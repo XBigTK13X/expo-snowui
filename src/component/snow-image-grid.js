@@ -32,6 +32,10 @@ export function SnowImageGrid(props) {
 
         return <SnowImageButton
             snowStyle={props.snowStyle}
+            nextFocusLeft={props.nextFocusLeft}
+            nextFocusRight={props.nextFocusRight}
+            nextFocusUp={props.nextFocusUp}
+            nextFocusDown={props.nextFocusDown}
             wide={props.wideImage}
             dull={isDull}
             imageUrl={imageUrl}

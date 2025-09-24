@@ -211,6 +211,10 @@ export function SnowRangeSlider(props) {
                 <View style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
                     ref={elementRef}
+                    nextFocusLeft={props.nextFocusLeft}
+                    nextFocusRight={props.nextFocusRight}
+                    nextFocusUp={props.nextFocusUp}
+                    nextFocusDown={props.nextFocusDown}
                     onPress={() => { focusThumb(true) }}
                     onFocus={() => { focusThumb(true) }}
                     focusable={true}

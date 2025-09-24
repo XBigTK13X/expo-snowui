@@ -63,6 +63,10 @@ export function SnowImageButton(props) {
         <View>
             <TouchableOpacity
                 ref={touchRef}
+                nextFocusLeft={props.nextFocusLeft}
+                nextFocusRight={props.nextFocusRight}
+                nextFocusUp={props.nextFocusUp}
+                nextFocusDown={props.nextFocusDown}
                 activeOpacity={1.0}
                 onPress={props.onPress}
                 onLongPress={props.onLongPress}

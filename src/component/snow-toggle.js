@@ -11,6 +11,10 @@ export function SnowToggle(props) {
     return (
         <Pressable
             onPress={toggleValue}
+            nextFocusLeft={props.nextFocusLeft}
+            nextFocusRight={props.nextFocusRight}
+            nextFocusUp={props.nextFocusUp}
+            nextFocusDown={props.nextFocusDown}
             style={SnowStyle.component.toggle.center}>
             <SnowLabel>{props.title}</SnowLabel>
             <Switch

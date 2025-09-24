@@ -81,6 +81,10 @@ export function SnowTextButton(props) {
     return (
         <Pressable
             ref={touchRef}
+            nextFocusLeft={props.nextFocusLeft}
+            nextFocusRight={props.nextFocusRight}
+            nextFocusUp={props.nextFocusUp}
+            nextFocusDown={props.nextFocusDown}
             style={wrapperStyle}
             onPress={onPressUnlessTyping}
             onLongPress={onLongPressUnlessTyping}

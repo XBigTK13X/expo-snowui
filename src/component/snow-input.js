@@ -17,6 +17,10 @@ export function SnowInput(props) {
         style={textStyle}
         secureTextEntry={props.secureTextEntry}
         focusable={props.shouldFocus}
+        nextFocusLeft={props.nextFocusLeft}
+        nextFocusRight={props.nextFocusRight}
+        nextFocusUp={props.nextFocusUp}
+        nextFocusDown={props.nextFocusDown}
         autoFocus={props.shouldFocus}
         onChangeText={(val) => {
             if (props.onValueChange) {

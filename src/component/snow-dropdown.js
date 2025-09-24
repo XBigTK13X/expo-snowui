@@ -25,6 +25,10 @@ export function SnowDropdown(props) {
             }
         }
         return <SnowTextButton
+            nextFocusLeft={props.nextFocusLeft}
+            nextFocusRight={props.nextFocusRight}
+            nextFocusUp={props.nextFocusUp}
+            nextFocusDown={props.nextFocusDown}
             snowStyle={props.snowStyle}
             tall={!props.short}
             fade={selected && props.fade}
