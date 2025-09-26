@@ -21,7 +21,8 @@ export function SnowGrid(props) {
     }
 
     const { SnowStyle } = useStyleContext(props)
-    const [hasFocused, setHasFocused] = React.useState(false)
+
+
     let itemsPerRow = 5
     if (props.itemsPerRow) {
         itemsPerRow = props.itemsPerRow
@@ -59,16 +60,9 @@ export function SnowGrid(props) {
                 columnWrapperStyle={columnStyle}
                 data={items}
                 renderItem={({ item, index, separators }) => {
-                    let child = renderItem(item, index)
-                    if (!hasFocused && index === 0 && React.isValidElement(child)) {
-                        if (!child.props.hasOwnProperty('shouldFocus')) {
-                            setHasFocused(true)
-                            child = React.cloneElement(child, { shouldFocus: props.shouldFocus })
-                        }
-                    }
                     return (
                         <View style={itemStyle}>
-                            {child}
+                            {renderItem(item, index)}
                         </View>
                     )
                 }}

@@ -21,12 +21,13 @@ export function SnowText(props) {
     if (props.center) {
         wrapperStyle = SnowStyle.component.text.center
     }
-    // Without this View wrapper, Android remote buttons try to focus the Text element.
     return (
-        <Text
-            style={style}
-            selectable={!props.noSelect}
-            children={props.children} />
+        <View style={wrapperStyle}>
+            <Text
+                style={style}
+                selectable={!props.noSelect}
+                children={props.children} />
+        </View>
     )
 }
 

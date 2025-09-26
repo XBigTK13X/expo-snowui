@@ -231,16 +231,10 @@ export function createStyle(overrides) {
             }
         },
         label: {
-            default: {
-                fontSize: AppStyle.fontSize.label,
-                color: AppStyle.color.text,
-                margin: 10,
-                padding: 10
-            },
-            center: {
-                alignItems: 'center',
-                width: '100%'
-            }
+            fontSize: AppStyle.fontSize.label,
+            color: AppStyle.color.text,
+            margin: 10,
+            padding: 10
         },
         modal: {
             prompt: {
