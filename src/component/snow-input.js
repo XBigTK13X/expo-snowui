@@ -1,3 +1,4 @@
+import React from 'react'
 import { TextInput } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../context/snow-style-context'
@@ -22,9 +23,7 @@ export function SnowInput(props) {
         onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
     }
     return <TextInput
-        {...props}
         style={textStyle}
-        autoFocus={props.shouldFocus}
         focusable={true}
         editable={true}
         onChangeText={(val) => {
@@ -35,7 +34,11 @@ export function SnowInput(props) {
                 onDebounce(val)
             }
         }}
-        onSubmitEditing={props.onSubmit}
+        onSubmitEditing={() => {
+            if (props.onSubmit) {
+                props.onSubmit()
+            }
+        }}
         value={props.value}
     />
 }

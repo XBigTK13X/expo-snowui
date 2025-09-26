@@ -1,13 +1,11 @@
 import { Text, View } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 import SnowText from './snow-text'
-import SnowNoFocus from './snow-no-focus'
 
 export function SnowHeader(props) {
     const { SnowStyle } = useStyleContext(props)
     return (
         <SnowText
-            {...SnowNoFocus.noFocusElement}
             skipDefault
             center={props.center}
             noSelect={props.noSelect}
