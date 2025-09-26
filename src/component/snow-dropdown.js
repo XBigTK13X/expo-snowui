@@ -3,6 +3,14 @@ import SnowGrid from './snow-grid'
 import SnowTextButton from './snow-text-button'
 import SnowLabel from './snow-label'
 
+/* spread props
+nextFocusLeft
+nextFocusRight
+nextFocusUp
+nextFocusDown
+snowStyle
+*/
+
 export function SnowDropdown(props) {
     if (!props.options) {
         return null
@@ -25,11 +33,7 @@ export function SnowDropdown(props) {
             }
         }
         return <SnowTextButton
-            nextFocusLeft={props.nextFocusLeft}
-            nextFocusRight={props.nextFocusRight}
-            nextFocusUp={props.nextFocusUp}
-            nextFocusDown={props.nextFocusDown}
-            snowStyle={props.snowStyle}
+            {...props}
             tall={!props.short}
             fade={selected && props.fade}
             selected={selected}

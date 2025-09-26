@@ -2,6 +2,13 @@ import { Switch, Pressable } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 import { SnowLabel } from './snow-label'
 
+/* spread props
+nextFocusLeft
+nextFocusRight
+nextFocusUp
+nextFocusDown
+*/
+
 export function SnowToggle(props) {
     const { SnowStyle } = useStyleContext(props)
 
@@ -10,11 +17,8 @@ export function SnowToggle(props) {
     }
     return (
         <Pressable
+            {...props}
             onPress={toggleValue}
-            nextFocusLeft={props.nextFocusLeft}
-            nextFocusRight={props.nextFocusRight}
-            nextFocusUp={props.nextFocusUp}
-            nextFocusDown={props.nextFocusDown}
             style={SnowStyle.component.toggle.center}>
             <SnowLabel>{props.title}</SnowLabel>
             <Switch

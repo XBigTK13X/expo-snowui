@@ -13,6 +13,13 @@ const min = 0.0
 const max = 1.0
 const step = 0.01
 
+/* spread props
+nextFocusLeft
+nextFocusRight
+nextFocusUp
+nextFocusDown
+*/
+
 // This is a tricky component because props.value can be debounced
 // The numerical value the component provides is `percent`
 // This is a float between 0.0 and 1.0, to ease multiplication
@@ -210,11 +217,8 @@ export function SnowRangeSlider(props) {
                 <View style={leftTrackStyle} />
                 <View style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
+                    {...props}
                     ref={elementRef}
-                    nextFocusLeft={props.nextFocusLeft}
-                    nextFocusRight={props.nextFocusRight}
-                    nextFocusUp={props.nextFocusUp}
-                    nextFocusDown={props.nextFocusDown}
                     onPress={() => { focusThumb(true) }}
                     onFocus={() => { focusThumb(true) }}
                     focusable={true}

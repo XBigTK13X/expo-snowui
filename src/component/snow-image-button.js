@@ -4,6 +4,15 @@ import SnowText from './snow-text'
 import { Image } from 'expo-image'
 import { useStyleContext } from '../context/snow-style-context'
 
+/* spread props
+nextFocusLeft
+nextFocusRight
+nextFocusUp
+nextFocusDown
+onPress
+onLongPress
+*/
+
 export function SnowImageButton(props) {
     const { SnowStyle } = useStyleContext(props)
 
@@ -62,14 +71,9 @@ export function SnowImageButton(props) {
     return (
         <View>
             <TouchableOpacity
+                {...props}
                 ref={touchRef}
-                nextFocusLeft={props.nextFocusLeft}
-                nextFocusRight={props.nextFocusRight}
-                nextFocusUp={props.nextFocusUp}
-                nextFocusDown={props.nextFocusDown}
                 activeOpacity={1.0}
-                onPress={props.onPress}
-                onLongPress={props.onLongPress}
                 onFocus={() => { setFocused(true) }}
                 onBlur={() => { setFocused(false) }}
                 style={wrapperStyle}

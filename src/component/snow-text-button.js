@@ -4,6 +4,14 @@ import { useFocusContext } from '../context/snow-focus-context'
 import { useStyleContext } from '../context/snow-style-context'
 import SnowText from './snow-text'
 
+/* spread props
+nextFocusLeft
+nextFocusRight
+nextFocusUp
+nextFocusDown
+*/
+
+
 export function SnowTextButton(props) {
     const { SnowStyle } = useStyleContext(props)
     const { focusIsLocked } = useFocusContext()
@@ -80,11 +88,8 @@ export function SnowTextButton(props) {
 
     return (
         <Pressable
+            {...props}
             ref={touchRef}
-            nextFocusLeft={props.nextFocusLeft}
-            nextFocusRight={props.nextFocusRight}
-            nextFocusUp={props.nextFocusUp}
-            nextFocusDown={props.nextFocusDown}
             style={wrapperStyle}
             onPress={onPressUnlessTyping}
             onLongPress={onLongPressUnlessTyping}
