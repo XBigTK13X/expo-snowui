@@ -1,6 +1,6 @@
 import React from 'react'
+import { Platform, View, useTVEventHandler } from 'react-native'
 import Snow from 'react-native-snowui';
-import { View } from 'react-native'
 
 const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg"
 const wideImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Double-alaskan-rainbow.jpg"
@@ -140,7 +140,7 @@ function RangeSliderTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>
-      <Snow.RangeSlider onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
+      <Snow.RangeSlider setRemoteCallbacks={props.setRemoteCallbacks} onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
     </View>
   )
 }
@@ -198,7 +198,29 @@ export default function App() {
   const [rangeSliderValue, setRangeSliderValue] = React.useState(0.5)
   const [toggleValue, setToggleValue] = React.useState(false)
   const togglePermitted = () => { setToggleValue(!toggleValue) }
+  const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
+  type RemoteCallback = (kind: string, action: number) => void;
+  const remoteCallbacksRef = React.useRef<Record<string, RemoteCallback | null>>({});
 
+  if (Platform.isTV) {
+    const remoteHandler = (remoteEvent: any) => {
+      const callbacks = remoteCallbacksRef.current
+      for (const [_, callback] of Object.entries(callbacks)) {
+        if (callback == null) {
+          continue
+        }
+        // action 0  = start, action 1 = end for longpresses
+        const kind = remoteEvent.eventType
+        const action = remoteEvent.eventKeyAction
+        callback(kind, action)
+      }
+    }
+    useTVEventHandler(remoteHandler);
+  }
+
+  React.useEffect(() => {
+    remoteCallbacksRef.current = remoteCallbacks
+  }, [remoteCallbacks])
 
   let components = [
     ['Break', <BreakTab />],
@@ -210,7 +232,7 @@ export default function App() {
     ['Input', <InputTab inputValue={inputValue} setInputValue={setInputValue} />],
     ['Label', <LabelTab />],
     ['Modal', <ModalTab />],
-    ['Range Slider', <RangeSliderTab setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
+    ['Range Slider', <RangeSliderTab setRemoteCallbacks={setRemoteCallbacks} setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
     ['Tabs', <TabsTab />],
     ['TextButton', <TextButtonTab />],
     ['Text', <TextTab />],

@@ -53,19 +53,28 @@ export function SnowRangeSlider(props) {
         sliderWidth = props.width
     }
 
+    const layoutsRef = React.useRef({
+        slider: sliderWidth,
+        track: 0,
+        thumb: 0,
+        leftTrack: 0,
+        rightTrack: sliderWidth
+    })
+
     let onValueChange = props.onValueChange
     if (props.debounce) {
         onValueChange = useDebouncedCallback(props.onValueChange, SnowConfig.inputDebounceMilliseconds)
     }
 
     const thumbPositionToPercent = (positionX) => {
-        if (positionX < 0) {
-            positionX = 0
+        let actionPositionX = positionX - layoutsRef.current.track.x - (layoutsRef.current.thumb.width / 2)
+        if (actionPositionX < 0) {
+            actionPositionX = 0
         }
-        if (positionX > sliderWidth) {
-            positionX = sliderWidth
+        if (actionPositionX > sliderWidth) {
+            actionPositionX = sliderWidth
         }
-        let newPercent = positionX / sliderWidth
+        let newPercent = actionPositionX / sliderWidth
         if (newPercent < 0) {
             newPercent = 0
         }
@@ -73,7 +82,7 @@ export function SnowRangeSlider(props) {
             newPercent = 1
         }
         setPercent(newPercent)
-        onValueChange(newPercent)
+        percentRef.current = newPercent
     }
 
     const panRef = React.useRef(
@@ -82,18 +91,26 @@ export function SnowRangeSlider(props) {
             onMoveShouldSetPanResponder: () => true,
             onPanResponderEnd: () => {
                 isDraggingRef.current = false
+                onValueChange(percentRef.current)
             },
             onPanResponderRelease: () => {
                 isDraggingRef.current = false
+                onValueChange(percentRef.current)
             },
-            onPanResponderMove: (pressEvent) => {
+            onPanResponderMove: (pressEvent, gestureState) => {
                 isDraggingRef.current = true
-                const positionX = pressEvent.nativeEvent.locationX
+                let positionX = gestureState.moveX
+                if (!positionX) {
+                    positionX = gestureState.x0
+                }
                 thumbPositionToPercent(positionX)
             },
-            onPanResponderGrant: (pressEvent) => {
+            onPanResponderGrant: (pressEvent, gestureState) => {
                 isDraggingRef.current = true
-                const positionX = pressEvent.nativeEvent.locationX
+                let positionX = gestureState.moveX
+                if (!positionX) {
+                    positionX = gestureState.x0
+                }
                 thumbPositionToPercent(positionX)
             }
         })
@@ -190,7 +207,13 @@ export function SnowRangeSlider(props) {
         }
     ]
 
-    const thumbX = percent * sliderWidth
+    let thumbX = 0
+    if (isDraggingRef.current) {
+        thumbX = percent * sliderWidth
+    }
+    else {
+        thumbX = percentRef.current * sliderWidth
+    }
 
     const leftTrackStyle = [
         SnowStyle.component.rangeSlider.leftTrack,
@@ -211,13 +234,22 @@ export function SnowRangeSlider(props) {
         })
     }
 
+    const handleLayout = (kind) => {
+        return (event) => {
+            let widths = { ...layoutsRef.current }
+            widths[kind] = event.nativeEvent.layout
+            layoutsRef.current = widths
+        };
+    }
+
     return (
-        <View style={SnowStyle.component.rangeSlider.wrapper}>
-            <View {...panRef.current.panHandlers} style={trackWrapperStyle}>
-                <View style={leftTrackStyle} />
-                <View style={SnowStyle.component.rangeSlider.rightTrack} />
+        <View onLayout={handleLayout('slider')} style={SnowStyle.component.rangeSlider.wrapper}>
+            <View {...panRef.current.panHandlers} onLayout={handleLayout('track')} style={trackWrapperStyle}>
+                <View onLayout={handleLayout('leftTrack')} style={leftTrackStyle} />
+                <View onLayout={handleLayout('rightTrack')} style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
                     {...props}
+                    onLayout={handleLayout('thumb')}
                     ref={elementRef}
                     onPress={() => { focusThumb(true) }}
                     onFocus={() => { focusThumb(true) }}

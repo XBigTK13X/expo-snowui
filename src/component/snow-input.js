@@ -23,6 +23,7 @@ export function SnowInput(props) {
         onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
     }
     return <TextInput
+        {...props}
         style={textStyle}
         focusable={true}
         editable={true}
