@@ -209,6 +209,7 @@ export default function App() {
 
   if (Platform.isTV) {
     const remoteHandler = (remoteEvent: any) => {
+      console.log({ remoteEvent })
       const callbacks = remoteCallbacksRef.current
       for (const [_, callback] of Object.entries(callbacks)) {
         if (callback == null) {

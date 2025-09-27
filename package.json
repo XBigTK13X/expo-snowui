@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GUI components and contexts shared by the snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -32,7 +32,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-snowui-example",
+    "example": "yarn workspace expo-snowui-example",
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -47,14 +47,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XBigTK13X/react-native-snowui.git"
+    "url": "git+https://github.com/XBigTK13X/expo-snowui.git"
   },
   "author": "XBigTK13X <xbigtk13x@gmail.com> (https://github.com/XBigTK13X)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/XBigTK13X/react-native-snowui/issues"
+    "url": "https://github.com/XBigTK13X/expo-snowui/issues"
   },
-  "homepage": "https://github.com/XBigTK13X/react-native-snowui#readme",
+  "homepage": "https://github.com/XBigTK13X/expo-snowui#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

@@ -19,8 +19,10 @@ export function SnowText(props) {
         wrapperStyle = SnowStyle.component.text.center
     }
     return (
-        <View style={wrapperStyle}>
+        <View
+            style={wrapperStyle}>
             <Text
+                {...noFocusProps}
                 style={style}
                 selectable={!props.noSelect}
                 children={props.children} />

@@ -4,12 +4,17 @@ import SnowText from './snow-text'
 
 export function SnowLabel(props) {
     const { SnowStyle } = useStyleContext(props)
+
+    let style = [SnowStyle.component.label]
+    if (props.style) {
+        style.push(props.style)
+    }
     return (
         <SnowText
             skipDefault
             center={props.center}
             noSelect={props.noSelect}
-            style={SnowStyle.component.label}
+            style={style}
             children={props.children}
         />
     )
