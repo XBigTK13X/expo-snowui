@@ -79,8 +79,6 @@
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^29.7.0",
     "prettier": "^3.6.2",
-    "react": "19.1.0",
-    "react-native": "npm:react-native-tvos@0.81.4-0",
     "react-native-builder-bob": "^0.40.13",
     "release-it": "^19.0.4",
     "typescript": "^5.9.2"
@@ -158,6 +156,8 @@
     "expo": "^54.0.9",
     "expo-image": "^3.0.8",
     "lodash": "^4.17.21",
+    "react": "19.1.0",
+    "react-native": "npm:react-native-tvos@0.81.4-0",
     "use-debounce": "^10.0.6"
   }
 }

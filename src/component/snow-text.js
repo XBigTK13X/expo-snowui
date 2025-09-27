@@ -22,7 +22,6 @@ export function SnowText(props) {
         <View
             style={wrapperStyle}>
             <Text
-                {...noFocusProps}
                 style={style}
                 selectable={!props.noSelect}
                 children={props.children} />

@@ -21,8 +21,7 @@ export function FocusContextProvider(props) {
         allowFocusing,
         lockedElement,
         setLockedElement,
-        focusIsLocked,
-        noFocusProps
+        focusIsLocked
     }
     return (
         <FocusContext.Provider
