@@ -294,8 +294,6 @@ export function createStyle(overrides) {
             panel: {
                 backgroundColor: AppStyle.color.panel,
                 marginTop: isWeb ? -16 : -18,
-                marginLeft: 15,
-                marginRight: 24,
                 borderRadius: AppStyle.button.borderRadius,
                 borderWidth: 1,
                 borderColor: 'transparent',

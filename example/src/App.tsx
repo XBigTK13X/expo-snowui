@@ -42,7 +42,10 @@ function DropdownTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Dropdown</Snow.Label>
-      <Snow.Dropdown options={['Yes', 'No']} valueIndex={props.dropdownIndex} onValueChange={props.setDropdownIndex} />
+      <Snow.Dropdown
+        options={['Yes', 'No']}
+        valueIndex={props.dropdownIndex}
+        onValueChange={props.setDropdownIndex} />
     </View>
   )
 }
@@ -167,7 +170,9 @@ function TextButtonTab() {
   return (
     <View>
       <Snow.Label>TextButton</Snow.Label>
-      <Snow.TextButton title="I am a button" />
+      <Snow.Grid itemsPerRow={3}>
+        <Snow.TextButton title="I am a button" />
+      </Snow.Grid>
     </View>
   )
 }

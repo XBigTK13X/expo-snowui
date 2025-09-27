@@ -34,7 +34,6 @@ export function SnowDropdown(props) {
         }
         return <SnowTextButton
             {...props}
-            tall={!props.short}
             fade={selected && props.fade}
             selected={selected}
             title={item.name ? item.name : item}
@@ -44,10 +43,22 @@ export function SnowDropdown(props) {
     if (props.title) {
         return <View>
             <SnowLabel center>{props.title}</SnowLabel>
-            <SnowGrid shouldFocus={props.shouldFocus} itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
+            <SnowGrid
+                shouldFocus={props.shouldFocus}
+                itemsPerRow={props.itemsPerRow}
+                items={props.options}
+                renderItem={renderItem}
+            />
         </View>
     }
-    return <SnowGrid shouldFocus={props.shouldFocus} itemsPerRow={props.itemsPerRow} items={props.options} renderItem={renderItem} />
+    return (
+        <SnowGrid
+            shouldFocus={props.shouldFocus}
+            itemsPerRow={props.itemsPerRow}
+            items={props.options}
+            renderItem={renderItem}
+        />
+    )
 }
 
 export default SnowDropdown

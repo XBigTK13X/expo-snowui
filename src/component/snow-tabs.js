@@ -46,7 +46,6 @@ export function SnowTabs(props) {
         <View>
             <SnowDropdown
                 snowStyle={tabStyle}
-                short
                 fade
                 options={props.headers}
                 onValueChange={setTabIndex}
