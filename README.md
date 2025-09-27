@@ -1,4 +1,4 @@
-# react-native-snowui
+# expo-snowui
 
 GUI components and contexts shared by the snowsuite apps
 
@@ -6,7 +6,7 @@ GUI components and contexts shared by the snowsuite apps
 
 
 ```sh
-npm install react-native-snowui
+npm install expo-snowui
 ```
 
 Note that your app needs to use `react-native-tvos` as a dep, not `react-native`.

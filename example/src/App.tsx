@@ -1,6 +1,6 @@
 import React from 'react'
 import { Platform, View, useTVEventHandler } from 'react-native'
-import Snow from 'react-native-snowui';
+import Snow from 'expo-snowui';
 
 const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg"
 const wideImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Double-alaskan-rainbow.jpg"
@@ -151,7 +151,7 @@ function RangeSliderTab(props: any) {
 function TabsTab() {
   return (
     <View>
-      <Snow.Label>Tabs</Snow.Label>
+      <Snow.Label>Component: Tabs</Snow.Label>
       <Snow.Tabs headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
         <Snow.Text>You have reached the second tab.</Snow.Text>
@@ -169,7 +169,7 @@ function TabsTab() {
 function TextButtonTab() {
   return (
     <View>
-      <Snow.Label>TextButton</Snow.Label>
+      <Snow.Label>Component: TextButton</Snow.Label>
       <Snow.Grid itemsPerRow={3}>
         <Snow.TextButton title="I am a button" />
       </Snow.Grid>
@@ -249,6 +249,7 @@ export default function App() {
       <View>
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
+        <Snow.Label>Components</Snow.Label>
         <Snow.Grid shouldFocus items={components} renderItem={(item: any, itemIndex: number) => {
           return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
         }} />
