@@ -4,10 +4,7 @@ import { useStyleContext } from '../context/snow-style-context'
 export function SnowText(props) {
     const { SnowStyle } = useStyleContext(props)
 
-    let style = []
-    if (!props.style) {
-        style = [SnowStyle.component.text.text]
-    }
+    let style = [SnowStyle.component.text.text]
     if (!props.shrink && !props.skipDefault) {
         style.push(SnowStyle.component.text.normal)
     }
