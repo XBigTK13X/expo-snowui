@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
+import { noFocusProps } from '../context/snow-focus-context'
 import SnowText from './snow-text'
 
 export function SnowLabel(props) {
@@ -9,8 +10,10 @@ export function SnowLabel(props) {
     if (props.style) {
         style.push(props.style)
     }
+
     return (
         <SnowText
+            {...noFocusProps}
             skipDefault
             center={props.center}
             noSelect={props.noSelect}

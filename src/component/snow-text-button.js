@@ -96,7 +96,7 @@ export function SnowTextButton(props) {
             focusable={allowFocus || focused}
             onFocus={() => { changeFocus(true) }}
             onBlur={() => { changeFocus(false) }}
-            hasTVPreferredFocus={props.shouldFocus && !Keyboard.isVisible}
+            hasTVPreferredFocus={props.shouldFocus && !Keyboard.isVisible()}
             disabled={props.disabled}>
             <SnowText noSelect style={textStyle}>{props.title}</SnowText>
         </Pressable >

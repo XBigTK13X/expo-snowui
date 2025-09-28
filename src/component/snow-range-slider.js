@@ -39,7 +39,7 @@ nextFocusDown
 // After a handful of other libraries still had problems, I rolled my own
 export function SnowRangeSlider(props) {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { allowFocusing, setLockedElement, lockedElement } = useFocusContext()
+    const { setRemoteCallbacks } = useFocusContext()
 
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(0)
@@ -127,19 +127,16 @@ export function SnowRangeSlider(props) {
     }, [percent])
 
     React.useEffect(() => {
-        if (props.setRemoteCallbacks) {
-            props.setRemoteCallbacks((callbacks) => {
-                callbacks['slider'] = sliderHandleRemote
+        setRemoteCallbacks((callbacks) => {
+            callbacks['slider'] = sliderHandleRemote
+            return callbacks
+        })
+        return () => {
+            setRemoteCallbacks((callbacks) => {
+                callbacks['slider'] = null
                 return callbacks
             })
-            return () => {
-                props.setRemoteCallbacks((callbacks) => {
-                    callbacks['slider'] = null
-                    return callbacks
-                })
-            }
         }
-
     })
 
     const applyStep = (amount) => {

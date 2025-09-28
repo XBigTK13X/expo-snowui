@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, View, useTVEventHandler } from 'react-native'
+import { View } from 'react-native'
 import Snow from 'expo-snowui';
 
 const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg"
@@ -143,7 +143,7 @@ function RangeSliderTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>
-      <Snow.RangeSlider setRemoteCallbacks={props.setRemoteCallbacks} onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
+      <Snow.RangeSlider onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
     </View>
   )
 }
@@ -195,7 +195,7 @@ function ToggleTab(props: any) {
   )
 }
 
-export default function App() {
+function AppPage() {
   const [tabIndex, setTabIndex] = React.useState(0)
 
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
@@ -203,30 +203,6 @@ export default function App() {
   const [rangeSliderValue, setRangeSliderValue] = React.useState(0.5)
   const [toggleValue, setToggleValue] = React.useState(false)
   const togglePermitted = () => { setToggleValue(!toggleValue) }
-  const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
-  type RemoteCallback = (kind: string, action: number) => void;
-  const remoteCallbacksRef = React.useRef<Record<string, RemoteCallback | null>>({});
-
-  if (Platform.isTV) {
-    const remoteHandler = (remoteEvent: any) => {
-      console.log({ remoteEvent })
-      const callbacks = remoteCallbacksRef.current
-      for (const [_, callback] of Object.entries(callbacks)) {
-        if (callback == null) {
-          continue
-        }
-        // action 0  = start, action 1 = end for longpresses
-        const kind = remoteEvent.eventType
-        const action = remoteEvent.eventKeyAction
-        callback(kind, action)
-      }
-    }
-    useTVEventHandler(remoteHandler);
-  }
-
-  React.useEffect(() => {
-    remoteCallbacksRef.current = remoteCallbacks
-  }, [remoteCallbacks])
 
   let components = [
     ['Break', <BreakTab />],
@@ -238,7 +214,7 @@ export default function App() {
     ['Input', <InputTab inputValue={inputValue} setInputValue={setInputValue} />],
     ['Label', <LabelTab />],
     ['Modal', <ModalTab />],
-    ['Range Slider', <RangeSliderTab setRemoteCallbacks={setRemoteCallbacks} setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
+    ['Range Slider', <RangeSliderTab setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
     ['Tabs', <TabsTab />],
     ['TextButton', <TextButtonTab />],
     ['Text', <TextTab />],
@@ -246,12 +222,12 @@ export default function App() {
   ]
 
   return (
-    <Snow.App snowStyle={styleOverrides}>
+    <View>
       <View>
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
         <Snow.Label>Components</Snow.Label>
-        <Snow.Grid shouldFocus items={components} renderItem={(item: any, itemIndex: number) => {
+        <Snow.Grid focusKey={"comp-buttons"} focusDown={`component-tab-current`} items={components} renderItem={(item: any, itemIndex: number) => {
           return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
         }} />
         <Snow.Break />
@@ -259,6 +235,14 @@ export default function App() {
       <View>
         {components[tabIndex]?.[1]}
       </View>
+    </View>
+  )
+}
+
+export default function App() {
+  return (
+    <Snow.App snowStyle={styleOverrides}>
+      <AppPage />
     </Snow.App>
   );
 }

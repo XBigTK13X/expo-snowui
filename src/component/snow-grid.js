@@ -1,7 +1,9 @@
 import React from 'react'
 import {
     View,
-    FlatList
+    FlatList,
+    Platform,
+    TVFocusGuideView
 } from 'react-native'
 
 import { useStyleContext } from '../context/snow-style-context'
@@ -22,6 +24,13 @@ export function SnowGrid(props) {
 
     const { SnowStyle } = useStyleContext(props)
 
+    const [didFocus, setDidFocus] = React.useState(false)
+
+    React.useEffect(() => {
+        if (!didFocus && props.shouldFocus) {
+            setDidFocus(true)
+        }
+    })
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -51,8 +60,9 @@ export function SnowGrid(props) {
         // If you try to style the column when 1 item per row, flat list throws an error
         columnStyle = SnowStyle.component.grid.list
     }
+
     return (
-        <View style={gridStyle}>
+        < View style={gridStyle} >
             <FlatList
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
@@ -60,9 +70,27 @@ export function SnowGrid(props) {
                 columnWrapperStyle={columnStyle}
                 data={items}
                 renderItem={({ item, index, separators }) => {
+                    let child = renderItem(item, index)
+
+                    let focus = {}
+                    if (props.focusDown) {
+                        focus.focusDown = props.focusDown
+                    }
+                    if (props.focusUp) {
+                        focus.focusUp = props.focusUp
+                    }
+                    let row = Math.floor(index / itemsPerRow)
+                    let column = index % itemsPerRow
+                    child = React.cloneElement(child,
+                        {
+                            ...focus,
+                            focusKey: `${props.focusKey}-row-${row}-column-${column}`
+                        }
+                    )
+
                     return (
                         <View style={itemStyle}>
-                            {renderItem(item, index)}
+                            {child}
                         </View>
                     )
                 }}

@@ -19,3 +19,5 @@ npx yarn install
 cd example
 npx yarn install
 cd ..
+
+# script/patch-react.sh
