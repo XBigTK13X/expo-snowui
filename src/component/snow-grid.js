@@ -60,7 +60,7 @@ export function SnowGrid(props) {
     }
 
     const maxColumn = itemsPerRow
-    const maxRow = Math.ceil(items.length / itemsPerRow)
+    const maxRow = Math.floor(items.length / itemsPerRow)
 
     return (
         < View style={gridStyle} >

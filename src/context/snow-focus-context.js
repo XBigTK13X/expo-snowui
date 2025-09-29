@@ -42,6 +42,13 @@ focusUp,focusRight,focusDown,focusLeft
 */
 
 
+const oppositeDirections = {
+    'up': 'down',
+    'left': 'right',
+    'down': 'up',
+    'right': 'left'
+}
+
 export function FocusContextProvider(props) {
     const [mapKeys, setMapKeys] = React.useState({})
     const mapKeysRef = React.useRef(mapKeys)
@@ -106,9 +113,15 @@ export function FocusContextProvider(props) {
         })
     }
 
-    const addFocusMap = (elementRef, elementProps) => {
+    const addFocusMap = (elementRef, elementProps, onPress, onLongPress) => {
         const mapKey = elementProps.focusKey
-        const refs = { mapKey: elementRef }
+        const refs = {
+            [mapKey]: {
+                element: elementRef,
+                onPress,
+                onLongPress
+            }
+        }
         const directions = {
             [mapKey]: {
                 'up': elementProps.focusUp,
@@ -157,7 +170,20 @@ export function FocusContextProvider(props) {
         ) {
             return false
         }
-        setFocusedKey(focusMap.directions[focusedKeyRef.current][direction])
+        let nextFocusKey = focusMap.directions[focusedKeyRef.current][direction]
+        if (!focusMap.directions[nextFocusKey][oppositeDirections[direction]]) {
+            setFocusMaps((prev) => {
+                let result = [...prev]
+                let directions = {
+                    [nextFocusKey]: {
+                        [oppositeDirections[direction]]: focusedKeyRef.current
+                    }
+                }
+                result[result.length - 1] = _.merge({}, result[result.length - 1], { directions })
+                return result
+            })
+        }
+        setFocusedKey(nextFocusKey)
     }
 
     const moveFocusRight = () => {
@@ -176,53 +202,85 @@ export function FocusContextProvider(props) {
         moveFocus('down')
     }
 
+    const pressFocusedElement = () => {
+        const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
+        if (!focusMap.refs ||
+            !focusMap.refs[focusedKeyRef.current] ||
+            !focusMap.refs[focusedKeyRef.current].onPress) {
+            return false
+        }
+        return focusMap.refs[focusedKeyRef.current].onPress()
+    }
+
+    const longPressFocusedElement = () => {
+        const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
+        if (!focusMap.refs ||
+            !focusMap.refs[focusedKeyRef.current] ||
+            !focusMap.refs[focusedKeyRef.current].onLongPress) {
+            return false
+        }
+        return focusMap.refs[focusedKeyRef.current].onLongPress()
+    }
+
     if (Platform.isTV) {
         const remoteHandler = (remoteEvent) => {
-            console.log({ remoteEvent })
             const callbacks = remoteCallbacksRef.current
+            // action 0  = start, action 1 = end for longpresses
+            const kind = remoteEvent.eventType
+            const action = remoteEvent.eventKeyAction
             for (const [_, callback] of Object.entries(callbacks)) {
                 if (callback == null) {
                     continue
                 }
-                // action 0  = start, action 1 = end for longpresses
-                const kind = remoteEvent.eventType
-                const action = remoteEvent.eventKeyAction
-                if (kind === 'up') {
-                    moveFocusUp()
-                }
-                if (kind === 'down') {
-                    moveFocusDown()
-                }
-                if (kind === 'left') {
-                    moveFocusLeft()
-                }
-                if (kind === 'right') {
-                    moveFocusRight()
-                }
                 callback(kind, action)
             }
+            switch (kind) {
+                case 'up':
+                    moveFocusUp()
+                    break
+                case 'down':
+                    moveFocusDown()
+                    break
+                case 'right':
+                    moveFocusRight()
+                    break
+                case 'left':
+                    moveFocusLeft()
+                    break
+                default:
+                    break
 
+            }
+            useTVEventHandler(remoteHandler);
         }
-        useTVEventHandler(remoteHandler);
     }
+
     if (Platform.OS === 'web') {
         React.useEffect(() => {
             const focusKeyboardHandler = (event) => {
                 switch (event.key) {
+                    case 'Enter':
+                        if (event.code === 'NumpadEnter') {
+                            longPressFocusedElement()
+                        }
+                        else {
+                            pressFocusedElement()
+                        }
+                        break
                     case 'ArrowUp':
                         moveFocusUp()
-                        break;
+                        break
                     case 'ArrowDown':
                         moveFocusDown()
-                        break;
+                        break
                     case 'ArrowLeft':
                         moveFocusLeft()
-                        break;
+                        break
                     case 'ArrowRight':
                         moveFocusRight()
-                        break;
+                        break
                     default:
-                        break;
+                        break
                 }
             };
             window.addEventListener('keydown', focusKeyboardHandler);

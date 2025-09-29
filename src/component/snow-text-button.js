@@ -14,14 +14,23 @@ nextFocusDown
 
 export function SnowTextButton(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { DEBUG_FOCUS, isFocused, addFocusMap, setFocusedKey } = useFocusContext()
+    const { isFocused, addFocusMap, setFocusedKey } = useFocusContext()
     const touchRef = React.useRef(null)
 
-    React.useEffect(() => {
-        if (DEBUG_FOCUS) {
-            console.log({ action: 'SnowTextButton->addFocusMap', touchRef, props })
+    const onPressUnlessTyping = () => {
+        if (props.onPress && !Keyboard.isVisible()) {
+            return props.onPress()
         }
-        addFocusMap(touchRef, props)
+    }
+
+    const onLongPressUnlessTyping = () => {
+        if (props.onLongPress && !Keyboard.isVisible()) {
+            return props.onLongPress()
+        }
+    }
+
+    React.useEffect(() => {
+        addFocusMap(touchRef, props, onPressUnlessTyping, onLongPressUnlessTyping)
         if (props.focusStart) {
             setFocusedKey(props.focusKey)
         }
@@ -64,18 +73,6 @@ export function SnowTextButton(props) {
     if (props.short) {
         wrapperStyle.push(SnowStyle.component.textButton.shortWrapper)
         textStyle.push(SnowStyle.component.textButton.smallText)
-    }
-
-    const onPressUnlessTyping = () => {
-        if (props.onPress && !Keyboard.isVisible()) {
-            return props.onPress()
-        }
-    }
-
-    const onLongPressUnlessTyping = () => {
-        if (props.onLongPress && !Keyboard.isVisible()) {
-            return props.onLongPress()
-        }
     }
 
     return (
