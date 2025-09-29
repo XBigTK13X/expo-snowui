@@ -250,7 +250,6 @@ export function SnowRangeSlider(props) {
                     ref={elementRef}
                     onPress={() => { focusThumb(true) }}
                     onFocus={() => { focusThumb(true) }}
-                    focusable={true}
                     style={thumbStyle} />
             </View>
         </View>

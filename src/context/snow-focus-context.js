@@ -1,21 +1,11 @@
 import React from 'react';
 import _ from 'lodash'
-import { Platform, useTVEventHandler, Keyboard } from 'react-native'
+import { Platform, useTVEventHandler, Keyboard, findNodeHandle } from 'react-native'
 import { SnowSafeArea } from '../component/snow-safe-area'
 
 const FocusContext = React.createContext({});
 
 let DEBUG_FOCUS = false
-
-export const noFocusProps = Platform.isTV ? {
-    focusable: false,
-    importantForAccessibility: "no",
-    accessible: false,
-    pointerEvents: "none",
-    collapsable: false,
-    focusable: false,
-    clickable: false
-} : {}
 
 export function useFocusContext() {
     const value = React.useContext(FocusContext);
@@ -154,6 +144,11 @@ export function FocusContextProvider(props) {
         setMapKeys({})
     }
 
+    const focusOn = (elementRef, focusKey) => {
+        elementRef.current.focus()
+        setFocusedKey(focusKey)
+    }
+
     const moveFocus = (direction) => {
         if (DEBUG_FOCUS) {
             console.log({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
@@ -171,7 +166,14 @@ export function FocusContextProvider(props) {
             return false
         }
         let nextFocusKey = focusMap.directions[focusedKeyRef.current][direction]
-        if (!focusMap.directions[nextFocusKey][oppositeDirections[direction]]) {
+        const hasReverseMapping = focusMap.directions[nextFocusKey][oppositeDirections[direction]]
+        const hasTransientMapping = focusMap.transient && focusMap.transient[nextFocusKey] && focusMap.transient[nextFocusKey][oppositeDirections[direction]]
+        if (!hasReverseMapping || hasTransientMapping) {
+            let transient = {
+                [nextFocusKey]: {
+                    [oppositeDirections[direction]]: focusedKeyRef.current
+                }
+            }
             setFocusMaps((prev) => {
                 let result = [...prev]
                 let directions = {
@@ -179,11 +181,11 @@ export function FocusContextProvider(props) {
                         [oppositeDirections[direction]]: focusedKeyRef.current
                     }
                 }
-                result[result.length - 1] = _.merge({}, result[result.length - 1], { directions })
+                result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
                 return result
             })
         }
-        setFocusedKey(nextFocusKey)
+        focusOn(focusMap.refs[nextFocusKey].element, nextFocusKey)
     }
 
     const moveFocusRight = () => {
@@ -303,7 +305,7 @@ export function FocusContextProvider(props) {
         focusedKey,
         isFocused,
         setRemoteCallbacks,
-        setFocusedKey,
+        focusOn,
         addFocusLayer,
         popFocusLayer,
         addFocusMap,

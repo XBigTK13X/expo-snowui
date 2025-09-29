@@ -25,7 +25,6 @@ export function SnowInput(props) {
     return <TextInput
         {...props}
         style={textStyle}
-        focusable={true}
         editable={true}
         onChangeText={(val) => {
             if (props.onValueChange) {

@@ -77,7 +77,6 @@ export function SnowImageButton(props) {
                 onFocus={() => { setFocused(true) }}
                 onBlur={() => { setFocused(false) }}
                 style={wrapperStyle}
-                focusable={true}
                 hasTVPreferredFocus={props.shouldFocus}
             >
                 <Image

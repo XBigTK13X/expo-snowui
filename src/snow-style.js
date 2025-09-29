@@ -313,7 +313,9 @@ export function createStyle(overrides) {
                 backgroundColor: AppStyle.color.core,
                 borderWidth: AppStyle.button.borderRadius,
                 borderColor: AppStyle.color.core,
-                borderRadius: AppStyle.button.borderRadius
+                borderRadius: AppStyle.button.borderRadius,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
             },
             tallWrapper: {
                 height: 80,

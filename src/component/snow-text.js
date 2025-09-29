@@ -1,6 +1,5 @@
 import { View, Text } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
-import { noFocusProps } from '../context/snow-focus-context'
 
 export function SnowText(props) {
     const { SnowStyle } = useStyleContext(props)
@@ -21,10 +20,8 @@ export function SnowText(props) {
     }
     return (
         <View
-            {...noFocusProps}
             style={wrapperStyle}>
             <Text
-                {...noFocusProps}
                 style={style}
                 selectable={!props.noSelect}
                 children={props.children} />

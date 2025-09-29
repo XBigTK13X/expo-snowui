@@ -65,7 +65,6 @@ export function SnowGrid(props) {
     return (
         < View style={gridStyle} >
             <FlatList
-                focusable={false}
                 scrollEnabled={props.scroll === true}
                 numColumns={itemsPerRow}
                 contentContainerStyle={SnowStyle.component.grid.list}
