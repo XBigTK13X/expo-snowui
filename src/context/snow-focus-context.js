@@ -235,6 +235,14 @@ export function FocusContextProvider(props) {
                 callback(kind, action)
             }
             switch (kind) {
+                case 'select':
+                    pressFocusedElement()
+                    break
+                case 'longselect':
+                    if (action === 1) {
+                        longPressFocusedElement()
+                    }
+                    break
                 case 'up':
                     moveFocusUp()
                     break
@@ -251,8 +259,9 @@ export function FocusContextProvider(props) {
                     break
 
             }
-            useTVEventHandler(remoteHandler);
+
         }
+        useTVEventHandler(remoteHandler);
     }
 
     if (Platform.OS === 'web') {

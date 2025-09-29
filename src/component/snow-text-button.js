@@ -80,6 +80,7 @@ export function SnowTextButton(props) {
             {...props}
             ref={touchRef}
             style={wrapperStyle}
+            focusable={false}
             onPress={onPressUnlessTyping}
             onLongPress={onLongPressUnlessTyping}
             disabled={props.disabled}>
