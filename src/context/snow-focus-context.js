@@ -16,11 +16,7 @@ export function useFocusContext() {
 }
 
 // TODO
-
-// Handle props.shouldFocus && !Keyboard.isVisible()
-// Always disallows focus changing when the Keyboard is showing on Android or TV
 // Focus can get lost if in a tabs element there is only text. Nothing inside the tab should be selectable, but the outer view gets a focusKey
-// In a grid with a row of 5 followed by a row of 4, the right grid column elements cannot move to the bottom row
 
 /* Relevant props
 focusStart
@@ -147,6 +143,9 @@ export function FocusContextProvider(props) {
     }
 
     const moveFocus = (direction) => {
+        if (Keyboard.isVisible()) {
+            return false
+        }
         if (DEBUG_FOCUS) {
             console.log({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
         }
