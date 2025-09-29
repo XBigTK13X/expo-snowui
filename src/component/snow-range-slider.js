@@ -13,13 +13,6 @@ const min = 0.0
 const max = 1.0
 const step = 0.01
 
-/* spread props
-nextFocusLeft
-nextFocusRight
-nextFocusUp
-nextFocusDown
-*/
-
 // This is a tricky component because props.value can be debounced
 // The numerical value the component provides is `percent`
 // This is a float between 0.0 and 1.0, to ease multiplication
@@ -39,14 +32,21 @@ nextFocusDown
 // After a handful of other libraries still had problems, I rolled my own
 export function SnowRangeSlider(props) {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { setRemoteCallbacks } = useFocusContext()
-
+    const { setRemoteCallbacks, addFocusMap, focusOn, isFocused } = useFocusContext()
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(0)
     const percentRef = React.useRef(percent)
-    const [thumbFocus, setThumbFocus] = React.useState(false)
-    const elementRef = React.useRef(null)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
+    const elementRef = React.useRef(null)
+
+    React.useEffect(() => {
+        if (elementRef.current) {
+            addFocusMap(elementRef, props)
+            if (props.focusStart) {
+                focusOn(elementRef, props.focusKey)
+            }
+        }
+    }, [props.focusKey])
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
     if (props.width) {
@@ -163,7 +163,7 @@ export function SnowRangeSlider(props) {
     }
 
     const sliderHandleRemote = (kind, action) => {
-        if (lockedElement) {
+        if (isFocused(props.focusKey)) {
             if (kind === 'right') {
                 applyStep(step)
                 clearInterval(applyStepInterval)
@@ -178,23 +178,15 @@ export function SnowRangeSlider(props) {
             else if (kind === 'longLeft') {
                 longPress(-step * 2, action)
             }
-            else if (kind === 'down') {
-                focusThumb(false)
-            }
         }
     }
 
-    const focusThumb = (focus) => {
-        if (allowFocusing) {
-            if (focus !== thumbFocus) {
-                if (focus) {
-                    setLockedElement(findNodeHandle(elementRef.current))
-                } else {
-                    setLockedElement(null)
-                }
-                setThumbFocus(focus)
-            }
-        }
+    const handleLayout = (kind) => {
+        return (event) => {
+            let widths = { ...layoutsRef.current }
+            widths[kind] = event.nativeEvent.layout
+            layoutsRef.current = widths
+        };
     }
 
     const trackWrapperStyle = [
@@ -225,18 +217,10 @@ export function SnowRangeSlider(props) {
             left: thumbX - SnowStyle.component.rangeSlider.thumb.width / 2
         }
     ]
-    if (thumbFocus) {
+    if (isFocused(props.focusKey)) {
         thumbStyle.push({
-            backgroundColor: 'white'
+            backgroundColor: SnowStyle.color.hover
         })
-    }
-
-    const handleLayout = (kind) => {
-        return (event) => {
-            let widths = { ...layoutsRef.current }
-            widths[kind] = event.nativeEvent.layout
-            layoutsRef.current = widths
-        };
     }
 
     return (
@@ -245,12 +229,14 @@ export function SnowRangeSlider(props) {
                 <View onLayout={handleLayout('leftTrack')} style={leftTrackStyle} />
                 <View onLayout={handleLayout('rightTrack')} style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
-                    {...props}
-                    onLayout={handleLayout('thumb')}
                     ref={elementRef}
-                    onPress={() => { focusThumb(true) }}
-                    onFocus={() => { focusThumb(true) }}
-                    style={thumbStyle} />
+                    style={thumbStyle}
+                    onLayout={handleLayout('thumb')}
+                    focusStart={props.focusStart}
+                    focusKey={props.focusKey}
+                    focusUp={props.focusUp}
+                    focusDown={props.focusDown}
+                />
             </View>
         </View>
     );
