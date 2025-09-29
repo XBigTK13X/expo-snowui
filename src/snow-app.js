@@ -14,7 +14,7 @@ export function SnowApp(props) {
     return (
         <ScrollView style={{ flex: 1, backgroundColor: 'black' }} contentContainerStyle={rootInnerStyle}>
             <StyleContextProvider snowStyle={props.snowStyle} snowConfig={props.snowConfig}>
-                <FocusContextProvider>
+                <FocusContextProvider DEBUG_FOCUS={props.DEBUG_FOCUS}>
                     <View style={{ flex: 1, marginBottom: 50 }}>
                         {props.children}
                     </View>

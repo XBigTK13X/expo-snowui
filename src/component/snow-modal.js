@@ -1,9 +1,30 @@
+import React from 'react'
 import { Modal } from 'react-native'
-import SnowFillView from './snow-fill-view'
 import { useStyleContext } from '../context/snow-style-context'
+import { useFocusContext } from '../context/snow-focus-context'
+import SnowFillView from './snow-fill-view'
+import SnowText from './snow-text'
 
 export function SnowModal(props) {
+    if (!props.focusLayer) {
+        return <SnowText>SnowModal requires a focusLayer prop</SnowText>
+    }
     const { SnowStyle } = useStyleContext(props)
+    const { pushFocusLayer, popFocusLayer, isFocusedLayer } = useFocusContext()
+
+    React.useEffect(() => {
+        if (props.focusLayer) {
+            pushFocusLayer(props.focusLayer)
+            return () => {
+                popFocusLayer()
+            }
+        }
+
+    }, [props.focusLayer])
+
+    if (!isFocusedLayer(props.focusLayer)) {
+        return null
+    }
 
     let style = [SnowStyle.component.modal.prompt]
     if (props.transparent) {

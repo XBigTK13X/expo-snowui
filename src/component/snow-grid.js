@@ -53,7 +53,6 @@ export function SnowGrid(props) {
 
     const maxColumn = Math.min(items.length, itemsPerRow)
     const maxRow = Math.max(1, Math.ceil(items.length / itemsPerRow))
-    console.log({ focusKey: props.focusKey, maxColumn, maxRow })
 
     return (
         < View style={gridStyle} >
@@ -89,7 +88,6 @@ export function SnowGrid(props) {
                             focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
                         }
                     }
-                    console.log({ row, maxRow, focus })
                     if (row === maxRow - 1) {
                         if (props.focusDown) {
                             focus.focusDown = props.focusDown

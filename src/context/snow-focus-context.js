@@ -5,7 +5,7 @@ import { SnowSafeArea } from '../component/snow-safe-area'
 
 const FocusContext = React.createContext({});
 
-let DEBUG_FOCUS = true
+let DEBUG_FOCUS = false
 
 export function useFocusContext() {
     const value = React.useContext(FocusContext);
@@ -41,11 +41,9 @@ const oppositeDirections = {
 }
 
 export function FocusContextProvider(props) {
-    const [mapKeys, setMapKeys] = React.useState({})
-    const mapKeysRef = React.useRef(mapKeys)
     const [focusedKey, setFocusedKey] = React.useState(null)
     const focusedKeyRef = React.useRef(focusedKey)
-    const [focusMaps, setFocusMaps] = React.useState([{ refs: {}, directions: {} }])
+    const [focusMaps, setFocusMaps] = React.useState([{ layerName: 'app', refs: {}, directions: {} }])
     const focusMapsRef = React.useRef(focusMaps)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
@@ -53,10 +51,6 @@ export function FocusContextProvider(props) {
     if (props.DEBUG_FOCUS) {
         DEBUG_FOCUS = props.DEBUG_FOCUS
     }
-
-    React.useEffect(() => {
-        mapKeysRef.current = mapKeys
-    }, [mapKeys])
 
     React.useEffect(() => {
         focusedKeyRef.current = focusedKey
@@ -74,21 +68,23 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS === 'verbose') {
             console.log({ action: 'isFocused', elementFocusKey, focusedKey })
         }
-        return elementFocusKey !== undefined && elementFocusKey === focusedKey
+        return elementFocusKey && elementFocusKey === focusedKey
     }
 
-    const addFocusLayer = (mapKey, refs, directions) => {
+    const isFocusedLayer = (layerName) => {
+        if (DEBUG_FOCUS === 'verbose') {
+            console.log({ action: 'isFocusedLayer', layerName, layerMaps })
+        }
+        return layerName && focusMaps[focusMaps.length - 1].layerName === layerName
+    }
+
+    const pushFocusLayer = (layerName) => {
         if (DEBUG_FOCUS) {
-            console.log({ action: 'addFocusLayer', mapKey, refs, directions })
+            console.log({ action: 'pushFocusLayer' })
         }
         setFocusMaps((prev) => {
             let result = [...prev]
-            result.push({ refs, directions })
-            return result
-        })
-        setMapKeys((prev) => {
-            let result = { ...prev }
-            result[mapKey] = true
+            result.push({ layerName, refs: {}, directions: {} })
             return result
         })
     }
@@ -98,10 +94,18 @@ export function FocusContextProvider(props) {
             console.log({ action: 'popFocusLayer', focusMaps })
         }
         setFocusMaps((prev) => {
-            let result = { ...prev }
+            let result = [...prev]
             result.pop()
             return result
         })
+    }
+
+    const clearFocusLayers = () => {
+        if (DEBUG_FOCUS) {
+            console.log({ action: 'clearFocusMaps' })
+        }
+        setFocusMaps([{ layerName: 'app', refs: {}, directions: {} }])
+        setFocusedKey(null)
     }
 
     const addFocusMap = (elementRef, elementProps) => {
@@ -134,20 +138,6 @@ export function FocusContextProvider(props) {
             }
             return result
         })
-        setMapKeys((prev) => {
-            let result = { ...prev }
-            result[focusKey] = true
-            return result
-        })
-    }
-
-    const clearFocusMaps = () => {
-        if (DEBUG_FOCUS) {
-            console.log({ action: 'clearFocusMaps' })
-        }
-        setFocusMaps([])
-        setFocusedKey(null)
-        setMapKeys({})
     }
 
     const focusOn = (elementRef, focusKey) => {
@@ -376,14 +366,15 @@ export function FocusContextProvider(props) {
     const focusContext = {
         DEBUG_FOCUS,
         focusedKey,
-        addFocusLayer,
         addFocusMap,
-        clearFocusMaps,
+        clearFocusLayers,
         focusLongPress,
         focusOn,
         focusPress,
         isFocused,
+        isFocusedLayer,
         popFocusLayer,
+        pushFocusLayer,
         readFocusProps,
         setRemoteCallbacks
     }

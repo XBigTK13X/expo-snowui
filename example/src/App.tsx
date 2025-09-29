@@ -123,14 +123,14 @@ function ModalTab() {
   const toggleModal = () => { setShowModal(!showModal) }
   if (showModal) {
     return (
-      <Snow.Modal scroll>
+      <Snow.Modal focusLayer={'example-modal'} scroll>
+        <Snow.TextButton focusKey="tab-entry" focusDown="modal-bottom" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 1000 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>
         </View>
         <Snow.Text>And then the end</Snow.Text>
-
-        <Snow.TextButton focusKey="tab-entry" title="Close" onPress={toggleModal} />
+        <Snow.TextButton focusKey="modal-bottom" title="Close" onPress={toggleModal} />
       </Snow.Modal>
     )
   }
@@ -244,7 +244,7 @@ function AppPage() {
 
 export default function App() {
   return (
-    <Snow.App snowStyle={styleOverrides}>
+    <Snow.App snowStyle={styleOverrides} DEBUG_FOCUS={true}>
       <AppPage />
     </Snow.App>
   );
