@@ -14,15 +14,18 @@ nextFocusDown
 
 export function SnowTextButton(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { focusIsLocked } = useFocusContext()
-    const [focused, setFocused] = React.useState(false)
+    const { DEBUG_FOCUS, isFocused, addFocusMap, setFocusedKey } = useFocusContext()
     const touchRef = React.useRef(null)
 
     React.useEffect(() => {
-        if (props.shouldFocus && !Keyboard.isVisible()) {
-            touchRef.current.focus()
+        if (DEBUG_FOCUS) {
+            console.log({ action: 'SnowTextButton->addFocusMap', touchRef, props })
         }
-    })
+        addFocusMap(touchRef, props)
+        if (props.focusStart) {
+            setFocusedKey(props.focusKey)
+        }
+    }, [props.focusKey])
 
     const wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.disabled) {
@@ -32,7 +35,7 @@ export function SnowTextButton(props) {
         if (props.selected) {
             wrapperStyle.push(SnowStyle.component.textButton.selected)
         }
-        if (focused) {
+        if (isFocused(props.focusKey)) {
             wrapperStyle.push(SnowStyle.component.textButton.focused)
         }
     }
@@ -75,17 +78,6 @@ export function SnowTextButton(props) {
         }
     }
 
-    let allowFocus = !focusIsLocked && !Keyboard.isVisible()
-
-    const changeFocus = (focus) => {
-        if (!focusIsLocked) {
-            setFocused(focus)
-        }
-        else {
-            setFocused(false)
-        }
-    }
-
     return (
         <Pressable
             {...props}
@@ -93,10 +85,6 @@ export function SnowTextButton(props) {
             style={wrapperStyle}
             onPress={onPressUnlessTyping}
             onLongPress={onLongPressUnlessTyping}
-            focusable={allowFocus || focused}
-            onFocus={() => { changeFocus(true) }}
-            onBlur={() => { changeFocus(false) }}
-            hasTVPreferredFocus={props.shouldFocus && !Keyboard.isVisible()}
             disabled={props.disabled}>
             <SnowText noSelect style={textStyle}>{props.title}</SnowText>
         </Pressable >

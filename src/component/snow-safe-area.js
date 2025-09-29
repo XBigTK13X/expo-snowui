@@ -1,4 +1,4 @@
-import { View, TVFocusGuideView } from 'react-native'
+import { View } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 
 export function SnowSafeArea(props) {

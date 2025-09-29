@@ -1,9 +1,7 @@
 import React from 'react'
 import {
     View,
-    FlatList,
-    Platform,
-    TVFocusGuideView
+    FlatList
 } from 'react-native'
 
 import { useStyleContext } from '../context/snow-style-context'
@@ -61,6 +59,9 @@ export function SnowGrid(props) {
         columnStyle = SnowStyle.component.grid.list
     }
 
+    const maxColumn = itemsPerRow
+    const maxRow = Math.ceil(items.length / itemsPerRow)
+
     return (
         < View style={gridStyle} >
             <FlatList
@@ -71,23 +72,60 @@ export function SnowGrid(props) {
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     let child = renderItem(item, index)
-
-                    let focus = {}
-                    if (props.focusDown) {
-                        focus.focusDown = props.focusDown
-                    }
-                    if (props.focusUp) {
-                        focus.focusUp = props.focusUp
-                    }
                     let row = Math.floor(index / itemsPerRow)
                     let column = index % itemsPerRow
-                    child = React.cloneElement(child,
-                        {
-                            ...focus,
-                            focusKey: `${props.focusKey}-row-${row}-column-${column}`
+                    let focus = {}
+                    if (index === 0) {
+                        focus.focusKey = props.focusKey
+                        if (props.focusStart) {
+                            focus.focusStart = true
                         }
-                    )
+                    } else {
+                        focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
+                    }
 
+                    if (row === 0) {
+                        if (props.focusUp) {
+                            focus.focusUp = props.focusUp
+                        }
+                    } else {
+                        if (row - 1 === 0 && column === 0) {
+                            focus.focusUp = props.focusKey
+                        } else {
+                            focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
+                        }
+                    }
+
+                    if (row === maxRow) {
+                        if (props.focusDown) {
+                            focus.focusDown = props.focusDown
+                        }
+                    } else {
+                        focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
+                    }
+
+                    if (column === 0) {
+                        if (props.focusLeft) {
+                            focus.focusLeft = props.focusLeft
+                        }
+                    } else {
+                        if (column - 1 === 0 && row === 0) {
+                            focus.focusLeft = `${props.focusKey}`
+                        } else {
+                            focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
+                        }
+
+                    }
+
+                    if (column === maxColumn) {
+                        if (props.focusRight) {
+                            focus.focusRight = props.focusRight
+                        }
+                    } else {
+                        focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
+                    }
+
+                    child = React.cloneElement(child, { ...focus })
                     return (
                         <View style={itemStyle}>
                             {child}

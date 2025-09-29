@@ -56,3 +56,10 @@ This is a data class with two parts.
 First, a map of string keys to element refs.
 Second, a map of string keys to other string keys. This is a shallow tree structure.
 
+Maps will have layers. Adding a single map merges the provided data into the current state of the current top (end of list) layer.
+Components can clear all layers, remove the current layer, or add a new layer to the top.
+
+## Pitfalls
+
+1. Need to handle scrolling pages that are larger than the viewport
+2. Need to handle virtual lists

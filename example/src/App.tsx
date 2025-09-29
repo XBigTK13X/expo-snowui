@@ -43,6 +43,7 @@ function DropdownTab(props: any) {
     <View>
       <Snow.Label>Component: Dropdown</Snow.Label>
       <Snow.Dropdown
+        focusKey="tab-entry"
         options={['Yes', 'No']}
         valueIndex={props.dropdownIndex}
         onValueChange={props.setDropdownIndex} />
@@ -55,6 +56,7 @@ function GridTab() {
     <View>
       <Snow.Label>Component: Grid</Snow.Label>
       <Snow.Grid
+        focusKey="tab-entry"
         items={['Allow', 'Block', 'Cancel']}
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
@@ -76,8 +78,8 @@ function ImageButtonTab() {
   return (
     <View>
       <Snow.Label>Component: Image Button</Snow.Label>
-      <Snow.ImageButton imageUrl={tallImageUrl} title="Movie Poster" />
-      <Snow.ImageButton imageUrl={wideImageUrl} title="Rainbow" />
+      <Snow.ImageButton focusKey="tab-entry" focusDown="wide-button" imageUrl={tallImageUrl} title="Movie Poster" />
+      <Snow.ImageButton imageUrl={wideImageUrl} focusUp="tab-entry" title="Rainbow" />
     </View>
   )
 }
@@ -87,6 +89,7 @@ function ImageGridTab() {
     <View>
       <Snow.Label>Component: Image Grid</Snow.Label>
       <Snow.ImageGrid
+        focusKey="tab-entry"
         items={imageItems}
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
@@ -100,7 +103,7 @@ function InputTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Input</Snow.Label>
-      <Snow.Input value={props.inputValue} onValueChange={props.setInputValue} />
+      <Snow.Input focusKey="tab-entry" value={props.inputValue} onValueChange={props.setInputValue} />
     </View>
   )
 }
@@ -127,14 +130,14 @@ function ModalTab() {
         </View>
         <Snow.Text>And then the end</Snow.Text>
 
-        <Snow.TextButton title="Close" onPress={toggleModal} />
+        <Snow.TextButton focusKey="tab-entry" title="Close" onPress={toggleModal} />
       </Snow.Modal>
     )
   }
   return (
     <View>
       <Snow.Label>Component: Modal</Snow.Label>
-      <Snow.TextButton title="Show Modal" onPress={toggleModal} />
+      <Snow.TextButton focusKey="tab-entry" title="Show Modal" onPress={toggleModal} />
     </View>
   )
 }
@@ -143,7 +146,7 @@ function RangeSliderTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>
-      <Snow.RangeSlider onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
+      <Snow.RangeSlider focusKey="tab-entry" onValueChange={props.setRangeSliderValue} percent={props.rangeSliderValue} />
     </View>
   )
 }
@@ -152,7 +155,7 @@ function TabsTab() {
   return (
     <View>
       <Snow.Label>Component: Tabs</Snow.Label>
-      <Snow.Tabs headers={["First", "Second", "Third"]}>
+      <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
         <Snow.Text>You have reached the second tab.</Snow.Text>
         <Snow.ImageGrid
@@ -170,7 +173,7 @@ function TextButtonTab() {
   return (
     <View>
       <Snow.Label>Component: TextButton</Snow.Label>
-      <Snow.Grid itemsPerRow={3}>
+      <Snow.Grid focusKey="tab-entry" itemsPerRow={3}>
         <Snow.TextButton title="I am a button" />
       </Snow.Grid>
     </View>
@@ -190,7 +193,7 @@ function ToggleTab(props: any) {
   return (
     <View>
       <Snow.Label>Component: Toggle</Snow.Label>
-      <Snow.Toggle title="Permitted" onValueChange={props.togglePermitted} value={props.toggleValue} />
+      <Snow.Toggle focusKey="tab-entry" title="Permitted" onValueChange={props.togglePermitted} value={props.toggleValue} />
     </View>
   )
 }
@@ -227,7 +230,7 @@ function AppPage() {
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
         <Snow.Label>Components</Snow.Label>
-        <Snow.Grid focusKey={"comp-buttons"} focusDown={`component-tab-current`} items={components} renderItem={(item: any, itemIndex: number) => {
+        <Snow.Grid focusStart focusKey={"component-picker"} focusDown={`tab-entry`} items={components} renderItem={(item: any, itemIndex: number) => {
           return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
         }} />
         <Snow.Break />
