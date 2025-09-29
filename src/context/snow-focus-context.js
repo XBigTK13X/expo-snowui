@@ -251,6 +251,10 @@ export function FocusContextProvider(props) {
     }
 
     const focusPress = (elementRef, focusKey) => {
+        // This is done by the remoteHandler on TV
+        if (Platform.isTV) {
+            return () => { }
+        }
         return () => {
             focusOn(elementRef, focusKey)
             pressFocusedElement(focusKey)
@@ -258,6 +262,10 @@ export function FocusContextProvider(props) {
     }
 
     const focusLongPress = (elementRef, focusKey) => {
+        // This is done by the remoteHandler on TV
+        if (Platform.isTV) {
+            return () => { }
+        }
         return () => {
             focusOn(elementRef, focusKey)
             longPressFocusedElement(focusKey)

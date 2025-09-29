@@ -391,7 +391,14 @@ export function createStyle(overrides) {
                 display: 'flex',
                 marginLeft: 'auto',
                 marginRight: 'auto',
-                marginBottom: 30
+                marginBottom: 30,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
+            },
+            color: {
+                true: AppStyle.color.coreDark,
+                false: AppStyle.color.outlineDark,
+                thumb: AppStyle.color.core
             }
         }
     }
