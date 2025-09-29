@@ -156,36 +156,50 @@ export function FocusContextProvider(props) {
         if (!focusedKeyRef.current || !focusMapsRef.current.length) {
             return false
         }
+        let sourceKey = focusedKeyRef.current
+        let destinationKey = null
         const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
         if (
             !focusMap.directions ||
-            !focusMap.directions[focusedKeyRef.current] ||
-            !focusMap.directions[focusedKeyRef.current][direction] ||
-            !focusMap.directions.hasOwnProperty(focusMap.directions[focusedKeyRef.current][direction])
+            !focusMap.directions[sourceKey] ||
+            !focusMap.directions[sourceKey][direction] ||
+            !focusMap.directions.hasOwnProperty(focusMap.directions[sourceKey][direction])
         ) {
-            return false
+            if (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) {
+                sourceKey = sourceKey.split('-row-')[0]
+                destinationKey = focusMap.directions[sourceKey][direction]
+                if (!destinationKey) {
+                    return false
+                }
+            } else {
+                return false
+            }
         }
-        let nextFocusKey = focusMap.directions[focusedKeyRef.current][direction]
-        const hasReverseMapping = focusMap.directions[nextFocusKey][oppositeDirections[direction]]
-        const hasTransientMapping = focusMap.transient && focusMap.transient[nextFocusKey] && focusMap.transient[nextFocusKey][oppositeDirections[direction]]
+
+        if (!destinationKey) {
+            destinationKey = focusMap.directions[sourceKey][direction]
+        }
+
+        const hasReverseMapping = focusMap.directions[destinationKey][oppositeDirections[direction]]
+        const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][oppositeDirections[direction]]
         if (!hasReverseMapping || hasTransientMapping) {
             let transient = {
-                [nextFocusKey]: {
-                    [oppositeDirections[direction]]: focusedKeyRef.current
+                [destinationKey]: {
+                    [oppositeDirections[direction]]: sourceKey
                 }
             }
             setFocusMaps((prev) => {
                 let result = [...prev]
                 let directions = {
-                    [nextFocusKey]: {
-                        [oppositeDirections[direction]]: focusedKeyRef.current
+                    [destinationKey]: {
+                        [oppositeDirections[direction]]: sourceKey
                     }
                 }
                 result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
                 return result
             })
         }
-        focusOn(focusMap.refs[nextFocusKey].element, nextFocusKey)
+        focusOn(focusMap.refs[destinationKey].element, destinationKey)
     }
 
     const moveFocusRight = () => {

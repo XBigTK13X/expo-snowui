@@ -1,23 +1,23 @@
 import React from 'react'
-import { View, Platform } from 'react-native';
+import { View, Pressable } from 'react-native';
 import SnowText from './snow-text'
 import { Image } from 'expo-image'
 import { useStyleContext } from '../context/snow-style-context'
-
-/* spread props
-nextFocusLeft
-nextFocusRight
-nextFocusUp
-nextFocusDown
-onPress
-onLongPress
-*/
+import { useFocusContext } from '../context/snow-focus-context'
 
 export function SnowImageButton(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, addFocusMap, focusOn } = useFocusContext()
-
+    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
     const elementRef = React.useRef(null)
+
+    React.useEffect(() => {
+        if (elementRef.current) {
+            addFocusMap(elementRef, props)
+            if (props.focusStart) {
+                focusOn(elementRef, props.focusKey)
+            }
+        }
+    }, [props.focusKey])
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
@@ -49,7 +49,7 @@ export function SnowImageButton(props) {
         wrapperStyle.push(SnowStyle.component.imageButton.selected)
         textWrapperStyle.push(SnowStyle.component.imageButton.selected)
     }
-    if (focused && Platform.isTV) {
+    if (isFocused(props.focusKey)) {
         wrapperStyle.push(SnowStyle.component.imageButton.focused)
         textWrapperStyle.push(SnowStyle.component.imageButton.focused)
     }
@@ -65,9 +65,10 @@ export function SnowImageButton(props) {
     return (
         <View>
             <Pressable
-                {...props}
                 ref={elementRef}
                 style={wrapperStyle}
+                onPress={focusPress(elementRef, props.focusKey)}
+                onLongPress={focusLongPress(elementRef, props.focusKey)}
             >
                 <Image
                     style={imageStyle}

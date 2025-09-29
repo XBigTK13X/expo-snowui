@@ -4,14 +4,6 @@ import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
 import SnowLabel from './snow-label'
 
-/* spread props
-snowStyle
-nextFocusLeft
-nextFocusRight
-nextFocusUp
-nextFocusDown
-*/
-
 export function SnowImageGrid(props) {
     if (!props.items || !props.items.length) {
         return null
@@ -39,7 +31,6 @@ export function SnowImageGrid(props) {
         }
 
         return <SnowImageButton
-            {...props}
             wide={props.wideImage}
             dull={isDull}
             imageUrl={imageUrl}
@@ -75,7 +66,8 @@ export function SnowImageGrid(props) {
                 </SnowLabel>
                 : null}
             <SnowGrid
-                shouldFocus={props.shouldFocus}
+                focusKey={props.focusKey}
+                focusStart={props.focusStart}
                 items={props.items}
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}
