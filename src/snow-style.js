@@ -155,6 +155,8 @@ export function createStyle(overrides) {
                 marginRight: 'auto',
                 borderColor: AppStyle.color.background,
                 borderWidth: AppStyle.button.borderRadius,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
             },
             wrapperWide: {
                 height: AppStyle.imageButton.wrapper.wide.height,

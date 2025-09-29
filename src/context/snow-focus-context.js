@@ -103,13 +103,13 @@ export function FocusContextProvider(props) {
         })
     }
 
-    const addFocusMap = (elementRef, elementProps, onPress, onLongPress) => {
+    const addFocusMap = (elementRef, elementProps) => {
         const mapKey = elementProps.focusKey
         const refs = {
             [mapKey]: {
                 element: elementRef,
-                onPress,
-                onLongPress
+                onPress: elementProps.onPress,
+                onLongPress: elementProps.onLongPress
             }
         }
         const directions = {
@@ -204,24 +204,46 @@ export function FocusContextProvider(props) {
         moveFocus('down')
     }
 
-    const pressFocusedElement = () => {
+    const pressFocusedElement = (focusKey) => {
+        if (!focusKey) {
+            focusKey = focusedKeyRef.current
+        }
         const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
-        if (!focusMap.refs ||
-            !focusMap.refs[focusedKeyRef.current] ||
-            !focusMap.refs[focusedKeyRef.current].onPress) {
+        if (Keyboard.isVisible() ||
+            !focusMap.refs ||
+            !focusMap.refs[focusKey] ||
+            !focusMap.refs[focusKey].onPress) {
             return false
         }
-        return focusMap.refs[focusedKeyRef.current].onPress()
+        return focusMap.refs[focusKey].onPress()
     }
 
-    const longPressFocusedElement = () => {
+    const longPressFocusedElement = (focusKey) => {
+        if (!focusKey) {
+            focusKey = focusedKeyRef.current
+        }
         const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
-        if (!focusMap.refs ||
-            !focusMap.refs[focusedKeyRef.current] ||
-            !focusMap.refs[focusedKeyRef.current].onLongPress) {
+        if (Keyboard.isVisible() ||
+            !focusMap.refs ||
+            !focusMap.refs[focusKey] ||
+            !focusMap.refs[focusKey].onLongPress) {
             return false
         }
-        return focusMap.refs[focusedKeyRef.current].onLongPress()
+        return focusMap.refs[focusKey].onLongPress()
+    }
+
+    const focusPress = (elementRef, focusKey) => {
+        return () => {
+            focusOn(elementRef, focusKey)
+            pressFocusedElement(focusKey)
+        }
+    }
+
+    const focusLongPress = (elementRef, focusKey) => {
+        return () => {
+            focusOn(elementRef, focusKey)
+            longPressFocusedElement(focusKey)
+        }
     }
 
     if (Platform.isTV) {
@@ -306,6 +328,8 @@ export function FocusContextProvider(props) {
         isFocused,
         setRemoteCallbacks,
         focusOn,
+        focusPress,
+        focusLongPress,
         addFocusLayer,
         popFocusLayer,
         addFocusMap,

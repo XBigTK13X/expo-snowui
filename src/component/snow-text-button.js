@@ -14,24 +14,12 @@ nextFocusDown
 
 export function SnowTextButton(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, addFocusMap, focusOn } = useFocusContext()
+    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
     const elementRef = React.useRef(null)
-
-    const onPressUnlessTyping = () => {
-        if (props.onPress && !Keyboard.isVisible()) {
-            return props.onPress()
-        }
-    }
-
-    const onLongPressUnlessTyping = () => {
-        if (props.onLongPress && !Keyboard.isVisible()) {
-            return props.onLongPress()
-        }
-    }
 
     React.useEffect(() => {
         if (elementRef.current) {
-            addFocusMap(elementRef, props, onPressUnlessTyping, onLongPressUnlessTyping)
+            addFocusMap(elementRef, props)
             if (props.focusStart) {
                 focusOn(elementRef, props.focusKey)
             }
@@ -82,8 +70,8 @@ export function SnowTextButton(props) {
             {...props}
             ref={elementRef}
             style={wrapperStyle}
-            onPress={onPressUnlessTyping}
-            onLongPress={onLongPressUnlessTyping}
+            onPress={focusPress(elementRef, props.focusKey)}
+            onLongPress={focusLongPress(elementRef, props.focusKey)}
             disabled={props.disabled}>
             <SnowText noSelect style={textStyle}>{props.title}</SnowText>
         </Pressable >

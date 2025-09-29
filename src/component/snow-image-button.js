@@ -1,5 +1,5 @@
 import React from 'react'
-import { TouchableOpacity, View, Platform } from 'react-native';
+import { View, Platform } from 'react-native';
 import SnowText from './snow-text'
 import { Image } from 'expo-image'
 import { useStyleContext } from '../context/snow-style-context'
@@ -15,15 +15,9 @@ onLongPress
 
 export function SnowImageButton(props) {
     const { SnowStyle } = useStyleContext(props)
+    const { isFocused, addFocusMap, focusOn } = useFocusContext()
 
-    const [focused, setFocused] = React.useState(false)
-    const touchRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (props.shouldFocus) {
-            touchRef.current.focus()
-        }
-    }, [])
+    const elementRef = React.useRef(null)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
@@ -70,14 +64,10 @@ export function SnowImageButton(props) {
 
     return (
         <View>
-            <TouchableOpacity
+            <Pressable
                 {...props}
-                ref={touchRef}
-                activeOpacity={1.0}
-                onFocus={() => { setFocused(true) }}
-                onBlur={() => { setFocused(false) }}
+                ref={elementRef}
                 style={wrapperStyle}
-                hasTVPreferredFocus={props.shouldFocus}
             >
                 <Image
                     style={imageStyle}
@@ -89,7 +79,7 @@ export function SnowImageButton(props) {
                     <SnowText style={fontStyle}>{title}</SnowText>
                 </View>
 
-            </TouchableOpacity>
+            </Pressable>
         </View>
     )
 }
