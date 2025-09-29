@@ -220,17 +220,23 @@ export function createStyle(overrides) {
         },
         input: {
             text: {
-                border: 'solid white 2px',
+                borderWidth: 2,
+                borderColor: AppStyle.color.coreDark,
                 backgroundColor: AppStyle.color.core,
-                color: 'white',
+                color: AppStyle.color.text,
                 margin: 10,
-                padding: 10
+                padding: 10,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
             },
             small: {
                 margin: 1,
                 padding: 1,
                 fontSize: 10
-            }
+            },
+            focused: {
+                borderColor: AppStyle.color.hover
+            },
         },
         label: {
             fontSize: AppStyle.fontSize.label,

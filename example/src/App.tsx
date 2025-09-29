@@ -79,7 +79,7 @@ function ImageButtonTab() {
     <View>
       <Snow.Label>Component: Image Button</Snow.Label>
       <Snow.ImageButton focusKey="tab-entry" focusDown="wide-button" imageUrl={tallImageUrl} title="Movie Poster" />
-      <Snow.ImageButton imageUrl={wideImageUrl} focusUp="tab-entry" title="Rainbow" />
+      <Snow.ImageButton focusKey="wide-button" focusUp="tab-entry" imageUrl={wideImageUrl} title="Rainbow" />
     </View>
   )
 }

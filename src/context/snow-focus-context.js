@@ -5,7 +5,7 @@ import { SnowSafeArea } from '../component/snow-safe-area'
 
 const FocusContext = React.createContext({});
 
-let DEBUG_FOCUS = false
+let DEBUG_FOCUS = true
 
 export function useFocusContext() {
     const value = React.useContext(FocusContext);

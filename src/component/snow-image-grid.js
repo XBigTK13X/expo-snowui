@@ -31,6 +31,7 @@ export function SnowImageGrid(props) {
         }
 
         return <SnowImageButton
+            snowStyle={props.snowStyle}
             wide={props.wideImage}
             dull={isDull}
             imageUrl={imageUrl}

@@ -2,20 +2,28 @@ import React from 'react'
 import { TextInput } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../context/snow-style-context'
-
-/* spreadble props
-secureTextEntry
-nextFocusLeft
-nextFocusRight
-nextFocusUp
-nextFocusDown
-*/
+import { useFocusContext } from '../context/snow-focus-context'
 
 export function SnowInput(props) {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
+    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
+    const elementRef = React.useRef(null)
+
+    React.useEffect(() => {
+        if (elementRef.current) {
+            addFocusMap(elementRef, props)
+            if (props.focusStart) {
+                focusOn(elementRef, props.focusKey)
+            }
+        }
+    }, [props.focusKey])
+
     let textStyle = [SnowStyle.component.input.text]
     if (props.short) {
         textStyle.push(SnowStyle.component.input.small)
+    }
+    if (isFocused(props.focusKey)) {
+        textStyle.push(SnowStyle.component.input.focused)
     }
 
     let onDebounce = null
@@ -23,7 +31,8 @@ export function SnowInput(props) {
         onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
     }
     return <TextInput
-        {...props}
+        ref={elementRef}
+        secureTextEntry={props.secureTextEntry}
         style={textStyle}
         editable={true}
         onChangeText={(val) => {
