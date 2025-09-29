@@ -70,7 +70,7 @@ export function FocusContextProvider(props) {
     }, [remoteCallbacks])
 
     const isFocused = (elementFocusKey) => {
-        if (DEBUG_FOCUS) {
+        if (DEBUG_FOCUS === 'verbose') {
             console.log({ action: 'isFocused', elementFocusKey, focusedKey })
         }
         return elementFocusKey !== undefined && elementFocusKey === focusedKey
@@ -104,16 +104,16 @@ export function FocusContextProvider(props) {
     }
 
     const addFocusMap = (elementRef, elementProps) => {
-        const mapKey = elementProps.focusKey
+        const focusKey = elementProps.focusKey
         const refs = {
-            [mapKey]: {
+            [focusKey]: {
                 element: elementRef,
                 onPress: elementProps.onPress,
                 onLongPress: elementProps.onLongPress
             }
         }
         const directions = {
-            [mapKey]: {
+            [focusKey]: {
                 'up': elementProps.focusUp,
                 'right': elementProps.focusRight,
                 'down': elementProps.focusDown,
@@ -121,16 +121,21 @@ export function FocusContextProvider(props) {
             }
         }
         if (DEBUG_FOCUS) {
-            console.log({ action: 'addFocusMap', elementRef, elementProps, mapKey, refs, directions })
+            console.log({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
         }
         setFocusMaps((prev) => {
             let result = [...prev]
             result[result.length - 1] = _.merge({}, result[result.length - 1], { refs, directions })
+            // If an existing key was re-added, remove transient mappings
+            // This is a bandaid that needs proper key reuse handling
+            if (result.transient && result.transient[focusKey]) {
+                delete result.transient[focusKey]
+            }
             return result
         })
         setMapKeys((prev) => {
             let result = { ...prev }
-            result[mapKey] = true
+            result[focusKey] = true
             return result
         })
     }
@@ -171,6 +176,9 @@ export function FocusContextProvider(props) {
                 if (!destinationKey) {
                     return false
                 }
+                if (DEBUG_FOCUS) {
+                    console.log({ action: 'gridAdjustment', sourceKey, destinationKey, focusMap })
+                }
             } else {
                 return false
             }
@@ -180,13 +188,16 @@ export function FocusContextProvider(props) {
             destinationKey = focusMap.directions[sourceKey][direction]
         }
 
-        const hasReverseMapping = focusMap.directions[destinationKey][oppositeDirections[direction]]
+        const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][oppositeDirections[direction]]
         const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][oppositeDirections[direction]]
         if (!hasReverseMapping || hasTransientMapping) {
             let transient = {
                 [destinationKey]: {
                     [oppositeDirections[direction]]: sourceKey
                 }
+            }
+            if (DEBUG_FOCUS) {
+                console.log({ action: 'transientMap', transient })
             }
             setFocusMaps((prev) => {
                 let result = [...prev]
@@ -337,18 +348,42 @@ export function FocusContextProvider(props) {
         }, []);
     }
 
+    const readFocusProps = (elementProps) => {
+        let focusProps = {}
+        if (elementProps.focusStart) {
+            focusProps.focusStart = elementProps.focusStart
+        }
+        if (elementProps.focusKey) {
+            focusProps.focusKey = elementProps.focusKey
+        }
+        if (elementProps.focusUp) {
+            focusProps.focusUp = elementProps.focusUp
+        }
+        if (elementProps.focusDown) {
+            focusProps.focusDown = elementProps.focusDown
+        }
+        if (elementProps.focusLeft) {
+            focusProps.focusLeft = elementProps.focusLeft
+        }
+        if (elementProps.focusRight) {
+            focusProps.focusRight = elementProps.focusRight
+        }
+        return focusProps
+    }
+
     const focusContext = {
+        DEBUG_FOCUS,
         focusedKey,
-        isFocused,
-        setRemoteCallbacks,
-        focusOn,
-        focusPress,
-        focusLongPress,
         addFocusLayer,
-        popFocusLayer,
         addFocusMap,
         clearFocusMaps,
-        DEBUG_FOCUS
+        focusLongPress,
+        focusOn,
+        focusPress,
+        isFocused,
+        popFocusLayer,
+        readFocusProps,
+        setRemoteCallbacks
     }
 
     return (

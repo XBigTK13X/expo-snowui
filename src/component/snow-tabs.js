@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import SnowDropdown from './snow-dropdown'
 import { useStyleContext } from '../context/snow-style-context'
+import { useFocusContext } from '../context/snow-focus-context'
 
 export function SnowTabs(props) {
     const { SnowStyle } = useStyleContext(props)
@@ -12,6 +13,7 @@ export function SnowTabs(props) {
     if (!props.children) {
         return null
     }
+    const { readFocusProps } = useFocusContext()
 
     const [tabIndex, setTabIndex] = React.useState(0)
     const tabStyle = {
@@ -35,9 +37,18 @@ export function SnowTabs(props) {
         }
     }
 
+    const innerFocusKey = `${props.focusKey}-tab`
+
+    const outerFocusProps = readFocusProps(props)
+    outerFocusProps.focusDown = innerFocusKey
+
     const tabs = React.Children.toArray(props.children).map(child => {
         if (React.isValidElement(child)) {
-            return React.cloneElement(child, { snowStyle: tabStyle });
+            return React.cloneElement(child, {
+                snowStyle: tabStyle,
+                focusKey: innerFocusKey,
+                focusDown: props.focusDown
+            });
         }
         return child;
     }).filter(child => child !== null);
@@ -45,6 +56,7 @@ export function SnowTabs(props) {
     return (
         <View>
             <SnowDropdown
+                {...outerFocusProps}
                 snowStyle={tabStyle}
                 fade
                 options={props.headers}

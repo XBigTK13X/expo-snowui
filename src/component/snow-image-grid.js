@@ -1,5 +1,6 @@
 import React from 'react'
 import { View } from 'react-native'
+import { useFocusContext } from '../context/snow-focus-context'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
 import SnowLabel from './snow-label'
@@ -8,6 +9,7 @@ export function SnowImageGrid(props) {
     if (!props.items || !props.items.length) {
         return null
     }
+    const { readFocusProps } = useFocusContext()
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
     const renderItem = (item, itemIndex) => {
@@ -67,8 +69,7 @@ export function SnowImageGrid(props) {
                 </SnowLabel>
                 : null}
             <SnowGrid
-                focusKey={props.focusKey}
-                focusStart={props.focusStart}
+                {...readFocusProps(props)}
                 items={props.items}
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}

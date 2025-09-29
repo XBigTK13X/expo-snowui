@@ -22,14 +22,6 @@ export function SnowGrid(props) {
 
     const { SnowStyle } = useStyleContext(props)
 
-    const [didFocus, setDidFocus] = React.useState(false)
-
-    React.useEffect(() => {
-        if (!didFocus && props.shouldFocus) {
-            setDidFocus(true)
-        }
-    })
-
     let itemsPerRow = 5
     if (props.itemsPerRow) {
         itemsPerRow = props.itemsPerRow
@@ -59,8 +51,9 @@ export function SnowGrid(props) {
         columnStyle = SnowStyle.component.grid.list
     }
 
-    const maxColumn = itemsPerRow
-    const maxRow = Math.floor(items.length / itemsPerRow)
+    const maxColumn = Math.min(items.length, itemsPerRow)
+    const maxRow = Math.max(1, Math.ceil(items.length / itemsPerRow))
+    console.log({ focusKey: props.focusKey, maxColumn, maxRow })
 
     return (
         < View style={gridStyle} >
@@ -75,6 +68,7 @@ export function SnowGrid(props) {
                     let row = Math.floor(index / itemsPerRow)
                     let column = index % itemsPerRow
                     let focus = {}
+
                     if (index === 0) {
                         focus.focusKey = props.focusKey
                         if (props.focusStart) {
@@ -95,8 +89,8 @@ export function SnowGrid(props) {
                             focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
                         }
                     }
-
-                    if (row === maxRow) {
+                    console.log({ row, maxRow, focus })
+                    if (row === maxRow - 1) {
                         if (props.focusDown) {
                             focus.focusDown = props.focusDown
                         }
@@ -114,10 +108,9 @@ export function SnowGrid(props) {
                         } else {
                             focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
                         }
-
                     }
 
-                    if (column === maxColumn) {
+                    if (column === maxColumn - 1) {
                         if (props.focusRight) {
                             focus.focusRight = props.focusRight
                         }
@@ -125,7 +118,7 @@ export function SnowGrid(props) {
                         focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
                     }
 
-                    child = React.cloneElement(child, { ...focus })
+                    child = React.cloneElement(child, { ...focus, maxColumn, maxRow })
                     return (
                         <View style={itemStyle}>
                             {child}

@@ -1,9 +1,11 @@
 import { View } from 'react-native'
+import { useFocusContext } from '../context/snow-focus-context'
 import SnowGrid from './snow-grid'
 import SnowTextButton from './snow-text-button'
 import SnowLabel from './snow-label'
 
 export function SnowDropdown(props) {
+    const { readFocusProps } = useFocusContext()
     if (!props.options) {
         return null
     }
@@ -36,8 +38,7 @@ export function SnowDropdown(props) {
         return <View>
             <SnowLabel center>{props.title}</SnowLabel>
             <SnowGrid
-                focusStart={props.focusStart}
-                focusKey={props.focusKey}
+                {...readFocusProps(props)}
                 itemsPerRow={props.itemsPerRow}
                 items={props.options}
                 renderItem={renderItem}
@@ -46,8 +47,7 @@ export function SnowDropdown(props) {
     }
     return (
         <SnowGrid
-            focusStart={props.focusStart}
-            focusKey={props.focusKey}
+            {...readFocusProps(props)}
             itemsPerRow={props.itemsPerRow}
             items={props.options}
             renderItem={renderItem}
