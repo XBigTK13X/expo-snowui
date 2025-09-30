@@ -12,8 +12,6 @@ Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
 Allow long press directions to continue moving focus
-Sometimes on a long list, the list wont scroll down when an item is offscren and focused (TV)
-Snowpage sometimes loses focus is moving down past a list
 */
 
 const FocusContext = React.createContext({});

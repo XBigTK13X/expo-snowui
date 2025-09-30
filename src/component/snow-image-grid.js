@@ -60,7 +60,13 @@ export function SnowImageGrid(props) {
             title={itemName}
         />
     }
-
+    let gridProps = {}
+    if (props.itemsPerRow) {
+        gridProps.itemsPerRow = props.itemsPerRow
+    }
+    if (props.itemsPerPage) {
+        gridProps.itemsPerPage = props.itemsPerPage
+    }
     return (
         <View>
             {props.title ?
@@ -70,6 +76,7 @@ export function SnowImageGrid(props) {
                 : null}
             <SnowGrid
                 {...readFocusProps(props)}
+                {...gridProps}
                 items={props.items}
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}
