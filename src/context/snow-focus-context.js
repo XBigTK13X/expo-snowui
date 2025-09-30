@@ -6,12 +6,14 @@ import { SnowSafeArea } from '../component/snow-safe-area'
 let DEBUG_FOCUS = false
 
 /*
- TODO
- Allow the focus engine to determine a transient link in the other direction.
-      If there exists a map going to the element before using that map, find it and create a transient link.
+TODO
 
- Focus can get lost if in a tabs element there is only text.
+Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
+
+Allow long press directions to continue moving focus
+Sometimes on a long list, the list wont scroll down when an item is offscren and focused (TV)
+Snowpage sometimes loses focus is moving down past a list
 */
 
 const FocusContext = React.createContext({});
@@ -29,6 +31,32 @@ const oppositeDirections = {
     'left': 'right',
     'down': 'up',
     'right': 'left'
+}
+
+function getCircularReplacer() {
+    const seen = new WeakSet()
+    return (key, value) => {
+        if (key.indexOf('__') !== -1 || key === '_viewConfig') {
+            // React garbage, discard key
+            return '[react node]';
+        }
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                // Circular reference found, discard key
+                return '[circular reference]';
+            }
+            seen.add(value);
+        }
+        return value;
+    };
+}
+
+const prettyLog = (payload) => {
+    if (Platform.OS !== 'web') {
+        console.log(JSON.stringify({ ...payload }, getCircularReplacer(), 4))
+    } else {
+        console.log({ ...payload })
+    }
 }
 
 /* Relevant props
@@ -70,21 +98,21 @@ export function FocusContextProvider(props) {
 
     const isFocused = (elementFocusKey) => {
         if (DEBUG_FOCUS === 'verbose') {
-            console.log({ action: 'isFocused', elementFocusKey, focusedKey })
+            prettyLog({ action: 'isFocused', elementFocusKey, focusedKey })
         }
         return elementFocusKey && elementFocusKey === focusedKey
     }
 
     const isFocusedLayer = (layerName) => {
         if (DEBUG_FOCUS === 'verbose') {
-            console.log({ action: 'isFocusedLayer', layerName, layerMaps })
+            prettyLog({ action: 'isFocusedLayer', layerName, layerMaps })
         }
         return layerName && focusMaps[focusMaps.length - 1].layerName === layerName
     }
 
     const pushFocusLayer = (layerName) => {
         if (DEBUG_FOCUS) {
-            console.log({ action: 'pushFocusLayer' })
+            prettyLog({ action: 'pushFocusLayer' })
         }
         setFocusMaps((prev) => {
             let result = [...prev]
@@ -95,7 +123,7 @@ export function FocusContextProvider(props) {
 
     const popFocusLayer = () => {
         if (DEBUG_FOCUS) {
-            console.log({ action: 'popFocusLayer', focusMaps })
+            prettyLog({ action: 'popFocusLayer', focusMaps })
         }
         setFocusMaps((prev) => {
             let result = [...prev]
@@ -106,7 +134,7 @@ export function FocusContextProvider(props) {
 
     const clearFocusLayers = () => {
         if (DEBUG_FOCUS) {
-            console.log({ action: 'clearFocusMaps' })
+            prettyLog({ action: 'clearFocusMaps' })
         }
         setFocusMaps([{ layerName: 'app', refs: {}, directions: {} }])
         setFocusedKey(null)
@@ -130,7 +158,7 @@ export function FocusContextProvider(props) {
             }
         }
         if (DEBUG_FOCUS) {
-            console.log({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
+            prettyLog({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
         }
         setFocusMaps((prev) => {
             let result = [...prev]
@@ -155,11 +183,11 @@ export function FocusContextProvider(props) {
             return false
         }
         if (DEBUG_FOCUS) {
-            console.log({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
+            prettyLog({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
         }
         if (!focusedKeyRef.current || !focusMapsRef.current.length) {
             if (DEBUG_FOCUS) {
-                console.log({ action: 'moveFocus FAIL element currently focused' })
+                prettyLog({ action: 'moveFocus FAIL element currently focused' })
             }
             return false
         }
@@ -171,30 +199,28 @@ export function FocusContextProvider(props) {
             focusMap.directions[sourceKey] &&
             focusMap.directions[sourceKey][direction] &&
             focusMap.directions.hasOwnProperty(focusMap.directions[sourceKey][direction])
+        let isGridCell = false
         if (!normalDestination) {
-            const isGridCell = sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1
+            isGridCell = sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1
             if (isGridCell) {
                 sourceKey = sourceKey.split('-row-')[0]
-                destinationKey = focusMap.directions[sourceKey][direction]
-                const destinationInGrid = !destinationKey || destinationKey.indexOf(sourceKey) !== -1
-                if (!destinationKey || destinationInGrid) {
+                let target = focusMap.directions[sourceKey][direction]
+                // The target is defined and isn't a cell in the grid
+                if (target && target.indexOf(sourceKey) === -1) {
+                    destinationKey = target
                     if (DEBUG_FOCUS) {
-                        console.log({ action: 'moveFocus FAIL no normal destination and is a grid cell' })
+                        prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusMap })
                     }
-                    return false
-                }
-                if (DEBUG_FOCUS) {
-                    console.log({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusMap })
                 }
             }
         }
 
         // If the destination wasn't found using edge cases above
         // Use a normal lookup
-        if (!destinationKey) {
+        if (!destinationKey && !isGridCell) {
             destinationKey = focusMap.directions[sourceKey][direction]
             if (DEBUG_FOCUS) {
-                console.log({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusMap })
+                prettyLog({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusMap })
             }
         }
 
@@ -212,7 +238,7 @@ export function FocusContextProvider(props) {
                         }
                     }
                     if (DEBUG_FOCUS) {
-                        console.log({ action: 'moveFocus->transientMap', transient })
+                        prettyLog({ action: 'moveFocus->transientMap', transient })
                     }
                     let result = [...prev]
                     const directions = {
@@ -225,7 +251,7 @@ export function FocusContextProvider(props) {
                 })
             }
         }
-        if (!destinationKey) {
+        if (!destinationKey && !isGridCell) {
             // No direct mapping was found
             // No transient link was available
             // Walk through all known maps in the opposite requested direction
@@ -243,7 +269,7 @@ export function FocusContextProvider(props) {
                                 }
                             }
                             if (DEBUG_FOCUS) {
-                                console.log({ action: 'moveFocus->inferredMap', inferred })
+                                prettyLog({ action: 'moveFocus->inferredMap', inferred })
                             }
                             let result = [...prev]
                             const directions = {
@@ -263,13 +289,13 @@ export function FocusContextProvider(props) {
 
         if (!destinationKey || !focusMap.refs[destinationKey]) {
             if (DEBUG_FOCUS) {
-                console.log({ action: 'moveFocus FAIL no destination found', destinationKey })
+                prettyLog({ action: 'moveFocus FAIL no destination found', destinationKey })
             }
             return false
         }
 
         if (DEBUG_FOCUS) {
-            console.log({ action: 'moveFocus SUCCESS', destinationKey })
+            prettyLog({ action: 'moveFocus SUCCESS', destinationKey })
         }
 
         focusOn(focusMap.refs[destinationKey].element, destinationKey)
