@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 
 import { useStyleContext } from '../context/snow-style-context'
+import { useFocusContext } from '../context/snow-focus-context'
 import SnowTextButton from './snow-text-button'
 import SnowText from './snow-text'
 
@@ -23,6 +24,8 @@ export function SnowGrid(props) {
     }
 
     const { SnowStyle } = useStyleContext(props)
+    const { DEBUG_FOCUS } = useFocusContext()
+
     const [page, setPage] = React.useState(0)
     const [pagerPressed, setPagerPressed] = React.useState(false)
 
@@ -63,19 +66,24 @@ export function SnowGrid(props) {
     }
 
     const hasPageControls = items.length > itemsPerPage
+    if (hasPageControls) {
+        items = items.slice(page * itemsPerPage, page * itemsPerPage + itemsPerPage)
+    }
     const maxColumn = Math.min(items.length, itemsPerRow)
-    let maxRow = Math.max(1, Math.ceil((hasPageControls ? itemsPerPage : items.length) / itemsPerRow))
-    let lastElementColumn = (hasPageControls ? itemsPerPage : items.length) % itemsPerRow
+    let maxRow = Math.max(1, Math.ceil(items.length / itemsPerRow))
+    let lastElementColumn = items.length % itemsPerRow
     if (lastElementColumn === 0) {
         lastElementColumn = itemsPerRow
     }
     let pageControls = () => { return null }
     let firstCellKey = `${props.focusKey}-row-0-column-0`
-    let lastCellKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
+    let lastCellKey = `${props.focusKey}-end`
+    let lastCellFullKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
     if (hasPageControls) {
         const firstPage = () => {
             setPagerPressed(true)
             setPage(0)
+
         }
         const lastPage = () => {
             setPagerPressed(true)
@@ -193,7 +201,6 @@ export function SnowGrid(props) {
                 </View>
             )
         }
-        items = items.slice(page * itemsPerPage, page * itemsPerPage + itemsPerPage)
     }
 
     return (
@@ -222,6 +229,9 @@ export function SnowGrid(props) {
                         }
                         else {
                             focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
+                            if (focus.focusKey === lastCellFullKey) {
+                                focus.focusKey = lastCellKey
+                            }
                         }
                     }
                     // Only allow auto focusing before the pager is used
@@ -251,6 +261,7 @@ export function SnowGrid(props) {
                             focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
                         }
                     }
+
                     if (row === maxRow - 1) {
                         if (hasPageControls) {
                             focus.focusDown = 'next-page-bottom'
@@ -261,8 +272,8 @@ export function SnowGrid(props) {
                         }
 
                     } else {
-                        if (row === maxRow - 2 && column >= lastElementColumn) {
-                            focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${lastElementColumn - 1}`
+                        if (row === maxRow - 2 && column >= lastElementColumn - 1) {
+                            focus.focusDown = lastCellKey
                         } else {
                             focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
                         }
@@ -286,9 +297,23 @@ export function SnowGrid(props) {
                         }
                     } else {
                         focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
+                        if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
+                            focus.focusRight = lastCellKey
+                        }
                     }
-
-                    child = React.cloneElement(child, { ...focus, maxRow, maxColumn, lastElementColumn })
+                    let debugFocus = {}
+                    if (DEBUG_FOCUS) {
+                        debugFocus = {
+                            maxRow,
+                            maxColumn,
+                            lastElementColumn,
+                            row,
+                            column,
+                            lastCellKey,
+                            lastCellFullKey
+                        }
+                    }
+                    child = React.cloneElement(child, { ...focus, ...debugFocus })
                     return (
                         <View style={itemStyle}>
                             {child}

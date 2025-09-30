@@ -46,7 +46,7 @@ export function SnowRangeSlider(props) {
                 focusOn(elementRef, props.focusKey)
             }
         }
-    }, [props.focusKey])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
     if (props.width) {

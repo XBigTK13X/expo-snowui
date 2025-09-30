@@ -16,7 +16,7 @@ export function SnowInput(props) {
                 focusOn(elementRef, props.focusKey)
             }
         }
-    }, [props.focusKey])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     let textStyle = [SnowStyle.component.input.text]
     if (props.short) {

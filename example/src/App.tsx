@@ -74,14 +74,20 @@ function GridTab() {
       </Snow.Grid>
       <Snow.TextButton title="This should never get focus" />
       <Snow.Grid
-        itemsPerPage={10}
+        itemsPerPage={15}
         focusKey="paged-grid-test"
         focusUp='child-key-test'
+        focusDown='null-select-test'
         items={[...Array(100).keys()].slice(1)}
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
         }}
       />
+      <Snow.Grid focusKey="null-select-test">
+        <Snow.TextButton title={"Nothing"} />
+        <Snow.TextButton title={"Below"} />
+        <Snow.TextButton title={"Here"} />
+      </Snow.Grid>
     </View>
   )
 }

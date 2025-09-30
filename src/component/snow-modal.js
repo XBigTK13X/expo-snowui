@@ -19,8 +19,7 @@ export function SnowModal(props) {
                 popFocusLayer()
             }
         }
-
-    }, [props.focusLayer])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     if (!isFocusedLayer(props.focusLayer)) {
         return null

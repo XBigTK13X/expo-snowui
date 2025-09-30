@@ -17,7 +17,7 @@ export function SnowImageButton(props) {
                 focusOn(elementRef, props.focusKey)
             }
         }
-    }, [props.focusKey])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title

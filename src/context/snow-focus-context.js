@@ -7,6 +7,7 @@ let DEBUG_FOCUS = false
 
 /*
 TODO
+Snowpage focusing down on index after naving away to a different page leaves stale data in the focus map
 
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
@@ -102,23 +103,23 @@ export function FocusContextProvider(props) {
     }
 
     const pushFocusLayer = (layerName) => {
-        if (DEBUG_FOCUS) {
-            prettyLog({ action: 'pushFocusLayer' })
-        }
         setFocusLayers((prev) => {
             let result = [...prev]
             result.push({ layerName, refs: {}, directions: {} })
+            if (DEBUG_FOCUS) {
+                prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
+            }
             return result
         })
     }
 
     const popFocusLayer = () => {
-        if (DEBUG_FOCUS) {
-            prettyLog({ action: 'popFocusLayer', focusLayers })
-        }
         setFocusLayers((prev) => {
             let result = [...prev]
             result.pop()
+            if (DEBUG_FOCUS) {
+                prettyLog({ action: 'popFocusLayer', focusLayers: result })
+            }
             return result
         })
     }
@@ -443,6 +444,7 @@ export function FocusContextProvider(props) {
         clearFocusLayers,
         isFocused,
         isFocusedLayer,
+        layersAreClear: focusedKey === null,
         readFocusProps,
         setRemoteCallbacks,
         focusLongPress,

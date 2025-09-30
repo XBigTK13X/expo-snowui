@@ -16,7 +16,7 @@ export function SnowToggle(props) {
                 focusOn(elementRef, props.focusKey)
             }
         }
-    }, [props.focusKey])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     const toggleValue = () => {
         props.onValueChange(!props.value)

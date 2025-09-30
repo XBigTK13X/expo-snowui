@@ -16,7 +16,7 @@ export function SnowTextButton(props) {
                 focusOn(elementRef, props.focusKey)
             }
         }
-    }, [props.focusKey])
+    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
 
     const wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.disabled) {
