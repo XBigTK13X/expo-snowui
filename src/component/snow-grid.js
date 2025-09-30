@@ -70,10 +70,15 @@ export function SnowGrid(props) {
                     let focus = {}
 
                     if (index === 0) {
-                        focus.focusKey = props.focusKey
+                        if (child.props.focusKey) {
+                            focus.focusKey = child.props.focusKey
+                        } else {
+                            focus.focusKey = props.focusKey
+                        }
                         if (props.focusStart) {
                             focus.focusStart = true
                         }
+
                     } else {
                         focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
                     }
