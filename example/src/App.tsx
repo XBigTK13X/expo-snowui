@@ -72,6 +72,7 @@ function GridTab() {
       <Snow.Grid>
         <Snow.TextButton focusKey='child-key-test' title={"Button with key"} />
       </Snow.Grid>
+      <Snow.TextButton title="This should never get focus" />
     </View>
   )
 }
@@ -255,7 +256,7 @@ function AppPage() {
 
 export default function App() {
   return (
-    <Snow.App snowStyle={styleOverrides} DEBUG_FOCUS={false}>
+    <Snow.App snowStyle={styleOverrides} DEBUG_FOCUS={true}>
       <AppPage />
     </Snow.App>
   );

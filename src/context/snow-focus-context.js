@@ -199,29 +199,31 @@ export function FocusContextProvider(props) {
         }
 
         const opposite = oppositeDirections[direction]
-        // If the requested destination points to the current node in the opposite direction, then they can be transiently linked
-        // If a request comes from the same direction but a different source node in the future, then that link overrides any previously created
-        const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][opposite]
-        const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][opposite]
-        if (!hasReverseMapping || hasTransientMapping) {
-            setFocusMaps((prev) => {
-                const transient = {
-                    [destinationKey]: {
-                        [opposite]: sourceKey
+        if (destinationKey) {
+            // If the requested destination points to the current node in the opposite direction, then they can be transiently linked
+            // If a request comes from the same direction but a different source node in the future, then that link overrides any previously created
+            const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][opposite]
+            const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][opposite]
+            if (!hasReverseMapping || hasTransientMapping) {
+                setFocusMaps((prev) => {
+                    const transient = {
+                        [destinationKey]: {
+                            [opposite]: sourceKey
+                        }
                     }
-                }
-                if (DEBUG_FOCUS) {
-                    console.log({ action: 'moveFocus->transientMap', transient })
-                }
-                let result = [...prev]
-                const directions = {
-                    [destinationKey]: {
-                        [opposite]: sourceKey
+                    if (DEBUG_FOCUS) {
+                        console.log({ action: 'moveFocus->transientMap', transient })
                     }
-                }
-                result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
-                return result
-            })
+                    let result = [...prev]
+                    const directions = {
+                        [destinationKey]: {
+                            [opposite]: sourceKey
+                        }
+                    }
+                    result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
+                    return result
+                })
+            }
         }
         if (!destinationKey) {
             // No direct mapping was found
