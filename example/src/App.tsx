@@ -61,6 +61,13 @@ function GridTab() {
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
         }} />
+      <Snow.Grid
+        focusKey="inferred-test"
+        focusUp="tab-entry"
+        items={['Should', 'Be', 'Inferred']}
+        renderItem={(item: any) => {
+          return <Snow.TextButton title={item} />
+        }} />
     </View>
   )
 }

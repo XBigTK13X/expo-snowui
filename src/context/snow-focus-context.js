@@ -3,9 +3,18 @@ import _ from 'lodash'
 import { Platform, useTVEventHandler, Keyboard, findNodeHandle } from 'react-native'
 import { SnowSafeArea } from '../component/snow-safe-area'
 
-const FocusContext = React.createContext({});
-
 let DEBUG_FOCUS = false
+
+/*
+ TODO
+ Allow the focus engine to determine a transient link in the other direction.
+      If there exists a map going to the element before using that map, find it and create a transient link.
+
+ Focus can get lost if in a tabs element there is only text.
+      Nothing inside the tab should be selectable, but the outer view gets a focusKey
+*/
+
+const FocusContext = React.createContext({});
 
 export function useFocusContext() {
     const value = React.useContext(FocusContext);
@@ -15,10 +24,17 @@ export function useFocusContext() {
     return value;
 }
 
-// TODO
-// Focus can get lost if in a tabs element there is only text. Nothing inside the tab should be selectable, but the outer view gets a focusKey
+const oppositeDirections = {
+    'up': 'down',
+    'left': 'right',
+    'down': 'up',
+    'right': 'left'
+}
 
 /* Relevant props
+focusKey
+    A unique identifier for the focus context in a given element
+
 focusStart
     The element on the page that begins focused.
     Passing focusStart to multiple elements will not crash, but doesn't make sense.
@@ -28,15 +44,6 @@ focusUp,focusRight,focusDown,focusLeft
     Setting this to a key tells the provider the relative position of an element.
     Not setting a specific direction tells the provider to ignore keypresses from that element in that direction.
 */
-
-
-const oppositeDirections = {
-    'up': 'down',
-    'left': 'right',
-    'down': 'up',
-    'right': 'left'
-}
-
 export function FocusContextProvider(props) {
     const [focusedKey, setFocusedKey] = React.useState(null)
     const focusedKeyRef = React.useRef(focusedKey)
@@ -142,6 +149,7 @@ export function FocusContextProvider(props) {
         setFocusedKey(focusKey)
     }
 
+    // returning false cancels the requested movement
     const moveFocus = (direction) => {
         if (Keyboard.isVisible()) {
             return false
@@ -150,58 +158,118 @@ export function FocusContextProvider(props) {
             console.log({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
         }
         if (!focusedKeyRef.current || !focusMapsRef.current.length) {
+            if (DEBUG_FOCUS) {
+                console.log({ action: 'moveFocus FAIL element currently focused' })
+            }
             return false
         }
         let sourceKey = focusedKeyRef.current
         let destinationKey = null
         const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
-        if (
-            !focusMap.directions ||
-            !focusMap.directions[sourceKey] ||
-            !focusMap.directions[sourceKey][direction] ||
-            !focusMap.directions.hasOwnProperty(focusMap.directions[sourceKey][direction])
-        ) {
-            if (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) {
+
+        const normalDestination = focusMap.directions &&
+            focusMap.directions[sourceKey] &&
+            focusMap.directions[sourceKey][direction] &&
+            focusMap.directions.hasOwnProperty(focusMap.directions[sourceKey][direction])
+        if (!normalDestination) {
+            const isGridCell = sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1
+            if (isGridCell) {
                 sourceKey = sourceKey.split('-row-')[0]
                 destinationKey = focusMap.directions[sourceKey][direction]
-                const destinationInGrid = destinationKey.indexOf(sourceKey) !== -1
+                const destinationInGrid = !destinationKey || destinationKey.indexOf(sourceKey) !== -1
                 if (!destinationKey || destinationInGrid) {
+                    if (DEBUG_FOCUS) {
+                        console.log({ action: 'moveFocus FAIL no normal destination and is a grid cell' })
+                    }
                     return false
                 }
                 if (DEBUG_FOCUS) {
-                    console.log({ action: 'gridAdjustment', sourceKey, destinationKey, focusMap })
+                    console.log({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusMap })
                 }
-            } else {
-                return false
             }
         }
 
+        // If the destination wasn't found using edge cases above
+        // Use a normal lookup
         if (!destinationKey) {
             destinationKey = focusMap.directions[sourceKey][direction]
+            if (DEBUG_FOCUS) {
+                console.log({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusMap })
+            }
         }
 
-        const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][oppositeDirections[direction]]
-        const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][oppositeDirections[direction]]
+        const opposite = oppositeDirections[direction]
+        // If the requested destination points to the current node in the opposite direction, then they can be transiently linked
+        // If a request comes from the same direction but a different source node in the future, then that link overrides any previously created
+        const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][opposite]
+        const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][opposite]
         if (!hasReverseMapping || hasTransientMapping) {
-            let transient = {
-                [destinationKey]: {
-                    [oppositeDirections[direction]]: sourceKey
-                }
-            }
-            if (DEBUG_FOCUS) {
-                console.log({ action: 'transientMap', transient })
-            }
             setFocusMaps((prev) => {
-                let result = [...prev]
-                let directions = {
+                const transient = {
                     [destinationKey]: {
-                        [oppositeDirections[direction]]: sourceKey
+                        [opposite]: sourceKey
+                    }
+                }
+                if (DEBUG_FOCUS) {
+                    console.log({ action: 'moveFocus->transientMap', transient })
+                }
+                let result = [...prev]
+                const directions = {
+                    [destinationKey]: {
+                        [opposite]: sourceKey
                     }
                 }
                 result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
                 return result
             })
         }
+        if (!destinationKey) {
+            // No direct mapping was found
+            // No transient link was available
+            // Walk through all known maps in the opposite requested direction
+            // If the sourceKey is found, then we can add an inferred link
+            const hasInferredMapping = focusMap.inferred && focusMap.inferred[sourceKey] && focusMap.inferred[sourceKey][direction]
+            if (hasInferredMapping) {
+                destinationKey = focusMap.inferred[sourceKey][direction]
+            } else {
+                for (let inferredKey of Object.keys(focusMap.directions)) {
+                    if (focusMap.directions[inferredKey][opposite] === sourceKey) {
+                        setFocusMaps((prev) => {
+                            const inferred = {
+                                [sourceKey]: {
+                                    [direction]: { inferredKey }
+                                }
+                            }
+                            if (DEBUG_FOCUS) {
+                                console.log({ action: 'moveFocus->inferredMap', inferred })
+                            }
+                            let result = [...prev]
+                            const directions = {
+                                [sourceKey]: {
+                                    [direction]: inferredKey
+                                }
+                            }
+                            result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, inferred })
+                            return result
+                        })
+                        destinationKey = inferredKey
+                        break
+                    }
+                }
+            }
+        }
+
+        if (!destinationKey || !focusMap.refs[destinationKey]) {
+            if (DEBUG_FOCUS) {
+                console.log({ action: 'moveFocus FAIL no destination found', destinationKey })
+            }
+            return false
+        }
+
+        if (DEBUG_FOCUS) {
+            console.log({ action: 'moveFocus SUCCESS', destinationKey })
+        }
+
         focusOn(focusMap.refs[destinationKey].element, destinationKey)
     }
 
