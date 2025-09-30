@@ -24,13 +24,6 @@ export function useFocusContext() {
     return value;
 }
 
-const oppositeDirections = {
-    'up': 'down',
-    'left': 'right',
-    'down': 'up',
-    'right': 'left'
-}
-
 function getCircularReplacer() {
     const seen = new WeakSet()
     return (key, value) => {
@@ -73,8 +66,8 @@ focusUp,focusRight,focusDown,focusLeft
 export function FocusContextProvider(props) {
     const [focusedKey, setFocusedKey] = React.useState(null)
     const focusedKeyRef = React.useRef(focusedKey)
-    const [focusMaps, setFocusMaps] = React.useState([{ layerName: 'app', refs: {}, directions: {} }])
-    const focusMapsRef = React.useRef(focusMaps)
+    const [focusLayers, setFocusLayers] = React.useState([{ layerName: 'app', refs: {}, directions: {} }])
+    const focusLayersRef = React.useRef(focusLayers)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
 
@@ -87,8 +80,8 @@ export function FocusContextProvider(props) {
     }, [focusedKey])
 
     React.useEffect(() => {
-        focusMapsRef.current = focusMaps
-    }, [focusMaps])
+        focusLayersRef.current = focusLayers
+    }, [focusLayers])
 
     React.useEffect(() => {
         remoteCallbacksRef.current = remoteCallbacks
@@ -105,14 +98,14 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS === 'verbose') {
             prettyLog({ action: 'isFocusedLayer', layerName, layerMaps })
         }
-        return layerName && focusMaps[focusMaps.length - 1].layerName === layerName
+        return layerName && focusLayers[focusLayers.length - 1].layerName === layerName
     }
 
     const pushFocusLayer = (layerName) => {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'pushFocusLayer' })
         }
-        setFocusMaps((prev) => {
+        setFocusLayers((prev) => {
             let result = [...prev]
             result.push({ layerName, refs: {}, directions: {} })
             return result
@@ -121,9 +114,9 @@ export function FocusContextProvider(props) {
 
     const popFocusLayer = () => {
         if (DEBUG_FOCUS) {
-            prettyLog({ action: 'popFocusLayer', focusMaps })
+            prettyLog({ action: 'popFocusLayer', focusLayers })
         }
-        setFocusMaps((prev) => {
+        setFocusLayers((prev) => {
             let result = [...prev]
             result.pop()
             return result
@@ -132,9 +125,9 @@ export function FocusContextProvider(props) {
 
     const clearFocusLayers = () => {
         if (DEBUG_FOCUS) {
-            prettyLog({ action: 'clearFocusMaps' })
+            prettyLog({ action: 'clearfocusLayers' })
         }
-        setFocusMaps([{ layerName: 'app', refs: {}, directions: {} }])
+        setFocusLayers([{ layerName: 'app', refs: {}, directions: {} }])
         setFocusedKey(null)
     }
 
@@ -147,25 +140,61 @@ export function FocusContextProvider(props) {
                 onLongPress: elementProps.onLongPress
             }
         }
+        let focus = {}
+        if (elementProps.focusUp) {
+            focus['up'] = elementProps.focusUp
+        }
+        if (elementProps.focusDown) {
+            focus['down'] = elementProps.focusDown
+        }
+        if (elementProps.focusRight) {
+            focus['right'] = elementProps.focusRight
+        }
+        if (elementProps.focusLeft) {
+            focus['left'] = elementProps.focusLeft
+        }
         const directions = {
-            [focusKey]: {
-                'up': elementProps.focusUp,
-                'right': elementProps.focusRight,
-                'down': elementProps.focusDown,
-                'left': elementProps.focusLeft
-            }
+            [focusKey]: focus
         }
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
         }
-        setFocusMaps((prev) => {
+        setFocusLayers((prev) => {
             let result = [...prev]
-            result[result.length - 1] = _.merge({}, result[result.length - 1], { refs, directions })
-            // If an existing key was re-added, remove transient mappings
-            // This is a bandaid that needs proper key reuse handling
-            if (result.transient && result.transient[focusKey]) {
-                delete result.transient[focusKey]
+            let focusLayer = result[result.length - 1]
+            if (elementProps.focusUp) {
+                if (!focusLayer.directions.hasOwnProperty(elementProps.focusUp)) {
+                    focusLayer.directions[elementProps.focusUp] = {}
+                }
+                if (!focusLayer.directions[elementProps.focusUp]['down']) {
+                    focusLayer.directions[elementProps.focusUp]['down'] = focusKey
+                }
             }
+            if (elementProps.focusDown) {
+                if (!focusLayer.directions.hasOwnProperty(elementProps.focusDown)) {
+                    focusLayer.directions[elementProps.focusDown] = {}
+                }
+                if (!focusLayer.directions[elementProps.focusDown]['up']) {
+                    focusLayer.directions[elementProps.focusDown]['up'] = focusKey
+                }
+            }
+            if (elementProps.focusLeft) {
+                if (!focusLayer.directions.hasOwnProperty(elementProps.focusLeft)) {
+                    focusLayer.directions[elementProps.focusLeft] = {}
+                }
+                if (!focusLayer.directions[elementProps.focusLeft]['right']) {
+                    focusLayer.directions[elementProps.focusLeft]['right'] = focusKey
+                }
+            }
+            if (elementProps.focusRight) {
+                if (!focusLayer.directions.hasOwnProperty(elementProps.focusRight)) {
+                    focusLayer.directions[elementProps.focusRight] = {}
+                }
+                if (!focusLayer.directions[elementProps.focusRight]['left']) {
+                    focusLayer.directions[elementProps.focusRight]['left'] = focusKey
+                }
+            }
+            result[result.length - 1] = _.merge({}, { ...focusLayer }, { refs, directions })
             return result
         })
     }
@@ -178,36 +207,39 @@ export function FocusContextProvider(props) {
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
         if (Keyboard.isVisible()) {
+            if (DEBUG_FOCUS) {
+                prettyLog({ action: 'moveFocus FAIL Keyboard is visible' })
+            }
             return false
         }
         if (DEBUG_FOCUS) {
-            prettyLog({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusMaps: focusMapsRef.current })
+            prettyLog({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusLayers: focusLayersRef.current })
         }
-        if (!focusedKeyRef.current || !focusMapsRef.current.length) {
+        if (!focusedKeyRef.current || !focusLayersRef.current.length) {
             if (DEBUG_FOCUS) {
-                prettyLog({ action: 'moveFocus FAIL element currently focused' })
+                prettyLog({ action: 'moveFocus FAIL no element currently focused' })
             }
             return false
         }
         let sourceKey = focusedKeyRef.current
         let destinationKey = null
-        const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
+        const focusLayer = focusLayersRef.current[focusLayersRef.current.length - 1]
 
-        const normalDestination = focusMap.directions &&
-            focusMap.directions[sourceKey] &&
-            focusMap.directions[sourceKey][direction] &&
-            focusMap.directions.hasOwnProperty(focusMap.directions[sourceKey][direction])
+        const normalDestination = focusLayer.directions &&
+            focusLayer.directions[sourceKey] &&
+            focusLayer.directions[sourceKey][direction] &&
+            focusLayer.directions.hasOwnProperty(focusLayer.directions[sourceKey][direction])
         let isGridCell = false
         if (!normalDestination) {
             isGridCell = sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1
             if (isGridCell) {
                 sourceKey = sourceKey.split('-row-')[0]
-                let target = focusMap.directions[sourceKey][direction]
+                let target = focusLayer.directions[sourceKey][direction]
                 // The target is defined and isn't a cell in the grid
                 if (target && target.indexOf(sourceKey) === -1) {
                     destinationKey = target
                     if (DEBUG_FOCUS) {
-                        prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusMap })
+                        prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
                     }
                 }
             }
@@ -216,76 +248,14 @@ export function FocusContextProvider(props) {
         // If the destination wasn't found using edge cases above
         // Use a normal lookup
         if (!destinationKey && !isGridCell) {
-            destinationKey = focusMap.directions[sourceKey][direction]
+            destinationKey = focusLayer.directions[sourceKey][direction]
             if (DEBUG_FOCUS) {
-                prettyLog({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusMap })
+                prettyLog({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusLayer })
             }
         }
 
-        const opposite = oppositeDirections[direction]
-        if (destinationKey) {
-            // If the requested destination points to the current node in the opposite direction, then they can be transiently linked
-            // If a request comes from the same direction but a different source node in the future, then that link overrides any previously created
-            const hasReverseMapping = focusMap.directions[destinationKey] && focusMap.directions[destinationKey][opposite]
-            const hasTransientMapping = focusMap.transient && focusMap.transient[destinationKey] && focusMap.transient[destinationKey][opposite]
-            if (!hasReverseMapping || hasTransientMapping) {
-                setFocusMaps((prev) => {
-                    const transient = {
-                        [destinationKey]: {
-                            [opposite]: sourceKey
-                        }
-                    }
-                    if (DEBUG_FOCUS) {
-                        prettyLog({ action: 'moveFocus->transientMap', transient })
-                    }
-                    let result = [...prev]
-                    const directions = {
-                        [destinationKey]: {
-                            [opposite]: sourceKey
-                        }
-                    }
-                    result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, transient })
-                    return result
-                })
-            }
-        }
-        if (!destinationKey && !isGridCell) {
-            // No direct mapping was found
-            // No transient link was available
-            // Walk through all known maps in the opposite requested direction
-            // If the sourceKey is found, then we can add an inferred link
-            const hasInferredMapping = focusMap.inferred && focusMap.inferred[sourceKey] && focusMap.inferred[sourceKey][direction]
-            if (hasInferredMapping) {
-                destinationKey = focusMap.inferred[sourceKey][direction]
-            } else {
-                for (let inferredKey of Object.keys(focusMap.directions)) {
-                    if (focusMap.directions[inferredKey][opposite] === sourceKey) {
-                        setFocusMaps((prev) => {
-                            const inferred = {
-                                [sourceKey]: {
-                                    [direction]: { inferredKey }
-                                }
-                            }
-                            if (DEBUG_FOCUS) {
-                                prettyLog({ action: 'moveFocus->inferredMap', inferred })
-                            }
-                            let result = [...prev]
-                            const directions = {
-                                [sourceKey]: {
-                                    [direction]: inferredKey
-                                }
-                            }
-                            result[result.length - 1] = _.merge({}, result[result.length - 1], { directions, inferred })
-                            return result
-                        })
-                        destinationKey = inferredKey
-                        break
-                    }
-                }
-            }
-        }
 
-        if (!destinationKey || !focusMap.refs[destinationKey]) {
+        if (!destinationKey || !focusLayer.refs[destinationKey]) {
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'moveFocus FAIL no destination found', destinationKey })
             }
@@ -295,8 +265,7 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'moveFocus SUCCESS', destinationKey })
         }
-
-        focusOn(focusMap.refs[destinationKey].element, destinationKey)
+        focusOn(focusLayer.refs[destinationKey].element, destinationKey)
     }
 
     const moveFocusRight = () => {
@@ -319,7 +288,7 @@ export function FocusContextProvider(props) {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
         }
-        const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
+        const focusMap = focusLayersRef.current[focusLayersRef.current.length - 1]
         if (Keyboard.isVisible() ||
             !focusMap.refs ||
             !focusMap.refs[focusKey] ||
@@ -333,7 +302,7 @@ export function FocusContextProvider(props) {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
         }
-        const focusMap = focusMapsRef.current[focusMapsRef.current.length - 1]
+        const focusMap = focusLayersRef.current[focusLayersRef.current.length - 1]
         if (Keyboard.isVisible() ||
             !focusMap.refs ||
             !focusMap.refs[focusKey] ||
@@ -469,16 +438,16 @@ export function FocusContextProvider(props) {
         DEBUG_FOCUS,
         focusedKey,
         addFocusMap,
-        clearFocusLayers,
-        focusLongPress,
-        focusOn,
-        focusPress,
-        isFocused,
-        isFocusedLayer,
         popFocusLayer,
         pushFocusLayer,
+        clearFocusLayers,
+        isFocused,
+        isFocusedLayer,
         readFocusProps,
-        setRemoteCallbacks
+        setRemoteCallbacks,
+        focusLongPress,
+        focusOn,
+        focusPress
     }
 
     return (

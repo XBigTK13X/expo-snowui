@@ -248,12 +248,18 @@ function AppPage() {
   return (
     <View>
       <View>
+        <Snow.TextButton focusKey="test-higher-focus" focusDown="component-picker" title="Focus Test Button" />
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
         <Snow.Label>Components</Snow.Label>
-        <Snow.Grid focusStart focusKey={"component-picker"} focusDown={`tab-entry`} items={components} renderItem={(item: any, itemIndex: number) => {
-          return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
-        }} />
+        <Snow.Grid
+          focusStart
+          focusKey={"component-picker"}
+          focusDown={`tab-entry`}
+          items={components}
+          renderItem={(item: any, itemIndex: number) => {
+            return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
+          }} />
         <Snow.Break />
       </View>
       <View>

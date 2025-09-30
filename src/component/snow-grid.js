@@ -24,6 +24,7 @@ export function SnowGrid(props) {
 
     const { SnowStyle } = useStyleContext(props)
     const [page, setPage] = React.useState(0)
+    const [pagerPressed, setPagerPressed] = React.useState(false)
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -73,12 +74,15 @@ export function SnowGrid(props) {
     let lastCellKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
     if (hasPageControls) {
         const firstPage = () => {
+            setPagerPressed(true)
             setPage(0)
         }
         const lastPage = () => {
+            setPagerPressed(true)
             setPage(maxPage - 1)
         }
         const previousPage = () => {
+            setPagerPressed(true)
             setPage((prev) => {
                 if (prev > 0) {
                     return prev - 1
@@ -87,6 +91,7 @@ export function SnowGrid(props) {
             })
         }
         const nextPage = () => {
+            setPagerPressed(true)
             setPage((prev) => {
                 if (prev < maxPage - 1) {
                     return prev + 1
@@ -95,11 +100,13 @@ export function SnowGrid(props) {
             })
         }
         const previousHalf = () => {
+            setPagerPressed(true)
             setPage((prev) => {
                 return Math.floor(prev / 2)
             })
         }
         const nextHalf = () => {
+            setPagerPressed(true)
             setPage((prev) => {
                 return Math.floor((prev + maxPage) / 2)
             })
@@ -217,11 +224,14 @@ export function SnowGrid(props) {
                             focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
                         }
                     }
-                    if (child.props.focusStart) {
-                        focus.focusStart = child.props.focusStart
-                    } else {
-                        if (index === 0 && props.focusStart) {
-                            focus.focusStart = true
+                    // Only allow auto focusing before the pager is used
+                    if (!pagerPressed) {
+                        if (child.props.focusStart) {
+                            focus.focusStart = child.props.focusStart
+                        } else {
+                            if (index === 0 && props.focusStart) {
+                                focus.focusStart = true
+                            }
                         }
                     }
 
