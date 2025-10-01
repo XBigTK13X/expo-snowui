@@ -39,6 +39,8 @@ export { SnowText } from './component/snow-text'
 import { SnowText } from './component/snow-text'
 export { SnowToggle } from './component/snow-toggle'
 import { SnowToggle } from './component/snow-toggle'
+export { SnowView } from './component/snow-view'
+import { SnowView } from './component/snow-view'
 
 export default {
   useFocusContext,
@@ -60,4 +62,5 @@ export default {
   TextButton: SnowTextButton,
   Text: SnowText,
   Toggle: SnowToggle,
+  View: SnowView
 }

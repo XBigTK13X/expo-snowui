@@ -239,6 +239,34 @@ function TabsTab() {
   )
 }
 
+function TabsMoreTab() {
+  return (
+    <View>
+      <Snow.Label>Component: Tabs</Snow.Label>
+      <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
+        <Snow.ImageGrid
+          items={imageItems}
+          getItemImageUrl={(item: any) => { return item.imageUrl }}
+          getItemImageSource={(item: any) => { return item.imageSource }}
+          getItemName={(item: any) => { return item.title }}
+        />
+        <Snow.ImageGrid
+          items={imageItems}
+          getItemImageUrl={(item: any) => { return item.imageUrl }}
+          getItemImageSource={(item: any) => { return item.imageSource }}
+          getItemName={(item: any) => { return item.title }}
+        />
+        <Snow.ImageGrid
+          items={imageItems}
+          getItemImageUrl={(item: any) => { return item.imageUrl }}
+          getItemImageSource={(item: any) => { return item.imageSource }}
+          getItemName={(item: any) => { return item.title }}
+        />
+      </Snow.Tabs>
+    </View>
+  )
+}
+
 function TextButtonTab() {
   return (
     <View>
@@ -290,14 +318,15 @@ function AppPage() {
     ['Modal', <ModalTab />],
     ['Range Slider', <RangeSliderTab setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
     ['Tabs', <TabsTab />],
+    ['TabsMore', <TabsMoreTab />],
     ['TextButton', <TextButtonTab />],
     ['Text', <TextTab />],
     ['Toggle', <ToggleTab togglePermitted={togglePermitted} toggleValue={toggleValue} />]
   ]
 
   return (
-    <View>
-      <View>
+    <Snow.View>
+      <Snow.View>
         <Snow.TextButton focusKey="test-higher-focus" focusDown="component-picker" title="Focus Test Button" />
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useStyleContext, useFocusContext.</Snow.Text>
@@ -311,11 +340,11 @@ function AppPage() {
             return <Snow.TextButton title={item[0]} onPress={() => { setTabIndex(itemIndex) }} />
           }} />
         <Snow.Break />
-      </View>
-      <View>
+      </Snow.View>
+      <Snow.View>
         {components[tabIndex]?.[1]}
-      </View>
-    </View>
+      </Snow.View>
+    </Snow.View>
   )
 }
 

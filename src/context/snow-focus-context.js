@@ -264,7 +264,7 @@ export function FocusContextProvider(props) {
 
         // If the destination wasn't found using edge cases above
         // Use a normal lookup
-        if (!destinationKey && !isGridCell) {
+        if (!destinationKey && !isGridCell && focusLayer.directions[sourceKey]) {
             destinationKey = focusLayer.directions[sourceKey][direction]
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusLayer })
