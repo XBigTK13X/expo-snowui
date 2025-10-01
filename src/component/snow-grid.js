@@ -203,6 +203,8 @@ const SnowGridComponent = (props) => {
         }
     }
 
+    let focusWiredIndex = 0
+
     return (
         < View style={gridStyle} >
             {pageControls('top')}
@@ -224,7 +226,7 @@ const SnowGridComponent = (props) => {
                             focus.focusKey = child.props.focusKey
                         }
                         else {
-                            if (index === 0 && !hasPageControls) {
+                            if (focusWiredIndex === 0 && !hasPageControls) {
                                 focus.focusKey = props.focusKey
                             }
                             else {
@@ -239,7 +241,7 @@ const SnowGridComponent = (props) => {
                             if (child.props.focusStart) {
                                 focus.focusStart = child.props.focusStart
                             } else {
-                                if (index === 0 && props.focusStart) {
+                                if (focusWiredIndex === 0 && props.focusStart) {
                                     focus.focusStart = true
                                 }
                             }
@@ -314,6 +316,7 @@ const SnowGridComponent = (props) => {
                             }
                         }
                         child = React.cloneElement(child, { ...focus, ...debugFocus })
+                        focusWiredIndex += 1
                     }
                     return (
                         <View style={itemStyle}>
