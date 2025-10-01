@@ -16,6 +16,9 @@ Allow grid to grid movement to maintain the relative positon.
     Imagine a 1x3 grid and then a 1x3 under it.
     When highlighting the second element of the first, a down move should send you to the send element of the next.
     However, grid movement currently always pushes you to the start of the grid
+
+Nested grids generate duplicate keys, breaking navigation.
+    assignFocus={false} is a bandaid, but it would be useful to allow nested grids
 */
 
 const FocusContext = React.createContext({});
@@ -248,7 +251,9 @@ export function FocusContextProvider(props) {
             isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) || (sourceKey.indexOf('-grid-end') !== -1)
             if (isGridCell) {
                 sourceKey = sourceKey.split('-row-')[0]
-                sourceKey = sourceKey.split('-grid-end')[0]
+                // Only ever replace one -grid-end at a time
+                // Otherwise, a nested grid will have focus escape a map too early
+                sourceKey = sourceKey.replace('-grid-end', '')
                 if (focusLayer.directions[sourceKey] && focusLayer.directions[sourceKey][direction]) {
                     let target = focusLayer.directions[sourceKey][direction]
                     // The target is defined and isn't a cell in the grid

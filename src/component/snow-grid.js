@@ -216,104 +216,105 @@ export function SnowGrid(props) {
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     let child = renderItem(item, index)
-                    let row = Math.floor(index / itemsPerRow)
-                    let column = index % itemsPerRow
-                    let focus = {}
-
-                    if (child.props.focusKey) {
-                        focus.focusKey = child.props.focusKey
-                    }
-                    else {
-                        if (index === 0 && !hasPageControls) {
-                            focus.focusKey = props.focusKey
+                    if (props.assignFocus !== false) {
+                        let row = Math.floor(index / itemsPerRow)
+                        let column = index % itemsPerRow
+                        let focus = {}
+                        if (child.props.focusKey) {
+                            focus.focusKey = child.props.focusKey
                         }
                         else {
-                            focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
-                            if (focus.focusKey === lastCellFullKey) {
-                                focus.focusKey = lastCellKey
+                            if (index === 0 && !hasPageControls) {
+                                focus.focusKey = props.focusKey
+                            }
+                            else {
+                                focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
+                                if (focus.focusKey === lastCellFullKey) {
+                                    focus.focusKey = lastCellKey
+                                }
                             }
                         }
-                    }
-                    // Only allow auto focusing before the pager is used
-                    if (!pagerPressed) {
-                        if (child.props.focusStart) {
-                            focus.focusStart = child.props.focusStart
-                        } else {
-                            if (index === 0 && props.focusStart) {
-                                focus.focusStart = true
-                            }
-                        }
-                    }
-
-                    if (row === 0) {
-                        if (hasPageControls) {
-                            focus.focusUp = props.focusKey
-                        }
-                        else {
-                            if (props.focusUp) {
-                                focus.focusUp = props.focusUp
-                            }
-                        }
-                    } else {
-                        if (row - 1 === 0 && column === 0 && !hasPageControls) {
-                            focus.focusUp = props.focusKey
-                        } else {
-                            focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
-                        }
-                    }
-
-                    if (row === maxRow - 1) {
-                        if (hasPageControls) {
-                            focus.focusDown = 'next-page-bottom'
-                        } else {
-                            if (props.focusDown) {
-                                focus.focusDown = props.focusDown
+                        // Only allow auto focusing before the pager is used
+                        if (!pagerPressed) {
+                            if (child.props.focusStart) {
+                                focus.focusStart = child.props.focusStart
+                            } else {
+                                if (index === 0 && props.focusStart) {
+                                    focus.focusStart = true
+                                }
                             }
                         }
 
-                    } else {
-                        if (row === maxRow - 2 && column >= lastElementColumn - 1) {
-                            focus.focusDown = lastCellKey
+                        if (row === 0) {
+                            if (hasPageControls) {
+                                focus.focusUp = props.focusKey
+                            }
+                            else {
+                                if (props.focusUp) {
+                                    focus.focusUp = props.focusUp
+                                }
+                            }
                         } else {
-                            focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
+                            if (row - 1 === 0 && column === 0 && !hasPageControls) {
+                                focus.focusUp = props.focusKey
+                            } else {
+                                focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
+                            }
                         }
-                    }
 
-                    if (column === 0) {
-                        if (props.focusLeft) {
-                            focus.focusLeft = props.focusLeft
-                        }
-                    } else {
-                        if (column - 1 === 0 && row === 0) {
-                            focus.focusLeft = props.focusKey
+                        if (row === maxRow - 1) {
+                            if (hasPageControls) {
+                                focus.focusDown = 'next-page-bottom'
+                            } else {
+                                if (props.focusDown) {
+                                    focus.focusDown = props.focusDown
+                                }
+                            }
+
                         } else {
-                            focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
+                            if (row === maxRow - 2 && column >= lastElementColumn - 1) {
+                                focus.focusDown = lastCellKey
+                            } else {
+                                focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
+                            }
                         }
-                    }
 
-                    if (column === maxColumn - 1) {
-                        if (props.focusRight) {
-                            focus.focusRight = props.focusRight
+                        if (column === 0) {
+                            if (props.focusLeft) {
+                                focus.focusLeft = props.focusLeft
+                            }
+                        } else {
+                            if (column - 1 === 0 && row === 0) {
+                                focus.focusLeft = props.focusKey
+                            } else {
+                                focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
+                            }
                         }
-                    } else {
-                        focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
-                        if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
-                            focus.focusRight = lastCellKey
+
+                        if (column === maxColumn - 1) {
+                            if (props.focusRight) {
+                                focus.focusRight = props.focusRight
+                            }
+                        } else {
+                            focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
+                            if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
+                                focus.focusRight = lastCellKey
+                            }
                         }
+                        let debugFocus = {}
+                        if (DEBUG_FOCUS) {
+                            debugFocus = {
+                                maxRow,
+                                maxColumn,
+                                lastElementColumn,
+                                row,
+                                column,
+                                lastCellKey,
+                                lastCellFullKey
+                            }
+                        }
+                        child = React.cloneElement(child, { ...focus, ...debugFocus })
                     }
-                    let debugFocus = {}
-                    if (DEBUG_FOCUS) {
-                        debugFocus = {
-                            maxRow,
-                            maxColumn,
-                            lastElementColumn,
-                            row,
-                            column,
-                            lastCellKey,
-                            lastCellFullKey
-                        }
-                    }
-                    child = React.cloneElement(child, { ...focus, ...debugFocus })
                     return (
                         <View style={itemStyle}>
                             {child}
