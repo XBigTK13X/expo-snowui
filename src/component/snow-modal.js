@@ -14,7 +14,7 @@ export function SnowModal(props) {
 
     React.useEffect(() => {
         if (props.focusLayer) {
-            pushFocusLayer(props.focusLayer)
+            pushFocusLayer(props.focusLayer, true)
             return () => {
                 popFocusLayer()
             }

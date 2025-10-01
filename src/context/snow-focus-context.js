@@ -102,10 +102,20 @@ export function FocusContextProvider(props) {
         return layerName && focusLayers[focusLayers.length - 1].layerName === layerName
     }
 
-    const pushFocusLayer = (layerName) => {
+    const pushFocusLayer = (layerName, layerIsUncloned) => {
+        // By default, assume that a new layer will want any elements from old layers
+        // This allows a root layout to define the first layer
+        // Then each page gets a single layer, which is popped at unmount
+        // That way, things like header elements can be referenced for focus by a page
+        // If something like a modal is desired, then specify that and do not copy the previous layer
         setFocusLayers((prev) => {
             let result = [...prev]
-            result.push({ layerName, refs: {}, directions: {} })
+            if (layerIsUncloned) {
+                result.push({ layerName, refs: {}, directions: {} })
+            }
+            else {
+                result.push({ layerName, refs: { ...prev[prev.length - 1].refs }, directions: { ...prev[prev.length - 1].directions } })
+            }
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
             }
