@@ -92,6 +92,49 @@ function GridTab() {
   )
 }
 
+function GridMoreTab() {
+  const [showModal, setShowModal] = React.useState(false)
+
+  if (showModal) {
+    return (
+      <View>
+        <Snow.Modal focusLayer="grid-more" onRequestClose={() => { setShowModal(false) }}>
+          <Snow.Label>Component: Grid</Snow.Label>
+          <Snow.Grid
+            focusKey="first-grid"
+            focusDown="second-grid"
+            items={['Allow', 'Block', 'Cancel']}
+            renderItem={(item: any) => {
+              return <Snow.TextButton title={item} />
+            }} />
+          <Snow.Break />
+          <Snow.Grid
+            focusStart
+            focusKey="second-grid"
+            items={['Important', 'Action', 'Taken']}
+            renderItem={(item: any) => {
+              return <Snow.TextButton title={item} />
+            }} />
+          <Snow.Break />
+          <Snow.Grid
+            focusKey="third-grid"
+            focusUp="second-grid"
+            items={['First', 'Second', 'Third']}
+            renderItem={(item: any) => {
+              return <Snow.TextButton title={item} />
+            }} />
+          <Snow.TextButton focusKey="tab-entry" title="Close Modal" onPress={() => { setShowModal(false) }} />
+        </Snow.Modal>
+      </View>
+    )
+  }
+  return (
+    <View>
+      <Snow.TextButton focusKey="tab-entry" title="Show Complex Grid" onPress={() => { setShowModal(true) }} />
+    </View>
+  )
+}
+
 function HeaderTab() {
   return (
     <View>
@@ -238,6 +281,7 @@ function AppPage() {
     ['Break', <BreakTab />],
     ['Dropdown', <DropdownTab dropdownIndex={dropdownIndex} setDropdownIndex={setDropdownIndex} />],
     ['Grid', <GridTab />],
+    ['Grid More', <GridMoreTab />],
     ['Header', <HeaderTab />],
     ['ImageButton', <ImageButtonTab />],
     ['ImageGrid', <ImageGridTab />],

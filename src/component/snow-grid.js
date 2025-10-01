@@ -77,7 +77,7 @@ export function SnowGrid(props) {
     }
     let pageControls = () => { return null }
     let firstCellKey = `${props.focusKey}-row-0-column-0`
-    let lastCellKey = `${props.focusKey}-end`
+    let lastCellKey = `${props.focusKey}-grid-end`
     let lastCellFullKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
     if (hasPageControls) {
         const firstPage = () => {

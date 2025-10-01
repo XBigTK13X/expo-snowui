@@ -7,12 +7,15 @@ let DEBUG_FOCUS = false
 
 /*
 TODO
-Snowpage focusing down on index after naving away to a different page leaves stale data in the focus map
-
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
 Allow long press directions to continue moving focus
+
+Allow grid to grid movement to maintain the relative positon.
+    Imagine a 1x3 grid and then a 1x3 under it.
+    When highlighting the second element of the first, a down move should send you to the send element of the next.
+    However, grid movement currently always pushes you to the start of the grid
 */
 
 const FocusContext = React.createContext({});
@@ -242,15 +245,18 @@ export function FocusContextProvider(props) {
             focusLayer.directions.hasOwnProperty(focusLayer.directions[sourceKey][direction])
         let isGridCell = false
         if (!normalDestination) {
-            isGridCell = sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1
+            isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) || (sourceKey.indexOf('-grid-end') !== -1)
             if (isGridCell) {
                 sourceKey = sourceKey.split('-row-')[0]
-                let target = focusLayer.directions[sourceKey][direction]
-                // The target is defined and isn't a cell in the grid
-                if (target && target.indexOf(sourceKey) === -1) {
-                    destinationKey = target
-                    if (DEBUG_FOCUS) {
-                        prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
+                sourceKey = sourceKey.split('-grid-end')[0]
+                if (focusLayer.directions[sourceKey] && focusLayer.directions[sourceKey][direction]) {
+                    let target = focusLayer.directions[sourceKey][direction]
+                    // The target is defined and isn't a cell in the grid
+                    if (target && target.indexOf(sourceKey) === -1) {
+                        destinationKey = target
+                        if (DEBUG_FOCUS) {
+                            prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
+                        }
                     }
                 }
             }
