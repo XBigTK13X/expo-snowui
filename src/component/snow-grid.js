@@ -9,7 +9,7 @@ import { useFocusContext } from '../context/snow-focus-context'
 import SnowTextButton from './snow-text-button'
 import SnowText from './snow-text'
 
-export function SnowGrid(props) {
+const SnowGridComponent = (props) => {
     if (!props.items && !props.children) {
         return null
     }
@@ -326,5 +326,9 @@ export function SnowGrid(props) {
         </View >
     )
 }
+
+SnowGridComponent.isSnowFocusWired = true
+
+export const SnowGrid = SnowGridComponent
 
 export default SnowGrid

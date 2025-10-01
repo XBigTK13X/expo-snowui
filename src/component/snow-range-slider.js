@@ -30,7 +30,7 @@ const step = 0.01
 // It completely breaks in Android or Web, depending on the version of react I override it to use
 
 // After a handful of other libraries still had problems, I rolled my own
-export function SnowRangeSlider(props) {
+const SnowRangeSliderComponent = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { setRemoteCallbacks, addFocusMap, focusOn, isFocused } = useFocusContext()
     const isDraggingRef = React.useRef(false)
@@ -241,5 +241,9 @@ export function SnowRangeSlider(props) {
         </View>
     );
 }
+
+SnowRangeSliderComponent.isSnowFocusWired = true
+
+export const SnowRangeSlider = SnowRangeSliderComponent
 
 export default SnowRangeSlider

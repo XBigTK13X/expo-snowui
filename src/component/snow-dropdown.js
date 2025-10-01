@@ -4,7 +4,7 @@ import SnowGrid from './snow-grid'
 import SnowTextButton from './snow-text-button'
 import SnowLabel from './snow-label'
 
-export function SnowDropdown(props) {
+const SnowDropdownComponent = (props) => {
     const { readFocusProps } = useFocusContext()
     if (!props.options) {
         return null
@@ -54,5 +54,9 @@ export function SnowDropdown(props) {
         />
     )
 }
+
+SnowDropdownComponent.isSnowFocusWired = true
+
+export const SnowDropdown = SnowDropdownComponent
 
 export default SnowDropdown

@@ -5,7 +5,7 @@ import { useFocusContext } from '../context/snow-focus-context'
 import SnowFillView from './snow-fill-view'
 import SnowText from './snow-text'
 
-export function SnowModal(props) {
+const SnowModalComponent = (props) => {
     if (!props.focusLayer) {
         return <SnowText>SnowModal requires a focusLayer prop</SnowText>
     }
@@ -62,5 +62,9 @@ export function SnowModal(props) {
             style={style} />
     </Modal>
 }
+
+SnowModalComponent.isSnowFocusWired = true
+
+export const SnowModal = SnowModalComponent
 
 export default SnowModal

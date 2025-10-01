@@ -4,7 +4,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../context/snow-style-context'
 import { useFocusContext } from '../context/snow-focus-context'
 
-export function SnowInput(props) {
+const SnowInputComponent = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
     const elementRef = React.useRef(null)
@@ -51,5 +51,9 @@ export function SnowInput(props) {
         value={props.value}
     />
 }
+
+SnowInputComponent.isSnowFocusWired = true
+
+export const SnowInput = SnowInputComponent
 
 export default SnowInput

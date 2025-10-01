@@ -5,7 +5,7 @@ import { Image } from 'expo-image'
 import { useStyleContext } from '../context/snow-style-context'
 import { useFocusContext } from '../context/snow-focus-context'
 
-export function SnowImageButton(props) {
+const SnowImageButtonComponent = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
     const elementRef = React.useRef(null)
@@ -84,5 +84,9 @@ export function SnowImageButton(props) {
         </View>
     )
 }
+
+SnowImageButtonComponent.isSnowFocusWired = true
+
+export const SnowImageButton = SnowImageButtonComponent
 
 export default SnowImageButton

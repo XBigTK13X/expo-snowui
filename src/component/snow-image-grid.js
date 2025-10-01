@@ -5,7 +5,7 @@ import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
 import SnowLabel from './snow-label'
 
-export function SnowImageGrid(props) {
+const SnowImageGridComponent = (props) => {
     if (!props.items || !props.items.length) {
         return null
     }
@@ -84,5 +84,9 @@ export function SnowImageGrid(props) {
         </View>
     )
 }
+
+SnowImageGridComponent.isSnowFocusWired = true
+
+const SnowImageGrid = SnowImageGridComponent
 
 export default SnowImageGrid
