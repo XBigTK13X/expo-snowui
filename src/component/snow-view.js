@@ -9,7 +9,7 @@ import { useFocusContext } from '../context/snow-focus-context'
 // Focus props goto the first child
 // Style props goto all children
 
-export function SnowView(props) {
+const SnowViewComponent = (props) => {
     let styleProps = {}
     if (props.snowStyle) {
         styleProps.snowStyle = props.snowStyle
@@ -35,5 +35,9 @@ export function SnowView(props) {
         children={children}
     />)
 }
+
+SnowViewComponent.isSnowFocusWired = true
+
+export const SnowView = SnowViewComponent
 
 export default SnowView
