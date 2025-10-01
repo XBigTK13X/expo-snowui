@@ -1,3 +1,4 @@
+import React from 'react'
 import { View } from 'react-native'
 import { useFocusContext } from '../context/snow-focus-context'
 
@@ -5,6 +6,8 @@ import { useFocusContext } from '../context/snow-focus-context'
 // These children are usually wrapped in a <View>
 // However, the View would strip out props used by snowui
 // Instead this component can be used to make sure props properly propogate.
+// Focus props goto the first child
+// Style props goto all children
 
 export function SnowView(props) {
     let styleProps = {}
@@ -16,10 +19,20 @@ export function SnowView(props) {
     }
     const { readFocusProps } = useFocusContext()
 
+    const children = React.Children.toArray(props.children).map((child, childIndex) => {
+        if (React.isValidElement(child)) {
+            if (childIndex === 0) {
+                return React.cloneElement(child, { ...readFocusProps(props), ...styleProps })
+            }
+            return React.cloneElement(child, { ...styleProps })
+        }
+        return child;
+    }).filter(child => child !== null);
+
     return (<View
         {...readFocusProps(props)}
         {...styleProps}
-        children={props.children}
+        children={children}
     />)
 }
 
