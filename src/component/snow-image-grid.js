@@ -87,6 +87,6 @@ const SnowImageGridComponent = (props) => {
 
 SnowImageGridComponent.isSnowFocusWired = true
 
-const SnowImageGrid = SnowImageGridComponent
+export const SnowImageGrid = SnowImageGridComponent
 
 export default SnowImageGrid

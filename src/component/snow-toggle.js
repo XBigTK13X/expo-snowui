@@ -4,7 +4,7 @@ import { useStyleContext } from '../context/snow-style-context'
 import { useFocusContext } from '../context/snow-focus-context'
 import { SnowLabel } from './snow-label'
 
-export function SnowToggle(props) {
+const SnowToggleComponent = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { addFocusMap, focusOn, isFocused, focusedKey } = useFocusContext()
     const elementRef = React.useRef(null)
@@ -55,5 +55,9 @@ export function SnowToggle(props) {
         </Pressable>
     )
 }
+
+SnowToggleComponent.isSnowFocusWired = true
+
+export const SnowToggle = SnowToggleComponent
 
 export default SnowToggle

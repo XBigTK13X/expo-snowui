@@ -5,7 +5,7 @@ import SnowDropdown from './snow-dropdown'
 import { useStyleContext } from '../context/snow-style-context'
 import { useFocusContext } from '../context/snow-focus-context'
 
-export function SnowTabs(props) {
+const SnowTabsComponent = (props) => {
     const { SnowStyle } = useStyleContext(props)
     if (!props.headers) {
         return null
@@ -70,5 +70,9 @@ export function SnowTabs(props) {
     )
 
 }
+
+SnowTabsComponent.isSnowFocusWired = true
+
+export const SnowTabs = SnowTabsComponent
 
 export default SnowTabs

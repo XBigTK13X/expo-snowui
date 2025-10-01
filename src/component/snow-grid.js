@@ -216,7 +216,7 @@ const SnowGridComponent = (props) => {
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     let child = renderItem(item, index)
-                    if (props.assignFocus !== false) {
+                    if (child.type.isSnowFocusWired && props.assignFocus !== false) {
                         let row = Math.floor(index / itemsPerRow)
                         let column = index % itemsPerRow
                         let focus = {}
