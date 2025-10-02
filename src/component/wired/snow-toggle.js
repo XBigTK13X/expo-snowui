@@ -1,22 +1,12 @@
-import React from 'react'
 import { Switch, Pressable } from 'react-native'
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
-import { SnowLabel } from './snow-label'
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import { SnowLabel } from '../snow-label'
 
-const SnowToggleComponent = (props) => {
+const SnowToggleW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { addFocusMap, focusOn, isFocused, focusedKey } = useFocusContext()
-    const elementRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (elementRef.current) {
-            addFocusMap(elementRef, props)
-            if (props.focusStart) {
-                focusOn(elementRef, props.focusKey)
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    const { useFocusWiring, isFocused } = useFocusContext()
+    const elementRef = useFocusWiring(props)
 
     const toggleValue = () => {
         props.onValueChange(!props.value)
@@ -56,8 +46,8 @@ const SnowToggleComponent = (props) => {
     )
 }
 
-SnowToggleComponent.isSnowFocusWired = true
+SnowToggleW.isSnowFocusWired = true
 
-export const SnowToggle = SnowToggleComponent
+export const SnowToggle = SnowToggleW
 
 export default SnowToggle

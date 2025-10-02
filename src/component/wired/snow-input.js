@@ -1,22 +1,12 @@
-import React from 'react'
 import { TextInput } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
 
-const SnowInputComponent = (props) => {
+const SnowInputW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
-    const elementRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (elementRef.current) {
-            addFocusMap(elementRef, props)
-            if (props.focusStart) {
-                focusOn(elementRef, props.focusKey)
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    const { isFocused, useFocusWiring } = useFocusContext()
+    const elementRef = useFocusWiring(props)
 
     let textStyle = [SnowStyle.component.input.text]
     if (props.short) {
@@ -52,8 +42,8 @@ const SnowInputComponent = (props) => {
     />
 }
 
-SnowInputComponent.isSnowFocusWired = true
+SnowInputW.isSnowFocusWired = true
 
-export const SnowInput = SnowInputComponent
+export const SnowInput = SnowInputW
 
 export default SnowInput

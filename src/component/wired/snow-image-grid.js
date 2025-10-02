@@ -1,11 +1,11 @@
 import React from 'react'
 import { View } from 'react-native'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
-import SnowLabel from './snow-label'
 
-const SnowImageGridComponent = (props) => {
+const SnowImageGridW = (props) => {
     if (!props.items || !props.items.length) {
         return null
     }
@@ -85,8 +85,8 @@ const SnowImageGridComponent = (props) => {
     )
 }
 
-SnowImageGridComponent.isSnowFocusWired = true
+SnowImageGridW.isSnowFocusWired = true
 
-export const SnowImageGrid = SnowImageGridComponent
+export const SnowImageGrid = SnowImageGridW
 
 export default SnowImageGrid

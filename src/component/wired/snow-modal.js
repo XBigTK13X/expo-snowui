@@ -1,25 +1,17 @@
-import React from 'react'
 import { Modal } from 'react-native'
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
-import SnowFillView from './snow-fill-view'
-import SnowText from './snow-text'
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import SnowFillView from '../snow-fill-view'
+import SnowText from '../snow-text'
 
-const SnowModalComponent = (props) => {
+const SnowModalW = (props) => {
     if (!props.focusLayer) {
         return <SnowText>SnowModal requires a focusLayer prop</SnowText>
     }
     const { SnowStyle } = useStyleContext(props)
-    const { pushFocusLayer, popFocusLayer, isFocusedLayer } = useFocusContext()
+    const { useFocusLayer, isFocusedLayer } = useFocusContext()
 
-    React.useEffect(() => {
-        if (props.focusLayer) {
-            pushFocusLayer(props.focusLayer, true)
-            return () => {
-                popFocusLayer()
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    useFocusLayer(props.focusLayer, true)
 
     if (!isFocusedLayer(props.focusLayer)) {
         return null
@@ -63,8 +55,8 @@ const SnowModalComponent = (props) => {
     </Modal>
 }
 
-SnowModalComponent.isSnowFocusWired = true
+SnowModalW.isSnowFocusWired = true
 
-export const SnowModal = SnowModalComponent
+export const SnowModal = SnowModalW
 
 export default SnowModal

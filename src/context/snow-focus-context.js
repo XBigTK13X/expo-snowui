@@ -89,6 +89,7 @@ export function FocusContextProvider(props) {
     const focusLayersRef = React.useRef(focusLayers)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
+    const [currentLayer, setCurrentLayer] = React.useState('app')
     let DEBUG_FOCUS = props.DEBUG_FOCUS
 
     React.useEffect(() => {
@@ -136,12 +137,14 @@ export function FocusContextProvider(props) {
             }
             return result
         })
+        setCurrentLayer(layerName)
     }
 
     const popFocusLayer = () => {
         setFocusLayers((prev) => {
             let result = [...prev]
             result.pop()
+            setCurrentLayer(result.at(-1).layerName)
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'popFocusLayer', focusLayers: result })
             }
@@ -158,12 +161,37 @@ export function FocusContextProvider(props) {
         }, [])
     }
 
+    // This is only used by low level components to interact with the focus system
+    const useFocusWiring = (elementProps) => {
+        const { addFocusMap, focusOn, currentLayer } = useFocusContext();
+        const elementRef = React.useRef(null);
+
+        React.useEffect(() => {
+            if (elementRef.current) {
+                addFocusMap(elementRef, elementProps);
+                if (elementProps.focusStart) {
+                    focusOn(elementRef, elementProps.focusKey);
+                }
+            }
+        }, [
+            elementProps.focusKey,
+            elementProps.focusDown,
+            elementProps.focusUp,
+            elementProps.focusRight,
+            elementProps.focusLeft,
+            currentLayer
+        ]);
+
+        return elementRef;
+    }
+
     const clearFocusLayers = () => {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'clearfocusLayers' })
         }
         setFocusLayers(emptyLayers())
         setFocusedKey(null)
+        setCurrentLayer('app')
     }
 
     // This only sets the scroll view for the current map
@@ -492,6 +520,7 @@ export function FocusContextProvider(props) {
     const focusContext = {
         DEBUG_FOCUS,
         focusedKey,
+        useFocusWiring,
         addFocusMap,
         useFocusLayer,
         popFocusLayer,

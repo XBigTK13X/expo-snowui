@@ -1,23 +1,14 @@
 import React from 'react'
 import { View, Pressable } from 'react-native';
-import SnowText from './snow-text'
 import { Image } from 'expo-image'
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import SnowText from '../snow-text'
 
-const SnowImageButtonComponent = (props) => {
+const SnowImageButtonW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
-    const elementRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (elementRef.current) {
-            addFocusMap(elementRef, props)
-            if (props.focusStart) {
-                focusOn(elementRef, props.focusKey)
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    const { isFocused, useFocusWiring, focusPress, focusLongPress } = useFocusContext()
+    const elementRef = useFocusWiring(props)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
@@ -85,8 +76,8 @@ const SnowImageButtonComponent = (props) => {
     )
 }
 
-SnowImageButtonComponent.isSnowFocusWired = true
+SnowImageButtonW.isSnowFocusWired = true
 
-export const SnowImageButton = SnowImageButtonComponent
+export const SnowImageButton = SnowImageButtonW
 
 export default SnowImageButton

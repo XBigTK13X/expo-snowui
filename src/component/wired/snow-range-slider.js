@@ -2,12 +2,11 @@ import React from "react";
 import {
     PanResponder,
     Pressable,
-    View,
-    findNodeHandle
+    View
 } from "react-native";
 import { useDebouncedCallback } from 'use-debounce'
-import { useFocusContext } from '../context/snow-focus-context'
-import { useStyleContext } from '../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import { useStyleContext } from '../../context/snow-style-context'
 
 const min = 0.0
 const max = 1.0
@@ -30,23 +29,14 @@ const step = 0.01
 // It completely breaks in Android or Web, depending on the version of react I override it to use
 
 // After a handful of other libraries still had problems, I rolled my own
-const SnowRangeSliderComponent = (props) => {
+const SnowRangeSliderW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { setRemoteCallbacks, addFocusMap, focusOn, isFocused } = useFocusContext()
+    const { setRemoteCallbacks, useFocusWiring, isFocused } = useFocusContext()
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(0)
     const percentRef = React.useRef(percent)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
-    const elementRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (elementRef.current) {
-            addFocusMap(elementRef, props)
-            if (props.focusStart) {
-                focusOn(elementRef, props.focusKey)
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    const elementRef = useFocusWiring(props)
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
     if (props.width) {
@@ -242,8 +232,8 @@ const SnowRangeSliderComponent = (props) => {
     );
 }
 
-SnowRangeSliderComponent.isSnowFocusWired = true
+SnowRangeSliderW.isSnowFocusWired = true
 
-export const SnowRangeSlider = SnowRangeSliderComponent
+export const SnowRangeSlider = SnowRangeSliderW
 
 export default SnowRangeSlider

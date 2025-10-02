@@ -1,6 +1,6 @@
 import React from 'react'
 import { View } from 'react-native'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useFocusContext } from '../../context/snow-focus-context'
 
 // Sometimes when building, say a Tabs element, a single tab entry will need multiple children.
 // These children are usually wrapped in a <View>
@@ -9,7 +9,7 @@ import { useFocusContext } from '../context/snow-focus-context'
 // Focus props goto the first child
 // Style props goto all children
 
-const SnowViewComponent = (props) => {
+const SnowViewW = (props) => {
     let styleProps = {}
     if (props.snowStyle) {
         styleProps.snowStyle = props.snowStyle
@@ -36,8 +36,8 @@ const SnowViewComponent = (props) => {
     />)
 }
 
-SnowViewComponent.isSnowFocusWired = true
+SnowViewW.isSnowFocusWired = true
 
-export const SnowView = SnowViewComponent
+export const SnowView = SnowViewW
 
 export default SnowView

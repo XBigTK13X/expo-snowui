@@ -1,22 +1,12 @@
-import React from 'react'
-import { Pressable, Keyboard } from 'react-native';
-import { useFocusContext } from '../context/snow-focus-context'
-import { useStyleContext } from '../context/snow-style-context'
-import SnowText from './snow-text'
+import { Pressable } from 'react-native';
+import { useFocusContext } from '../../context/snow-focus-context'
+import { useStyleContext } from '../../context/snow-style-context'
+import SnowText from '../snow-text'
 
-const SnowTextButtonComponent = (props) => {
+const SnowTextButtonW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, addFocusMap, focusOn, focusPress, focusLongPress } = useFocusContext()
-    const elementRef = React.useRef(null)
-
-    React.useEffect(() => {
-        if (elementRef.current) {
-            addFocusMap(elementRef, props)
-            if (props.focusStart) {
-                focusOn(elementRef, props.focusKey)
-            }
-        }
-    }, [props.focusKey, props.focusDown, props.focusUp, props.focusRight, props.focusLeft])
+    const { isFocused, focusPress, focusLongPress, useFocusWiring } = useFocusContext()
+    const elementRef = useFocusWiring(props)
 
     const wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.disabled) {
@@ -69,8 +59,8 @@ const SnowTextButtonComponent = (props) => {
     )
 }
 
-SnowTextButtonComponent.isSnowFocusWired = true
+SnowTextButtonW.isSnowFocusWired = true
 
-export const SnowTextButton = SnowTextButtonComponent
+export const SnowTextButton = SnowTextButtonW
 
 export default SnowTextButton

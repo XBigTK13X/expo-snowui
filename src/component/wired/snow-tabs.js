@@ -1,11 +1,11 @@
 import React from 'react'
 import { View } from 'react-native';
-
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
 import SnowDropdown from './snow-dropdown'
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
 
-const SnowTabsComponent = (props) => {
+
+const SnowTabsW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     if (!props.headers) {
         return null
@@ -71,8 +71,8 @@ const SnowTabsComponent = (props) => {
 
 }
 
-SnowTabsComponent.isSnowFocusWired = true
+SnowTabsW.isSnowFocusWired = true
 
-export const SnowTabs = SnowTabsComponent
+export const SnowTabs = SnowTabsW
 
 export default SnowTabs

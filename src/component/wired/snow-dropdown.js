@@ -1,10 +1,10 @@
 import { View } from 'react-native'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowTextButton from './snow-text-button'
-import SnowLabel from './snow-label'
 
-const SnowDropdownComponent = (props) => {
+const SnowDropdownW = (props) => {
     const { readFocusProps } = useFocusContext()
     if (!props.options) {
         return null
@@ -55,8 +55,8 @@ const SnowDropdownComponent = (props) => {
     )
 }
 
-SnowDropdownComponent.isSnowFocusWired = true
+SnowDropdownW.isSnowFocusWired = true
 
-export const SnowDropdown = SnowDropdownComponent
+export const SnowDropdown = SnowDropdownW
 
 export default SnowDropdown

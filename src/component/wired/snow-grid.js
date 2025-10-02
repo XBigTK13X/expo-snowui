@@ -4,10 +4,10 @@ import {
     FlatList
 } from 'react-native'
 
-import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useStyleContext } from '../../context/snow-style-context'
+import { useFocusContext } from '../../context/snow-focus-context'
+import SnowText from '../snow-text'
 import SnowTextButton from './snow-text-button'
-import SnowText from './snow-text'
 
 // The grid may contain items that aren't wired for focus
 // This tracks only wired items, so that focus hints between them
@@ -21,7 +21,7 @@ const emptyWiredGrid = () => {
     }
 }
 
-const SnowGridComponent = (props) => {
+const SnowGridW = (props) => {
     if (!props.items && !props.children) {
         return null
     }
@@ -356,8 +356,8 @@ const SnowGridComponent = (props) => {
     )
 }
 
-SnowGridComponent.isSnowFocusWired = true
+SnowGridW.isSnowFocusWired = true
 
-export const SnowGrid = SnowGridComponent
+export const SnowGrid = SnowGridW
 
 export default SnowGrid
