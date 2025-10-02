@@ -9,11 +9,11 @@ export function useStyleContext(componentProps) {
     if (!value) {
         throw new Error('useStyleContext must be wrapped in a <StyleContextProvider />');
     }
-    if (componentProps && componentProps.snowStyle) {
+    if (componentProps?.snowStyle) {
         value = { ...value }
         value.SnowStyle = _.merge({}, value.SnowStyle, componentProps.snowStyle)
     }
-    if (componentProps && componentProps.snowConfig) {
+    if (componentProps?.snowConfig) {
         value = { ...value }
         value.SnowConfig = _.merge({}, value.SnowConfig, componentProps.snowConfig)
     }

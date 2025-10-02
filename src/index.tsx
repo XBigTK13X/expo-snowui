@@ -42,8 +42,15 @@ import { SnowToggle } from './component/snow-toggle'
 export { SnowView } from './component/snow-view'
 import { SnowView } from './component/snow-view'
 
+const useFocusLayerFunc = (name: string, uncloned: boolean = false) => {
+  return useFocusContext().useFocusLayer(name, uncloned)
+}
+
+export const useFocusLayer = useFocusLayerFunc
+
 export default {
   useFocusContext,
+  useFocusLayer,
   useStyleContext,
   App: SnowApp,
   Break: SnowBreak,

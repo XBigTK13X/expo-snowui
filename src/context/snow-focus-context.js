@@ -3,8 +3,6 @@ import _ from 'lodash'
 import { Platform, useTVEventHandler, Keyboard, findNodeHandle } from 'react-native'
 import { SnowSafeArea } from '../component/snow-safe-area'
 
-let DEBUG_FOCUS = false
-
 /*
 TODO
 Focus can get lost if in a tabs element there is only text.
@@ -19,6 +17,10 @@ Allow grid to grid movement to maintain the relative positon.
 
 Nested grids generate duplicate keys, breaking navigation.
     assignFocus={false} is a bandaid, but it would be useful to allow nested grids
+
+Hitting the edge of a paged grid snaps up to the pager.
+    Maybe add a way to totally block focus in one direction?
+    null just means another component can decide to map to you.
 */
 
 const FocusContext = React.createContext({});
@@ -87,10 +89,7 @@ export function FocusContextProvider(props) {
     const focusLayersRef = React.useRef(focusLayers)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
-
-    if (props.DEBUG_FOCUS) {
-        DEBUG_FOCUS = props.DEBUG_FOCUS
-    }
+    let DEBUG_FOCUS = props.DEBUG_FOCUS
 
     React.useEffect(() => {
         focusedKeyRef.current = focusedKey
@@ -115,7 +114,7 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS === 'verbose') {
             prettyLog({ action: 'isFocusedLayer', layerName, layerMaps })
         }
-        return layerName && focusLayers[focusLayers.length - 1].layerName === layerName
+        return layerName && focusLayers.at(-1).layerName === layerName
     }
 
     const pushFocusLayer = (layerName, layerIsUncloned) => {
@@ -130,7 +129,7 @@ export function FocusContextProvider(props) {
                 result.push({ layerName, refs: {}, directions: {} })
             }
             else {
-                result.push({ layerName, refs: { ...prev[prev.length - 1].refs }, directions: { ...prev[prev.length - 1].directions } })
+                result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions } })
             }
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
@@ -150,12 +149,32 @@ export function FocusContextProvider(props) {
         })
     }
 
+    const useFocusLayer = (name, isUncloned) => {
+        React.useLayoutEffect(() => {
+            pushFocusLayer(name, isUncloned)
+            return () => {
+                popFocusLayer()
+            }
+        }, [])
+    }
+
     const clearFocusLayers = () => {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'clearfocusLayers' })
         }
         setFocusLayers(emptyLayers())
         setFocusedKey(null)
+    }
+
+    // This only sets the scroll view for the current map
+    const setScrollViewRef = (scrollViewRef) => {
+        setFocusLayers((prev) => {
+            let result = [...prev]
+            let focusLayer = result[result.length - 1]
+            focusLayer.scrollViewRef = scrollViewRef
+            result[result.length - 1] = focusLayer
+            return result
+        })
     }
 
     const addFocusMap = (elementRef, elementProps) => {
@@ -228,6 +247,20 @@ export function FocusContextProvider(props) {
 
     const focusOn = (elementRef, focusKey) => {
         elementRef.current.focus()
+        let scroll = focusLayersRef.current?.at(-1)?.scrollViewRef
+        if (scroll) {
+            elementRef.measureLayout(
+                scroll.getInnerViewNode(),
+                (x, y) => {
+                    scroll.scrollTo({ y, animated: true });
+                },
+                (err) => {
+                    if (DEBUG_FOCUS) {
+                        prettyLog({ error: 'Measurement error for scrollview' })
+                    }
+                }
+            );
+        }
         setFocusedKey(focusKey)
     }
 
@@ -250,12 +283,10 @@ export function FocusContextProvider(props) {
         }
         let sourceKey = focusedKeyRef.current
         let destinationKey = null
-        const focusLayer = focusLayersRef.current[focusLayersRef.current.length - 1]
+        const focusLayer = focusLayersRef.current.at(-1)
 
-        const normalDestination = focusLayer.directions &&
-            focusLayer.directions[sourceKey] &&
-            focusLayer.directions[sourceKey][direction] &&
-            focusLayer.directions.hasOwnProperty(focusLayer.directions[sourceKey][direction])
+        const request = focusLayer.directions?.[sourceKey]?.[direction];
+        const normalDestination = request && focusLayer.directions.hasOwnProperty(request)
         let isGridCell = false
         if (!normalDestination) {
             isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) || (sourceKey.indexOf('-grid-end') !== -1)
@@ -264,14 +295,12 @@ export function FocusContextProvider(props) {
                 // Only ever replace one -grid-end at a time
                 // Otherwise, a nested grid will have focus escape a map too early
                 sourceKey = sourceKey.replace('-grid-end', '')
-                if (focusLayer.directions[sourceKey] && focusLayer.directions[sourceKey][direction]) {
-                    let target = focusLayer.directions[sourceKey][direction]
-                    // The target is defined and isn't a cell in the grid
-                    if (target && target.indexOf(sourceKey) === -1) {
-                        destinationKey = target
-                        if (DEBUG_FOCUS) {
-                            prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
-                        }
+                let target = focusLayer.directions?.[sourceKey]?.[direction]
+                // The target is defined and isn't a cell in the grid
+                if (target && target.indexOf(sourceKey) === -1) {
+                    destinationKey = target
+                    if (DEBUG_FOCUS) {
+                        prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
                     }
                 }
             }
@@ -320,11 +349,8 @@ export function FocusContextProvider(props) {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
         }
-        const focusMap = focusLayersRef.current[focusLayersRef.current.length - 1]
-        if (Keyboard.isVisible() ||
-            !focusMap.refs ||
-            !focusMap.refs[focusKey] ||
-            !focusMap.refs[focusKey].onPress) {
+        const focusMap = focusLayersRef.current.at(-1)
+        if (Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onPress)) {
             return false
         }
         return focusMap.refs[focusKey].onPress()
@@ -334,11 +360,8 @@ export function FocusContextProvider(props) {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
         }
-        const focusMap = focusLayersRef.current[focusLayersRef.current.length - 1]
-        if (Keyboard.isVisible() ||
-            !focusMap.refs ||
-            !focusMap.refs[focusKey] ||
-            !focusMap.refs[focusKey].onLongPress) {
+        const focusMap = focusLayersRef.current.at(-1)
+        if (Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onLongPress)) {
             return false
         }
         return focusMap.refs[focusKey].onLongPress()
@@ -470,6 +493,7 @@ export function FocusContextProvider(props) {
         DEBUG_FOCUS,
         focusedKey,
         addFocusMap,
+        useFocusLayer,
         popFocusLayer,
         pushFocusLayer,
         clearFocusLayers,
@@ -478,6 +502,7 @@ export function FocusContextProvider(props) {
         layersAreClear: focusedKey === null,
         readFocusProps,
         setRemoteCallbacks,
+        setScrollViewRef,
         focusLongPress,
         focusOn,
         focusPress

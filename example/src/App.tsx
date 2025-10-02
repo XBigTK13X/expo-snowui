@@ -39,6 +39,7 @@ function BreakTab() {
 }
 
 function DropdownTab(props: any) {
+  Snow.useFocusLayer('tab-dropdown')
   const [form, setForm] = React.useState<any>({
     playerChoice: 0,
     alwaysTranscode: 0,
@@ -107,6 +108,7 @@ function DropdownTab(props: any) {
 }
 
 function GridTab() {
+  Snow.useFocusLayer('tab-grid')
   return (
     <View>
       <Snow.Label>Component: Grid</Snow.Label>
@@ -148,6 +150,7 @@ function GridTab() {
 }
 
 function GridMoreTab() {
+  Snow.useFocusLayer('tab-grid-more')
   const [showModal, setShowModal] = React.useState(false)
 
   if (showModal) {
@@ -198,6 +201,7 @@ function GridMoreTab() {
 }
 
 function HeaderTab() {
+  Snow.useFocusLayer('tab-header')
   return (
     <View>
       <Snow.Label>Component: Header</Snow.Label>
@@ -207,6 +211,7 @@ function HeaderTab() {
 }
 
 function ImageButtonTab() {
+  Snow.useFocusLayer('tab-image-button')
   return (
     <View>
       <Snow.Label>Component: Image Button</Snow.Label>
@@ -217,6 +222,7 @@ function ImageButtonTab() {
 }
 
 function ImageGridTab() {
+  Snow.useFocusLayer('tab-image-grid')
   return (
     <View>
       <Snow.Label>Component: Image Grid</Snow.Label>
@@ -232,6 +238,7 @@ function ImageGridTab() {
 }
 
 function InputTab(props: any) {
+  Snow.useFocusLayer('tab-input')
   return (
     <View>
       <Snow.Label>Component: Input</Snow.Label>
@@ -241,6 +248,7 @@ function InputTab(props: any) {
 }
 
 function LabelTab() {
+  Snow.useFocusLayer('tab-label')
   return (
     <View>
       <Snow.Label>Component: Label</Snow.Label>
@@ -251,6 +259,7 @@ function LabelTab() {
 
 
 function ModalTab() {
+  Snow.useFocusLayer('tab-modal')
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => { setShowModal(!showModal) }
   if (showModal) {
@@ -275,6 +284,7 @@ function ModalTab() {
 }
 
 function RangeSliderTab(props: any) {
+  Snow.useFocusLayer('tab-range-slider')
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>
@@ -284,6 +294,7 @@ function RangeSliderTab(props: any) {
 }
 
 function TabsTab() {
+  Snow.useFocusLayer('tab-tabs')
   return (
     <View>
       <Snow.Label>Component: Tabs</Snow.Label>
@@ -302,6 +313,7 @@ function TabsTab() {
 }
 
 function TabsMoreTab() {
+  Snow.useFocusLayer('tab-tabs-more')
   return (
     <View>
       <Snow.Label>Component: Tabs</Snow.Label>
@@ -330,6 +342,7 @@ function TabsMoreTab() {
 }
 
 function TextButtonTab() {
+  Snow.useFocusLayer('tab-text-button')
   return (
     <View>
       <Snow.Label>Component: TextButton</Snow.Label>
@@ -341,6 +354,7 @@ function TextButtonTab() {
 }
 
 function TextTab() {
+  Snow.useFocusLayer('tab-text')
   return (
     <View>
       <Snow.Label>Component: Text</Snow.Label>
@@ -350,6 +364,7 @@ function TextTab() {
 }
 
 function ToggleTab(props: any) {
+  Snow.useFocusLayer('tab-toggle')
   return (
     <View>
       <Snow.Label>Component: Toggle</Snow.Label>
