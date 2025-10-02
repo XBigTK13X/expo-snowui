@@ -1,6 +1,7 @@
 import React from "react";
 import {
     PanResponder,
+    Platform,
     Pressable,
     View
 } from "react-native";
@@ -116,18 +117,41 @@ const SnowRangeSliderW = (props) => {
         percentRef.current = percent
     }, [percent])
 
-    React.useEffect(() => {
-        setRemoteCallbacks((callbacks) => {
-            callbacks['slider'] = sliderHandleRemote
-            return callbacks
-        })
-        return () => {
+    if (Platform.isTV) {
+        React.useEffect(() => {
             setRemoteCallbacks((callbacks) => {
-                callbacks['slider'] = null
+                callbacks['slider'] = sliderHandleRemote
                 return callbacks
             })
-        }
-    })
+            return () => {
+                setRemoteCallbacks((callbacks) => {
+                    callbacks['slider'] = null
+                    return callbacks
+                })
+            }
+        }, [])
+    }
+
+    if (Platform.OS === 'web') {
+        React.useEffect(() => {
+            const rangeSliderKeyboardHandler = (event) => {
+                switch (event.key) {
+                    case 'ArrowLeft':
+                        applyStep(-step)
+                        break
+                    case 'ArrowRight':
+                        applyStep(step)
+                        break
+                    default:
+                        break
+                }
+            };
+            window.addEventListener('keydown', rangeSliderKeyboardHandler);
+            return () => {
+                window.removeEventListener('keydown', rangeSliderKeyboardHandler);
+            };
+        }, []);
+    }
 
     const applyStep = (amount) => {
         let result = percentRef.current + amount

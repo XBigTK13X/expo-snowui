@@ -113,7 +113,7 @@ export function FocusContextProvider(props) {
 
     const isFocusedLayer = (layerName) => {
         if (DEBUG_FOCUS === 'verbose') {
-            prettyLog({ action: 'isFocusedLayer', layerName, layerMaps })
+            prettyLog({ action: 'isFocusedLayer', layerName, focusLayers })
         }
         return layerName && focusLayers.at(-1).layerName === layerName
     }
@@ -164,13 +164,15 @@ export function FocusContextProvider(props) {
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
         const { addFocusMap, focusOn, currentLayer } = useFocusContext();
+        const [startFocused, setStartFocused] = React.useState(false)
         const elementRef = React.useRef(null);
 
         React.useEffect(() => {
             if (elementRef.current) {
                 addFocusMap(elementRef, elementProps);
-                if (elementProps.focusStart) {
+                if (elementProps.focusStart && !startFocused) {
                     focusOn(elementRef, elementProps.focusKey);
+                    setStartFocused(true)
                 }
             }
         }, [
@@ -520,15 +522,15 @@ export function FocusContextProvider(props) {
     const focusContext = {
         DEBUG_FOCUS,
         focusedKey,
+        currentLayer,
+        isFocused,
+        isFocusedLayer,
         useFocusWiring,
         addFocusMap,
         useFocusLayer,
         popFocusLayer,
         pushFocusLayer,
         clearFocusLayers,
-        isFocused,
-        isFocusedLayer,
-        layersAreClear: focusedKey === null,
         readFocusProps,
         setRemoteCallbacks,
         setScrollViewRef,
