@@ -185,7 +185,14 @@ function GridMoreTab() {
   }
   return (
     <View>
-      <Snow.TextButton focusKey="tab-entry" title="Show Complex Grid" onPress={() => { setShowModal(true) }} />
+      <Snow.TextButton focusKey="tab-entry" focusDown="mixed-grid" title="Show Complex Grid" onPress={() => { setShowModal(true) }} />
+      <Snow.Grid
+        focusKey="mixed-grid">
+        <Snow.Text>No focus for me</Snow.Text>
+        <Snow.TextButton title="But I will get some" />
+        <Snow.Text>The third child is skipped</Snow.Text>
+        <Snow.TextButton title="But the fourth gets focus" />
+      </Snow.Grid>
     </View>
   )
 }

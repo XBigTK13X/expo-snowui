@@ -138,6 +138,11 @@ export function createStyle(overrides) {
             },
             short: {
                 padding: 0
+            },
+            pager: {
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center'
             }
         },
         header: {

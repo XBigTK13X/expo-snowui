@@ -19,8 +19,6 @@ Allow grid to grid movement to maintain the relative positon.
 
 Nested grids generate duplicate keys, breaking navigation.
     assignFocus={false} is a bandaid, but it would be useful to allow nested grids
-
-Mixing non-wired elements into a SnowGrid breaks grid nav. Need to handle recalcing rows/cols/items based only on filtered list.
 */
 
 const FocusContext = React.createContext({});
@@ -59,6 +57,16 @@ const prettyLog = (payload) => {
     }
 }
 
+const emptyLayers = () => {
+    return [
+        {
+            layerName: 'app',
+            refs: {},
+            directions: {}
+        }
+    ]
+}
+
 /* Relevant props
 focusKey
     A unique identifier for the focus context in a given element
@@ -75,7 +83,7 @@ focusUp,focusRight,focusDown,focusLeft
 export function FocusContextProvider(props) {
     const [focusedKey, setFocusedKey] = React.useState(null)
     const focusedKeyRef = React.useRef(focusedKey)
-    const [focusLayers, setFocusLayers] = React.useState([{ layerName: 'app', refs: {}, directions: {} }])
+    const [focusLayers, setFocusLayers] = React.useState(emptyLayers())
     const focusLayersRef = React.useRef(focusLayers)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
@@ -146,7 +154,7 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'clearfocusLayers' })
         }
-        setFocusLayers([{ layerName: 'app', refs: {}, directions: {} }])
+        setFocusLayers(emptyLayers())
         setFocusedKey(null)
     }
 

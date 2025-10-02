@@ -9,6 +9,18 @@ import { useFocusContext } from '../context/snow-focus-context'
 import SnowTextButton from './snow-text-button'
 import SnowText from './snow-text'
 
+// The grid may contain items that aren't wired for focus
+// This tracks only wired items, so that focus hints between them
+// Can be more easily management
+const emptyWiredGrid = () => {
+    return {
+        row: 0,
+        column: 0,
+        index: 0,
+        lastGridRow: 0
+    }
+}
+
 const SnowGridComponent = (props) => {
     if (!props.items && !props.children) {
         return null
@@ -28,6 +40,7 @@ const SnowGridComponent = (props) => {
 
     const [page, setPage] = React.useState(0)
     const [pagerPressed, setPagerPressed] = React.useState(false)
+    const wiredGridRef = React.useRef(emptyWiredGrid())
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -137,7 +150,7 @@ const SnowGridComponent = (props) => {
                 }
             }
             return (
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <View style={SnowStyle.component.grid.pager}>
                     <SnowTextButton
                         focusKey={`first-page-${loc}`}
                         focusLeft={`last-page-${loc}`}
@@ -203,7 +216,7 @@ const SnowGridComponent = (props) => {
         }
     }
 
-    let focusWiredIndex = 0
+    wiredGridRef.current = emptyWiredGrid()
 
     return (
         < View style={gridStyle} >
@@ -218,15 +231,17 @@ const SnowGridComponent = (props) => {
                 data={items}
                 renderItem={({ item, index, separators }) => {
                     let child = renderItem(item, index)
+
                     if (child.type.isSnowFocusWired && props.assignFocus !== false) {
-                        let row = Math.floor(index / itemsPerRow)
-                        let column = index % itemsPerRow
+                        let wired = wiredGridRef.current
+                        let row = wired.row
+                        let column = wired.column
                         let focus = {}
                         if (child.props.focusKey) {
                             focus.focusKey = child.props.focusKey
                         }
                         else {
-                            if (focusWiredIndex === 0 && !hasPageControls) {
+                            if (wired.index === 0 && !hasPageControls) {
                                 focus.focusKey = props.focusKey
                             }
                             else {
@@ -241,7 +256,7 @@ const SnowGridComponent = (props) => {
                             if (child.props.focusStart) {
                                 focus.focusStart = child.props.focusStart
                             } else {
-                                if (focusWiredIndex === 0 && props.focusStart) {
+                                if (wired.index === 0 && props.focusStart) {
                                     focus.focusStart = true
                                 }
                             }
@@ -315,9 +330,20 @@ const SnowGridComponent = (props) => {
                                 lastCellFullKey
                             }
                         }
+                        row = Math.floor((index + 1) / itemsPerRow)
+                        if (row > wired.lastGridRow) {
+                            wired.row += 1
+                            wired.column = 0
+                            wired.lastGridRow = row
+                        }
+                        else {
+                            wired.column += 1
+                        }
+                        wired.index += 1
+                        wiredGridRef.current = wired
                         child = React.cloneElement(child, { ...focus, ...debugFocus })
-                        focusWiredIndex += 1
                     }
+
                     return (
                         <View style={itemStyle}>
                             {child}
