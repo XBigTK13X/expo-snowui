@@ -294,29 +294,40 @@ export function FocusContextProvider(props) {
 
     const focusOn = (elementRef, focusKey) => {
         if (DEBUG_FOCUS) {
-            prettyLog({ action: 'focusOn', focusKey, elementRef })
+            prettyLog({ action: 'focusOn', focusKey, hasElement: !!elementRef?.current });
         }
-        if (elementRef?.current) {
-            elementRef.current.focus()
-            let scroll = focusLayersRef.current?.at(-1)?.scrollViewRef
-            if (scroll) {
-                elementRef.measureLayout(
-                    scroll.getInnerViewNode(),
-                    (x, y) => {
-                        scroll.scrollTo({ y, animated: true });
-                    },
-                    (err) => {
-                        if (DEBUG_FOCUS) {
-                            prettyLog({ error: 'Measurement error for scrollview' })
+
+        const element = elementRef?.current;
+        if (element) {
+            element.focus?.()
+            const scrollRef = focusLayersRef.current?.at(-1)?.scrollViewRef
+            const scroll = scrollRef?.current
+
+            if (scroll && element.measureLayout) {
+                const scrollHandle =
+                    typeof scroll.getNativeScrollRef === 'function'
+                        ? findNodeHandle(scroll.getNativeScrollRef())
+                        : findNodeHandle(scroll);
+
+                if (scrollHandle) {
+                    element.measureLayout(
+                        scrollHandle,
+                        (x, y) => {
+                            scroll.scrollTo?.({ y, animated: true });
+                        },
+                        (err) => {
+                            if (DEBUG_FOCUS) {
+                                prettyLog({ error: 'Measurement error for scrollview', err });
+                            }
                         }
-                    }
-                );
+                    );
+                }
             }
         }
 
-        setFocusedKey(focusKey)
-        focusedKeyRef.current = focusKey
-    }
+        setFocusedKey(focusKey);
+        focusedKeyRef.current = focusKey;
+    };
 
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
