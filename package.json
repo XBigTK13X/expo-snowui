@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.2.20",
+  "version": "1.2.21",
   "description": "GUI components and contexts shared by the snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -50,7 +50,7 @@
     "url": "git+https://github.com/XBigTK13X/expo-snowui.git"
   },
   "author": "XBigTK13X <xbigtk13x@gmail.com> (https://github.com/XBigTK13X)",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/XBigTK13X/expo-snowui/issues"
   },
