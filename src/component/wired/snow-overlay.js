@@ -2,6 +2,7 @@ import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import SnowText from './snow-text'
 
 const SnowOverlayW = (props) => {
     if (!props.focusLayer) {
