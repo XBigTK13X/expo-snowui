@@ -265,7 +265,7 @@ function ModalTab() {
   if (showModal) {
     return (
       <Snow.Modal focusLayer={'example-modal'} scroll onRequestClose={toggleModal}>
-        <Snow.TextButton focusKey="tab-entry" focusDown="modal-bottom" title="Close" onPress={toggleModal} />
+        <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-bottom" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 1000 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>

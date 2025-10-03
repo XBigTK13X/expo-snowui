@@ -5,9 +5,6 @@ import { SnowSafeArea } from '../component/snow-safe-area'
 
 /*
 TODO
-Opening a modal with a seekbar at the top. No element in the view seems to get focus.
-    Check the video controls for an example.
-
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
@@ -107,6 +104,19 @@ export function FocusContextProvider(props) {
         remoteCallbacksRef.current = remoteCallbacks
     }, [remoteCallbacks])
 
+    // After focusMaps are added by components, decide at the focus layer level what should have the first focus
+    React.useEffect(() => {
+        let topLayer = focusLayers?.at(-1)
+        if (!topLayer.hasFocusedStart && topLayer.focusStartKey && topLayer.focusStartElementRef && (topLayer.isUncloned || !focusedKeyRef.current)) {
+            setFocusLayers((prev) => {
+                let result = [...prev]
+                result.at(-1).hasFocusedStart = true
+                return result
+            })
+            focusOn(topLayer.focusStartElementRef, topLayer.focusStartKey)
+        }
+    }, [focusLayers, currentLayer])
+
     const isFocused = (elementFocusKey) => {
         if (DEBUG_FOCUS === 'verbose') {
             prettyLog({ action: 'isFocused', elementFocusKey, focusedKey })
@@ -130,7 +140,7 @@ export function FocusContextProvider(props) {
         setFocusLayers((prev) => {
             let result = [...prev]
             if (layerIsUncloned) {
-                result.push({ layerName, refs: {}, directions: {} })
+                result.push({ layerName, refs: {}, directions: {}, isUncloned: true })
             }
             else {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions } })
@@ -167,17 +177,11 @@ export function FocusContextProvider(props) {
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
         const { addFocusMap, currentLayer } = useFocusContext();
-        const [startedFocused, setStartedFocused] = React.useState(false)
         const elementRef = React.useRef(null);
 
         React.useEffect(() => {
             if (elementRef.current) {
-                const focusOnAdd = !startedFocused && elementProps.focusStart
-                addFocusMap(elementRef, elementProps, focusOnAdd);
-                if (focusOnAdd) {
-                    setStartedFocused(true)
-                }
-
+                addFocusMap(elementRef, elementProps);
             }
         }, [
             elementProps.focusStart,
@@ -212,7 +216,7 @@ export function FocusContextProvider(props) {
         })
     }
 
-    const addFocusMap = (elementRef, elementProps, elementStartsFocused) => {
+    const addFocusMap = (elementRef, elementProps) => {
         const focusKey = elementProps.focusKey
         const refs = {
             [focusKey]: {
@@ -220,9 +224,6 @@ export function FocusContextProvider(props) {
                 onPress: elementProps.onPress,
                 onLongPress: elementProps.onLongPress
             }
-        }
-        if (elementStartsFocused) {
-            focusedKeyRef.current = elementProps.focusKey
         }
         let focus = {}
         if (elementProps.focusUp) {
@@ -278,13 +279,13 @@ export function FocusContextProvider(props) {
                     focusLayer.directions[elementProps.focusRight]['left'] = focusKey
                 }
             }
+            if (elementProps.focusStart) {
+                focusLayer.focusStartElementRef = elementRef
+                focusLayer.focusStartKey = elementProps.focusKey
+            }
             result[result.length - 1] = _.merge({}, { ...focusLayer }, { refs, directions })
             return result
         })
-        if (elementStartsFocused) {
-            elementRef.current.focus()
-            setFocusedKey(elementProps.focusKey)
-        }
     }
 
     const focusOn = (elementRef, focusKey) => {
