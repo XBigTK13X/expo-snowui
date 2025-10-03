@@ -107,7 +107,13 @@ export function FocusContextProvider(props) {
     // After focusMaps are added by components, decide at the focus layer level what should have the first focus
     React.useEffect(() => {
         let topLayer = focusLayers?.at(-1)
-        if (!topLayer.hasFocusedStart && topLayer.focusStartKey && topLayer.focusStartElementRef && (topLayer.isUncloned || !focusedKeyRef.current)) {
+        let shouldFocus = !topLayer.hasFocusedStart && topLayer.focusStartKey && topLayer.focusStartElementRef
+        let hasNoFocus = topLayer.isUncloned || !focusedKeyRef.current || !focusedKey
+        let hasInvalidFocus = focusedKey && !topLayer.directions.hasOwnProperty(focusedKey)
+        if (DEBUG_FOCUS === 'verbose') {
+            prettyLog({ action: 'useEffect(focus)', topLayer, shouldFocus, hasNoFocus, focusedKey })
+        }
+        if ((shouldFocus && hasNoFocus) || hasInvalidFocus) {
             setFocusLayers((prev) => {
                 let result = [...prev]
                 result.at(-1).hasFocusedStart = true
@@ -115,7 +121,7 @@ export function FocusContextProvider(props) {
             })
             focusOn(topLayer.focusStartElementRef, topLayer.focusStartKey)
         }
-    }, [focusLayers, currentLayer])
+    }, [focusLayers, currentLayer, focusedKey])
 
     const isFocused = (elementFocusKey) => {
         if (DEBUG_FOCUS === 'verbose') {
@@ -292,21 +298,24 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS) {
             prettyLog({ action: 'focusOn', focusKey, elementRef })
         }
-        elementRef.current.focus()
-        let scroll = focusLayersRef.current?.at(-1)?.scrollViewRef
-        if (scroll) {
-            elementRef.measureLayout(
-                scroll.getInnerViewNode(),
-                (x, y) => {
-                    scroll.scrollTo({ y, animated: true });
-                },
-                (err) => {
-                    if (DEBUG_FOCUS) {
-                        prettyLog({ error: 'Measurement error for scrollview' })
+        if (elementRef?.current) {
+            elementRef.current.focus()
+            let scroll = focusLayersRef.current?.at(-1)?.scrollViewRef
+            if (scroll) {
+                elementRef.measureLayout(
+                    scroll.getInnerViewNode(),
+                    (x, y) => {
+                        scroll.scrollTo({ y, animated: true });
+                    },
+                    (err) => {
+                        if (DEBUG_FOCUS) {
+                            prettyLog({ error: 'Measurement error for scrollview' })
+                        }
                     }
-                }
-            );
+                );
+            }
         }
+
         setFocusedKey(focusKey)
         focusedKeyRef.current = focusKey
     }

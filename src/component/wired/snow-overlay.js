@@ -5,16 +5,33 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import SnowText from '../snow-text'
 
 const SnowOverlayW = (props) => {
-    if (!props.focusLayer) {
-        return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
-    }
     const { SnowStyle } = useStyleContext(props)
-    const { useFocusLayer, isFocusedLayer, focusPress, focusLongPress, useFocusWiring, tvRemoteProps } = useFocusContext()
+    const {
+        focusOn,
+        focusLongPress,
+        focusPress,
+        isFocused,
+        isFocusedLayer,
+        tvRemoteProps,
+        useFocusLayer,
+        useFocusWiring,
+    } = useFocusContext()
     const elementRef = useFocusWiring(props)
 
     useFocusLayer(props.focusLayer, true)
+
+    React.useEffect(() => {
+        if (isFocusedLayer(props.focusLayer) && !isFocused(props.focusKey) && props.stealFocus !== false) {
+            focusOn(elementRef, props.focusKey)
+        }
+    })
+
     if (!isFocusedLayer(props.focusLayer)) {
         return null
+    }
+
+    if (!props.focusLayer) {
+        return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
     }
 
     let style = [SnowStyle.component.overlay.touchable]
