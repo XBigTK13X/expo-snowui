@@ -27,6 +27,8 @@ export { SnowLabel } from './component/snow-label'
 import { SnowLabel } from './component/snow-label'
 export { SnowModal } from './component/wired/snow-modal'
 import { SnowModal } from './component/wired/snow-modal'
+export { SnowOverlay } from './component/wired/snow-overlay'
+import { SnowOverlay } from './component/wired/snow-overlay'
 export { SnowRangeSlider } from './component/wired/snow-range-slider'
 import { SnowRangeSlider } from './component/wired/snow-range-slider'
 export { SnowSafeArea } from './component/snow-safe-area'
@@ -63,6 +65,7 @@ export default {
   Input: SnowInput,
   Label: SnowLabel,
   Modal: SnowModal,
+  Overlay: SnowOverlay,
   RangeSlider: SnowRangeSlider,
   SafeArea: SnowSafeArea,
   Tabs: SnowTabs,

@@ -263,6 +263,27 @@ export function createStyle(overrides) {
                 textAlign: 'center'
             }
         },
+        overlay: {
+            touchable: {
+                width: getWindowWidth(),
+                height: getWindowHeight(),
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
+            },
+            black: {
+                backgroundColor: 'black' // Without this color, letterbox will be white by default
+            },
+            transparent: {
+                backgroundColor: 'transparent'
+            }
+        },
         rangeSlider: {
             wrapper: {
                 alignItems: "center",

@@ -284,6 +284,25 @@ function ModalTab() {
   )
 }
 
+function OverlayTab() {
+  Snow.useFocusLayer('tab-overlay')
+  const [showOverlay, setShowOverlay] = React.useState(false)
+  const toggleOverlay = () => { setShowOverlay(!showOverlay) }
+  if (showOverlay) {
+    return (
+      <Snow.Overlay
+        focusStart
+        focusKey="overlay"
+        focusLayer="overlay"
+        onPress={toggleOverlay}
+      />
+    )
+  }
+  return (
+    <Snow.TextButton focusStart focusKey="tab-entry" title="Toggle Overlay" onPress={toggleOverlay} />
+  )
+}
+
 function RangeSliderTab(props: any) {
   Snow.useFocusLayer('tab-range-slider')
   return (
@@ -394,6 +413,7 @@ function AppPage() {
     ['Input', <InputTab inputValue={inputValue} setInputValue={setInputValue} />],
     ['Label', <LabelTab />],
     ['Modal', <ModalTab />],
+    ['Overlay', <OverlayTab />],
     ['Range Slider', <RangeSliderTab setRangeSliderValue={setRangeSliderValue} rangeSliderValue={rangeSliderValue} />],
     ['Tabs', <TabsTab />],
     ['TabsMore', <TabsMoreTab />],
