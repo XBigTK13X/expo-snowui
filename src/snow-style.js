@@ -295,7 +295,9 @@ export function createStyle(overrides) {
                 borderRadius: AppStyle.rangeSlider.thumbSize / 2,
                 borderWidth: 4,
                 backgroundColor: AppStyle.color.core,
-                borderColor: AppStyle.color.coreDark
+                borderColor: AppStyle.color.coreDark,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
             }
         },
         safeArea: {

@@ -121,7 +121,7 @@ export function FocusContextProvider(props) {
         if (DEBUG_FOCUS === 'verbose') {
             prettyLog({ action: 'isFocused', elementFocusKey, focusedKey })
         }
-        return elementFocusKey && elementFocusKey === focusedKey
+        return elementFocusKey && elementFocusKey === focusedKeyRef.current
     }
 
     const isFocusedLayer = (layerName) => {
@@ -308,6 +308,7 @@ export function FocusContextProvider(props) {
             );
         }
         setFocusedKey(focusKey)
+        focusedKeyRef.current = focusKey
     }
 
     // returning false cancels the requested movement

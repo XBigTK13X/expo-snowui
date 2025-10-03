@@ -135,15 +135,17 @@ const SnowRangeSliderW = (props) => {
     if (Platform.OS === 'web') {
         React.useEffect(() => {
             const rangeSliderKeyboardHandler = (event) => {
-                switch (event.key) {
-                    case 'ArrowLeft':
-                        applyStep(-step)
-                        break
-                    case 'ArrowRight':
-                        applyStep(step)
-                        break
-                    default:
-                        break
+                if (isFocused(props.focusKey)) {
+                    switch (event.key) {
+                        case 'ArrowLeft':
+                            applyStep(-step)
+                            break
+                        case 'ArrowRight':
+                            applyStep(step)
+                            break
+                        default:
+                            break
+                    }
                 }
             };
             window.addEventListener('keydown', rangeSliderKeyboardHandler);
@@ -247,6 +249,8 @@ const SnowRangeSliderW = (props) => {
                     style={thumbStyle}
                     onLayout={handleLayout('thumb')}
                     focusKey={props.focusKey}
+                    focusRight={props.focusKey}
+                    focusLeft={props.focusKey}
                     focusUp={props.focusUp}
                     focusDown={props.focusDown}
                 />
