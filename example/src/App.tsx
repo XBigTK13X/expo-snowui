@@ -286,15 +286,31 @@ function ModalTab() {
 
 function OverlayTab() {
   Snow.useFocusLayer('tab-overlay')
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => { setShowModal(!showModal) }
   const [showOverlay, setShowOverlay] = React.useState(false)
   const toggleOverlay = () => { setShowOverlay(!showOverlay) }
+
+  if (showModal) {
+    return (
+      <Snow.Modal
+        focusLayer="overlay-modal"
+      >
+        <Snow.TextButton focusStart focusKey="toggle-modal" title="Close Layers" onPress={() => {
+          toggleModal()
+          toggleOverlay()
+        }} />
+      </Snow.Modal>
+    )
+  }
+
   if (showOverlay) {
     return (
       <Snow.Overlay
         focusStart
         focusKey="overlay"
         focusLayer="overlay"
-        onPress={toggleOverlay}
+        onPress={toggleModal}
       />
     )
   }

@@ -107,13 +107,11 @@ export function FocusContextProvider(props) {
     // After focusMaps are added by components, decide at the focus layer level what should have the first focus
     React.useEffect(() => {
         let topLayer = focusLayers?.at(-1)
-        let shouldFocus = !topLayer.hasFocusedStart && topLayer.focusStartKey && topLayer.focusStartElementRef
-        let hasNoFocus = topLayer.isUncloned || !focusedKeyRef.current || !focusedKey
-        let hasInvalidFocus = focusedKey && !topLayer.directions.hasOwnProperty(focusedKey)
         if (DEBUG_FOCUS === 'verbose') {
-            prettyLog({ action: 'useEffect(focus)', topLayer, shouldFocus, hasNoFocus, focusedKey })
+            prettyLog({ action: 'useEffect(focus)', topLayer, focusedKey })
         }
-        if ((shouldFocus && hasNoFocus) || hasInvalidFocus) {
+        const shouldFocus = !focusedKey || (!!focusedKey && !topLayer.directions.hasOwnProperty(focusedKey))
+        if (shouldFocus && topLayer.focusStartKey && topLayer.focusStartElementRef) {
             setFocusLayers((prev) => {
                 let result = [...prev]
                 result.at(-1).hasFocusedStart = true
@@ -121,7 +119,7 @@ export function FocusContextProvider(props) {
             })
             focusOn(topLayer.focusStartElementRef, topLayer.focusStartKey)
         }
-    }, [focusLayers, currentLayer, focusedKey])
+    }, [focusedKey, focusLayers])
 
     const isFocused = (elementFocusKey) => {
         if (DEBUG_FOCUS === 'verbose') {
