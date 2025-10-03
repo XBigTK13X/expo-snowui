@@ -235,7 +235,8 @@ const SnowRangeSliderW = (props) => {
     ]
     if (isFocused(props.focusKey)) {
         thumbStyle.push({
-            backgroundColor: SnowStyle.color.hover
+            backgroundColor: SnowStyle.color.hover,
+            borderColor: SnowStyle.color.hoverDark
         })
     }
 

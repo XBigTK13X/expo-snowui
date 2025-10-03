@@ -23,6 +23,7 @@ const imageItems = [
 const styleOverrides = {
   color: {
     hover: 'rgba(44, 219, 175, 1)',
+    hoverDark: 'rgba(23, 116, 92, 1)',
     core: 'rgba(91, 34, 184, 1)',
     coreDark: 'rgba(62, 32, 110, 1)',
   }
