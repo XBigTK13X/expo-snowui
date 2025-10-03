@@ -246,7 +246,6 @@ const SnowRangeSliderW = (props) => {
                     ref={elementRef}
                     style={thumbStyle}
                     onLayout={handleLayout('thumb')}
-                    focusStart={props.focusStart}
                     focusKey={props.focusKey}
                     focusUp={props.focusUp}
                     focusDown={props.focusDown}

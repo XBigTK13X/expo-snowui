@@ -5,7 +5,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 
 const SnowInputW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { isFocused, useFocusWiring } = useFocusContext()
+    const { isFocused, useFocusWiring, tvRemoteProps } = useFocusContext()
     const elementRef = useFocusWiring(props)
 
     let textStyle = [SnowStyle.component.input.text]
@@ -22,6 +22,7 @@ const SnowInputW = (props) => {
     }
     return <TextInput
         ref={elementRef}
+        {...tvRemoteProps(props)}
         secureTextEntry={props.secureTextEntry}
         style={textStyle}
         editable={true}

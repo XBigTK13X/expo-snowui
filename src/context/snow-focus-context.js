@@ -1,10 +1,12 @@
 import React from 'react';
 import _ from 'lodash'
-import { Platform, useTVEventHandler, Keyboard, findNodeHandle } from 'react-native'
+import { Platform, useTVEventHandler, Keyboard } from 'react-native'
 import { SnowSafeArea } from '../component/snow-safe-area'
 
 /*
 TODO
+Hitting select on tv remote after first load, focused button doesn't get pressed.
+
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
@@ -132,7 +134,7 @@ export function FocusContextProvider(props) {
             else {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions } })
             }
-            if (DEBUG_FOCUS) {
+            if (DEBUG_FOCUS === 'verbose') {
                 prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
             }
             return result
@@ -163,19 +165,21 @@ export function FocusContextProvider(props) {
 
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
-        const { addFocusMap, focusOn, currentLayer } = useFocusContext();
-        const [startFocused, setStartFocused] = React.useState(false)
+        const { addFocusMap, currentLayer } = useFocusContext();
+        const [startedFocused, setStartedFocused] = React.useState(false)
         const elementRef = React.useRef(null);
 
         React.useEffect(() => {
             if (elementRef.current) {
-                addFocusMap(elementRef, elementProps);
-                if (elementProps.focusStart && !startFocused) {
-                    focusOn(elementRef, elementProps.focusKey);
-                    setStartFocused(true)
+                const focusOnAdd = !startedFocused && elementProps.focusStart
+                addFocusMap(elementRef, elementProps, focusOnAdd);
+                if (focusOnAdd) {
+                    setStartedFocused(true)
                 }
+
             }
         }, [
+            elementProps.focusStart,
             elementProps.focusKey,
             elementProps.focusDown,
             elementProps.focusUp,
@@ -207,7 +211,7 @@ export function FocusContextProvider(props) {
         })
     }
 
-    const addFocusMap = (elementRef, elementProps) => {
+    const addFocusMap = (elementRef, elementProps, elementStartsFocused) => {
         const focusKey = elementProps.focusKey
         const refs = {
             [focusKey]: {
@@ -215,6 +219,9 @@ export function FocusContextProvider(props) {
                 onPress: elementProps.onPress,
                 onLongPress: elementProps.onLongPress
             }
+        }
+        if (elementStartsFocused) {
+            focusedKeyRef.current = elementProps.focusKey
         }
         let focus = {}
         if (elementProps.focusUp) {
@@ -232,7 +239,7 @@ export function FocusContextProvider(props) {
         const directions = {
             [focusKey]: focus
         }
-        if (DEBUG_FOCUS) {
+        if (DEBUG_FOCUS === 'verbose') {
             prettyLog({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
         }
         setFocusLayers((prev) => {
@@ -273,9 +280,16 @@ export function FocusContextProvider(props) {
             result[result.length - 1] = _.merge({}, { ...focusLayer }, { refs, directions })
             return result
         })
+        if (elementStartsFocused) {
+            elementRef.current.focus()
+            setFocusedKey(elementProps.focusKey)
+        }
     }
 
     const focusOn = (elementRef, focusKey) => {
+        if (DEBUG_FOCUS) {
+            prettyLog({ action: 'focusOn', focusKey, elementRef })
+        }
         elementRef.current.focus()
         let scroll = focusLayersRef.current?.at(-1)?.scrollViewRef
         if (scroll) {
@@ -380,7 +394,11 @@ export function FocusContextProvider(props) {
             focusKey = focusedKeyRef.current
         }
         const focusMap = focusLayersRef.current.at(-1)
-        if (Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onPress)) {
+        const canPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onPress)
+        if (DEBUG_FOCUS) {
+            prettyLog({ action: 'pressFocusedElement', focusKey, canPress, keyboardVisible: Keyboard.isVisible(), onPress: focusMap?.refs?.[focusKey]?.onPress })
+        }
+        if (canPress) {
             return false
         }
         return focusMap.refs[focusKey].onPress()
@@ -391,17 +409,17 @@ export function FocusContextProvider(props) {
             focusKey = focusedKeyRef.current
         }
         const focusMap = focusLayersRef.current.at(-1)
-        if (Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onLongPress)) {
+        const canPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onLongPress)
+        if (DEBUG_FOCUS) {
+            prettyLog({ action: 'longPressFocusedElement', focusKey, canPress, keyboardVisible: Keyboard.isVisible(), onLongPress: focusMap?.refs?.[focusKey]?.onLongPress })
+        }
+        if (canPress) {
             return false
         }
         return focusMap.refs[focusKey].onLongPress()
     }
 
     const focusPress = (elementRef, focusKey) => {
-        // This is done by the remoteHandler on TV
-        if (Platform.isTV) {
-            return () => { }
-        }
         return () => {
             focusOn(elementRef, focusKey)
             pressFocusedElement(focusKey)
@@ -409,10 +427,6 @@ export function FocusContextProvider(props) {
     }
 
     const focusLongPress = (elementRef, focusKey) => {
-        // This is done by the remoteHandler on TV
-        if (Platform.isTV) {
-            return () => { }
-        }
         return () => {
             focusOn(elementRef, focusKey)
             longPressFocusedElement(focusKey)
@@ -430,6 +444,9 @@ export function FocusContextProvider(props) {
                     continue
                 }
                 callback(kind, action)
+            }
+            if (DEBUG_FOCUS === 'verbose') {
+                prettyLog({ action: 'remoteHandler', kind, action, focusedKey: focusedKeyRef.current })
             }
             switch (kind) {
                 case 'select':
@@ -519,12 +536,26 @@ export function FocusContextProvider(props) {
         return focusProps
     }
 
+    // If these are omitted, then TV remote doesn't work on first launch
+    // This is another low level helper for wired components
+    // Nothing outside snowui should need it
+    const tvRemoteProps = (elementProps) => {
+        if (!Platform.isTV || !elementProps.focusStart) {
+            return {}
+        }
+        return {
+            focusable: elementProps.focusStart,
+            hasTVPreferredFocus: elementProps.focusStart
+        }
+    }
+
     const focusContext = {
         DEBUG_FOCUS,
         focusedKey,
         currentLayer,
         isFocused,
         isFocusedLayer,
+        tvRemoteProps,
         useFocusWiring,
         addFocusMap,
         useFocusLayer,

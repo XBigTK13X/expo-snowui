@@ -5,7 +5,7 @@ import { SnowLabel } from '../snow-label'
 
 const SnowToggleW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { useFocusWiring, isFocused } = useFocusContext()
+    const { useFocusWiring, isFocused, tvRemoteProps } = useFocusContext()
     const elementRef = useFocusWiring(props)
 
     const toggleValue = () => {
@@ -28,6 +28,7 @@ const SnowToggleW = (props) => {
     return (
         <Pressable
             ref={elementRef}
+            {...tvRemoteProps(props)}
             style={SnowStyle.component.toggle.center}
             onPress={toggleValue}
         >
