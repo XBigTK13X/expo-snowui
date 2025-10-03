@@ -2,11 +2,11 @@ import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
-import SnowText from './snow-text'
+import SnowText from '../snow-text'
 
 const SnowOverlayW = (props) => {
     if (!props.focusLayer) {
-        return <SnowText>SnowModal requires a focusLayer prop</SnowText>
+        return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
     }
     const { SnowStyle } = useStyleContext(props)
     const { useFocusLayer, isFocusedLayer, focusPress, focusLongPress, useFocusWiring, tvRemoteProps } = useFocusContext()
