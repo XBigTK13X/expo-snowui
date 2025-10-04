@@ -5,16 +5,16 @@ import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
-    if (!props.focusLayer) {
-        return <SnowText>SnowModal requires a focusLayer prop</SnowText>
-    }
     const { SnowStyle } = useStyleContext(props)
-    const { useFocusLayer, isFocusedLayer } = useFocusContext()
-
-    useFocusLayer(props.focusLayer, true)
-
-    if (!isFocusedLayer(props.focusLayer)) {
-        return null
+    if (props.assignFocus !== false) {
+        if (!props.focusLayer) {
+            return <SnowText>SnowModal requires a focusLayer prop</SnowText>
+        }
+        const { useFocusLayer, isFocusedLayer } = useFocusContext()
+        useFocusLayer(props.focusLayer, true)
+        if (!isFocusedLayer(props.focusLayer)) {
+            return null
+        }
     }
 
     let style = [SnowStyle.component.modal.prompt]

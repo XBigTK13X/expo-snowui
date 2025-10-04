@@ -293,10 +293,9 @@ function OverlayTab() {
 
   if (showModal) {
     return (
-      <Snow.Modal
-        focusLayer="overlay-modal"
-      >
-        <Snow.TextButton focusStart focusKey="toggle-modal" title="Close Layers" onPress={() => {
+      <Snow.Modal assignFocus={false}>
+        <Snow.Text>There is a hidden overlay covering the screen.</Snow.Text>
+        <Snow.Overlay focusLayer="hidden-overlay" focusStart focusKey="toggle-modal" title="Close Layers" onPress={() => {
           toggleModal()
           toggleOverlay()
         }} />

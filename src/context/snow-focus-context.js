@@ -5,6 +5,10 @@ import { SnowSafeArea } from '../component/snow-safe-area'
 
 /*
 TODO
+Scrolling on the snowstream options page isn't working.
+
+The video player isn't showing up, no matter how I arrange an overlay.
+
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
