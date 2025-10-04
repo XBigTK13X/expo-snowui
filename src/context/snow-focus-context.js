@@ -1,6 +1,13 @@
 import React from 'react';
 import _ from 'lodash'
-import { Platform, useTVEventHandler, Keyboard } from 'react-native'
+import {
+    Platform,
+    useTVEventHandler,
+    Keyboard,
+    findNodeHandle,
+    UIManager,
+    Dimensions
+} from 'react-native'
 import { SnowSafeArea } from '../component/snow-safe-area'
 
 /*
@@ -213,17 +220,6 @@ export function FocusContextProvider(props) {
         setCurrentLayer('app')
     }
 
-    // This only sets the scroll view for the current map
-    const setScrollViewRef = (scrollViewRef) => {
-        setFocusLayers((prev) => {
-            let result = [...prev]
-            let focusLayer = result[result.length - 1]
-            focusLayer.scrollViewRef = scrollViewRef
-            result[result.length - 1] = focusLayer
-            return result
-        })
-    }
-
     const addFocusMap = (elementRef, elementProps) => {
         const focusKey = elementProps.focusKey
         const refs = {
@@ -297,35 +293,55 @@ export function FocusContextProvider(props) {
     }
 
     const focusOn = (elementRef, focusKey) => {
-        if (DEBUG_FOCUS) {
-            prettyLog({ action: 'focusOn', focusKey, hasElement: !!elementRef?.current });
+        const element = elementRef?.current;
+        if (!element) {
+            return
+        }
+        if (DEBUG_FOCUS === 'verbose') {
+            prettyLog({ action: 'focusOn', elementRef, focusKey });
         }
 
-        const element = elementRef?.current;
-        if (element) {
-            element.focus?.()
-            const scrollRef = focusLayersRef.current?.at(-1)?.scrollViewRef
-            const scroll = scrollRef?.current
+        element.requestTVFocus?.();
+        element.focus?.();
 
-            if (scroll && element.measureLayout) {
-                const scrollHandle =
-                    typeof scroll.getNativeScrollRef === 'function'
-                        ? findNodeHandle(scroll.getNativeScrollRef())
-                        : findNodeHandle(scroll);
+        const scroll = props?.scrollViewRef?.current;
+        const node = findNodeHandle(element);
 
-                if (scrollHandle) {
-                    element.measureLayout(
-                        scrollHandle,
-                        (x, y) => {
-                            scroll.scrollTo?.({ y, animated: true });
-                        },
-                        (err) => {
-                            if (DEBUG_FOCUS) {
-                                prettyLog({ error: 'Measurement error for scrollview', err });
-                            }
+        if (scroll && node) {
+            const scrollHandle =
+                typeof scroll.getNativeScrollRef === 'function'
+                    ? findNodeHandle(scroll.getNativeScrollRef())
+                    : findNodeHandle(scroll);
+
+            if (scrollHandle) {
+                UIManager.measureLayout(
+                    node,
+                    scrollHandle,
+                    (err) => {
+                        if (DEBUG_FOCUS === 'verbose') {
+                            prettyLog({ action: 'focusOn', error: 'Measurement error', err });
                         }
-                    );
-                }
+                    },
+                    (x, y, width, height) => {
+                        const viewportHeight = Dimensions.get('window').height;
+                        const verticalOffset = 200;
+
+                        const currentOffsetY = scroll?.scrollProperties?.offset || 0;
+
+                        const top = y;
+                        const bottom = y + height;
+
+                        const viewTop = currentOffsetY;
+                        const viewBottom = currentOffsetY + viewportHeight;
+
+                        if (top - verticalOffset < viewTop) {
+                            scroll.scrollTo?.({ y: Math.max(top - verticalOffset, 0), animated: false });
+                        } else if (bottom > viewBottom) {
+                            const target = bottom - viewportHeight + verticalOffset;
+                            scroll.scrollTo?.({ y: target, animated: false });
+                        }
+                    }
+                );
             }
         }
 
@@ -414,48 +430,34 @@ export function FocusContextProvider(props) {
         moveFocus('down')
     }
 
-    const pressFocusedElement = (focusKey) => {
+    const focusedElementAction = (focusKey, action) => {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
         }
         const focusMap = focusLayersRef.current.at(-1)
-        const canPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onPress)
+        const shouldNotPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.[action])
         if (DEBUG_FOCUS) {
-            prettyLog({ action: 'pressFocusedElement', focusKey, canPress, keyboardVisible: Keyboard.isVisible(), onPress: focusMap?.refs?.[focusKey]?.onPress })
+            prettyLog({ action: 'focusedElementAction', kind: action, focusKey, shouldNotPress, keyboardVisible: Keyboard.isVisible(), [action]: focusMap?.refs?.[focusKey]?.[action] })
         }
-        if (canPress) {
+        if (shouldNotPress) {
             return false
         }
-        return focusMap.refs[focusKey].onPress()
+        return focusMap.refs[focusKey][action]()
     }
 
-    const longPressFocusedElement = (focusKey) => {
-        if (!focusKey) {
-            focusKey = focusedKeyRef.current
+    const focusAction = (elementRef, focusKey, action) => {
+        return () => {
+            focusOn(elementRef, focusKey)
+            focusedElementAction(focusKey, action)
         }
-        const focusMap = focusLayersRef.current.at(-1)
-        const canPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.onLongPress)
-        if (DEBUG_FOCUS) {
-            prettyLog({ action: 'longPressFocusedElement', focusKey, canPress, keyboardVisible: Keyboard.isVisible(), onLongPress: focusMap?.refs?.[focusKey]?.onLongPress })
-        }
-        if (canPress) {
-            return false
-        }
-        return focusMap.refs[focusKey].onLongPress()
     }
 
     const focusPress = (elementRef, focusKey) => {
-        return () => {
-            focusOn(elementRef, focusKey)
-            pressFocusedElement(focusKey)
-        }
+        return focusAction(elementRef, focusKey, 'onPress')
     }
 
     const focusLongPress = (elementRef, focusKey) => {
-        return () => {
-            focusOn(elementRef, focusKey)
-            longPressFocusedElement(focusKey)
-        }
+        return focusAction(elementRef, focusKey, 'onLongPress')
     }
 
     if (Platform.isTV) {
@@ -474,14 +476,6 @@ export function FocusContextProvider(props) {
                 prettyLog({ action: 'remoteHandler', kind, action, focusedKey: focusedKeyRef.current })
             }
             switch (kind) {
-                case 'select':
-                    pressFocusedElement()
-                    break
-                case 'longselect':
-                    if (action === 1) {
-                        longPressFocusedElement()
-                    }
-                    break
                 case 'up':
                     moveFocusUp()
                     break
@@ -507,14 +501,6 @@ export function FocusContextProvider(props) {
         React.useEffect(() => {
             const focusKeyboardHandler = (event) => {
                 switch (event.key) {
-                    case 'Enter':
-                        if (event.code === 'NumpadEnter') {
-                            longPressFocusedElement()
-                        }
-                        else {
-                            pressFocusedElement()
-                        }
-                        break
                     case 'ArrowUp':
                         moveFocusUp()
                         break
@@ -589,7 +575,6 @@ export function FocusContextProvider(props) {
         clearFocusLayers,
         readFocusProps,
         setRemoteCallbacks,
-        setScrollViewRef,
         focusLongPress,
         focusOn,
         focusPress

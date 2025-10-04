@@ -477,7 +477,7 @@ function AppPage() {
 
 export default function App() {
   return (
-    <Snow.App snowStyle={styleOverrides} DEBUG_FOCUS={'verbose'}>
+    <Snow.App snowStyle={styleOverrides} DEBUG_FOCUS={false}>
       <AppPage />
     </Snow.App>
   );
