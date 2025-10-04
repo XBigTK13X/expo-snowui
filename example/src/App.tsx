@@ -263,6 +263,8 @@ function ModalTab() {
   Snow.useFocusLayer('tab-modal')
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => { setShowModal(!showModal) }
+  const [showFullscreen, setShowFullscreen] = React.useState(false)
+  const toggleFullscreen = () => { setShowFullscreen(!showFullscreen) }
   if (showModal) {
     return (
       <Snow.Modal focusLayer={'example-modal'} scroll onRequestClose={toggleModal}>
@@ -276,10 +278,22 @@ function ModalTab() {
       </Snow.Modal>
     )
   }
+  if (showFullscreen) {
+    return (
+      <Snow.Modal assignFocus={false}>
+        <Snow.FillView style={{ backgroundColor: 'green' }}>
+          <Snow.Text>This should be fullscreen with no border.</Snow.Text>
+        </Snow.FillView>
+        <Snow.Overlay focusKey="fullscreen-overlay" focusLayer="fullscreen-modal" onPress={toggleFullscreen}>
+        </Snow.Overlay>
+      </Snow.Modal>
+    )
+  }
   return (
     <View>
       <Snow.Label>Component: Modal</Snow.Label>
-      <Snow.TextButton focusKey="tab-entry" title="Show Modal" onPress={toggleModal} />
+      <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
+      <Snow.TextButton focusKey="modal-two" title="Test Fullscreen" onPress={toggleFullscreen} />
     </View>
   )
 }
