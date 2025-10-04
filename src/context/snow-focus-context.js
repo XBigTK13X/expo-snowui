@@ -102,6 +102,10 @@ export function FocusContextProvider(props) {
     const remoteCallbacksRef = React.useRef({});
     const [currentLayer, setCurrentLayer] = React.useState('app')
     let DEBUG_FOCUS = props.DEBUG_FOCUS
+    let SCROLL_OFFSET = 200
+    if (props.focusVerticalOffset) {
+        SCROLL_OFFSET = props.focusVersionOffset
+    }
 
     React.useEffect(() => {
         focusedKeyRef.current = focusedKey
@@ -305,43 +309,56 @@ export function FocusContextProvider(props) {
         element.focus?.();
 
         const scroll = props?.scrollViewRef?.current;
-        const node = findNodeHandle(element);
 
-        if (scroll && node) {
-            const scrollHandle =
-                typeof scroll.getNativeScrollRef === 'function'
-                    ? findNodeHandle(scroll.getNativeScrollRef())
-                    : findNodeHandle(scroll);
+        if (Platform.OS === 'web') {
+            if (element && scroll) {
+                const elementBounds = element.getBoundingClientRect();
+                const scrollBounds = scroll.getBoundingClientRect();
 
-            if (scrollHandle) {
-                UIManager.measureLayout(
-                    node,
-                    scrollHandle,
-                    (err) => {
-                        if (DEBUG_FOCUS === 'verbose') {
-                            prettyLog({ action: 'focusOn', error: 'Measurement error', err });
+                if (elementBounds.top < scrollBounds.top + SCROLL_OFFSET) {
+                    scroll.scrollTop += elementBounds.top - scrollBounds.top - SCROLL_OFFSET;
+                } else if (elementBounds.bottom > scrollBounds.bottom) {
+                    scroll.scrollTop += elementBounds.bottom - scrollBounds.bottom + SCROLL_OFFSET;
+                }
+            }
+        } else {
+            const node = findNodeHandle(element);
+
+            if (scroll && node) {
+                const scrollHandle =
+                    typeof scroll.getNativeScrollRef === 'function'
+                        ? findNodeHandle(scroll.getNativeScrollRef())
+                        : findNodeHandle(scroll);
+
+                if (scrollHandle) {
+                    UIManager.measureLayout(
+                        node,
+                        scrollHandle,
+                        (err) => {
+                            if (DEBUG_FOCUS === 'verbose') {
+                                prettyLog({ action: 'focusOn', error: 'Measurement error', err });
+                            }
+                        },
+                        (x, y, width, height) => {
+                            const viewportHeight = Dimensions.get('window').height;
+
+                            const currentOffsetY = scroll?.scrollProperties?.offset || 0;
+
+                            const top = y;
+                            const bottom = y + height;
+
+                            const viewTop = currentOffsetY;
+                            const viewBottom = currentOffsetY + viewportHeight;
+
+                            if (top - SCROLL_OFFSET < viewTop) {
+                                scroll.scrollTo?.({ y: Math.max(top - SCROLL_OFFSET, 0), animated: false });
+                            } else if (bottom > viewBottom) {
+                                const target = bottom - viewportHeight + SCROLL_OFFSET;
+                                scroll.scrollTo?.({ y: target, animated: false });
+                            }
                         }
-                    },
-                    (x, y, width, height) => {
-                        const viewportHeight = Dimensions.get('window').height;
-                        const verticalOffset = 200;
-
-                        const currentOffsetY = scroll?.scrollProperties?.offset || 0;
-
-                        const top = y;
-                        const bottom = y + height;
-
-                        const viewTop = currentOffsetY;
-                        const viewBottom = currentOffsetY + viewportHeight;
-
-                        if (top - verticalOffset < viewTop) {
-                            scroll.scrollTo?.({ y: Math.max(top - verticalOffset, 0), animated: false });
-                        } else if (bottom > viewBottom) {
-                            const target = bottom - viewportHeight + verticalOffset;
-                            scroll.scrollTo?.({ y: target, animated: false });
-                        }
-                    }
-                );
+                    );
+                }
             }
         }
 
