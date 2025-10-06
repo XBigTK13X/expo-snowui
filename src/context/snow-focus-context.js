@@ -159,10 +159,10 @@ export function FocusContextProvider(props) {
         setFocusLayers((prev) => {
             let result = [...prev]
             if (layerIsUncloned) {
-                result.push({ layerName, refs: {}, directions: {}, isUncloned: true })
+                result.push({ layerName, refs: {}, directions: {}, isUncloned: true, focusedKey })
             }
             else {
-                result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions } })
+                result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
             }
             if (DEBUG_FOCUS === 'verbose') {
                 prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
@@ -177,6 +177,7 @@ export function FocusContextProvider(props) {
             let result = [...prev]
             result.pop()
             setCurrentLayer(result.at(-1).layerName)
+            setFocusedKey(result.at(-1).focusedKey)
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'popFocusLayer', focusLayers: result })
             }
