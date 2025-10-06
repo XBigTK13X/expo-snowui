@@ -35,6 +35,8 @@ export { SnowSafeArea } from './component/snow-safe-area'
 import { SnowSafeArea } from './component/snow-safe-area'
 export { SnowTabs } from './component/wired/snow-tabs'
 import { SnowTabs } from './component/wired/snow-tabs'
+export { SnowTarget } from './component/wired/snow-target'
+import { SnowTarget } from './component/wired/snow-target'
 export { SnowTextButton } from './component/wired/snow-text-button'
 import { SnowTextButton } from './component/wired/snow-text-button'
 export { SnowText } from './component/snow-text'
@@ -69,6 +71,7 @@ export default {
   RangeSlider: SnowRangeSlider,
   SafeArea: SnowSafeArea,
   Tabs: SnowTabs,
+  Target: SnowTarget,
   TextButton: SnowTextButton,
   Text: SnowText,
   Toggle: SnowToggle,

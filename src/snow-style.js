@@ -60,16 +60,16 @@ export function createStyle(overrides) {
         imageButton: {
             wrapper: {
                 normal: {
-                    height: scaled(425),
+                    height: scaled(isTV ? 450 : 400),
                     width: scaled(310)
                 },
                 wide: {
-                    height: scaled(280),
+                    height: scaled(isTV ? 300 : 250),
                     width: scaled(310)
                 },
                 square: {
-                    height: scaled(250),
-                    width: scaled(250)
+                    height: scaled(isTV ? 380 : 340),
+                    width: scaled(isTV ? 380 : 340)
                 }
             },
             image: {
@@ -82,8 +82,8 @@ export function createStyle(overrides) {
                     width: scaled(260)
                 },
                 square: {
-                    height: scaled(200),
-                    width: scaled(200)
+                    height: scaled(250),
+                    width: scaled(250)
                 }
             },
             fontSize: {
@@ -336,6 +336,23 @@ export function createStyle(overrides) {
                 borderColor: 'transparent',
                 paddingTop: 30,
                 paddingBottom: 30
+            }
+        },
+        target: {
+            outer: {
+                alignItems: 'center',
+                justifyContent: 'center'
+            },
+            inner: {
+                width: '80%',
+                borderWidth: AppStyle.button.borderRadius,
+                borderColor: AppStyle.color.core,
+                borderRadius: AppStyle.button.borderRadius,
+                outlineStyle: 'none', // Disable web default white outline on focused element
+                outline: 'none', // Disable web default white outline on focused element
+            },
+            focused: {
+                borderColor: AppStyle.color.hover
             }
         },
         textButton: {

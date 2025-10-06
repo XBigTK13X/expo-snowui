@@ -35,6 +35,7 @@ const SnowImageGridW = (props) => {
         return <SnowImageButton
             snowStyle={props.snowStyle}
             wide={props.wideImage}
+            square={props.squareImage}
             dull={isDull}
             imageUrl={imageUrl}
             imageSource={imageSource}

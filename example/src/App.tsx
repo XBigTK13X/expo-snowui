@@ -229,7 +229,25 @@ function ImageGridTab() {
       <Snow.Label>Component: Image Grid</Snow.Label>
       <Snow.ImageGrid
         focusKey="tab-entry"
+        focusDown="wide-image"
         items={imageItems}
+        getItemImageUrl={(item: any) => { return item.imageUrl }}
+        getItemImageSource={(item: any) => { return item.imageSource }}
+        getItemName={(item: any) => { return item.title }}
+      />
+      <Snow.ImageGrid
+        focusKey="wide-image"
+        focusDown="square-image"
+        items={imageItems}
+        wideImage
+        getItemImageUrl={(item: any) => { return item.imageUrl }}
+        getItemImageSource={(item: any) => { return item.imageSource }}
+        getItemName={(item: any) => { return item.title }}
+      />
+      <Snow.ImageGrid
+        focusKey="square-image"
+        items={imageItems}
+        squareImage
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}
@@ -268,11 +286,13 @@ function ModalTab() {
   if (showModal) {
     return (
       <Snow.Modal focusLayer={'example-modal'} scroll onRequestClose={toggleModal}>
-        <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-bottom" title="Close" onPress={toggleModal} />
+        <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 1000 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>
         </View>
+        <Snow.Text>And a focusable blank target</Snow.Text>
+        <Snow.Target focusKey="modal-target" focusDown="modal-bottom" />
         <Snow.Text>And then the end</Snow.Text>
         <Snow.TextButton focusKey="modal-bottom" title="Close" onPress={toggleModal} />
       </Snow.Modal>
