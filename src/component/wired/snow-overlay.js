@@ -7,7 +7,7 @@ import SnowText from '../snow-text'
 const SnowOverlayW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const {
-        currentLayer,
+        focusedLayer,
         focusedKey,
         focusOn,
         focusLongPress,
@@ -28,7 +28,7 @@ const SnowOverlayW = (props) => {
         if ((!props.focusLayer || isFocusedLayer(props.focusLayer)) && !isFocused(props.focusKey) && props.stealFocus !== false) {
             focusOn(elementRef, props.focusKey)
         }
-    }, [currentLayer, focusedKey, elementRef, props.focusKey, props.focusLayer, props.stealFocus])
+    }, [focusedLayer, focusedKey, elementRef, props.focusKey, props.focusLayer, props.stealFocus])
 
     if (!isFocusedLayer(props.focusLayer)) {
         return null

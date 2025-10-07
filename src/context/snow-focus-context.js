@@ -98,9 +98,11 @@ export function FocusContextProvider(props) {
     const focusedKeyRef = React.useRef(focusedKey)
     const [focusLayers, setFocusLayers] = React.useState(emptyLayers())
     const focusLayersRef = React.useRef(focusLayers)
+    const [focusedLayer, setFocusedLayer] = React.useState('app')
+    const focusedLayerRef = React.useRef(focusedLayer)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
-    const [currentLayer, setCurrentLayer] = React.useState('app')
+
     let DEBUG_FOCUS = props.DEBUG_FOCUS
     let SCROLL_OFFSET = 200
     if (props.focusVerticalOffset) {
@@ -110,6 +112,10 @@ export function FocusContextProvider(props) {
     React.useEffect(() => {
         focusedKeyRef.current = focusedKey
     }, [focusedKey])
+
+    React.useEffect(() => {
+        focusedLayerRef.current = focusedLayer
+    }, [focusedLayer])
 
     React.useEffect(() => {
         focusLayersRef.current = focusLayers
@@ -169,14 +175,14 @@ export function FocusContextProvider(props) {
             }
             return result
         })
-        setCurrentLayer(layerName)
+        setFocusedLayer(layerName)
     }
 
     const popFocusLayer = () => {
         setFocusLayers((prev) => {
             let result = [...prev]
             result.pop()
-            setCurrentLayer(result.at(-1).layerName)
+            setFocusedLayer(result.at(-1).layerName)
             setFocusedKey(result.at(-1).focusedKey)
             if (DEBUG_FOCUS) {
                 prettyLog({ action: 'popFocusLayer', focusLayers: result })
@@ -196,7 +202,7 @@ export function FocusContextProvider(props) {
 
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
-        const { addFocusMap, currentLayer } = useFocusContext();
+        const { addFocusMap, focusedLayer } = useFocusContext();
         const elementRef = React.useRef(null);
 
         React.useEffect(() => {
@@ -210,7 +216,7 @@ export function FocusContextProvider(props) {
             elementProps.focusUp,
             elementProps.focusRight,
             elementProps.focusLeft,
-            currentLayer
+            focusedLayer
         ]);
 
         return elementRef;
@@ -222,7 +228,7 @@ export function FocusContextProvider(props) {
         }
         setFocusLayers(emptyLayers())
         setFocusedKey(null)
-        setCurrentLayer('app')
+        setFocusedLayer('app')
     }
 
     const addFocusMap = (elementRef, elementProps) => {
@@ -581,7 +587,7 @@ export function FocusContextProvider(props) {
     const focusContext = {
         DEBUG_FOCUS,
         focusedKey,
-        currentLayer,
+        focusedLayer,
         isFocused,
         isFocusedLayer,
         tvRemoteProps,
