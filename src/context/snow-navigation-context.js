@@ -1,7 +1,7 @@
 import React from 'react'
 import { BackHandler, Platform } from 'react-native'
 
-import util from '../util'
+import util, { prettyLog } from '../util'
 
 const NavigationContext = React.createContext({});
 
@@ -36,6 +36,8 @@ or it would create an import cycle
     routePages - A map of string IDs to page components
 */
 export function NavigationContextProvider(props) {
+    const DEBUG = props.DEBUG_NAVIGATION
+
     const [pageLookup, setPageLookup] = React.useState({})
     const [initialPath, setInitialPath] = React.useState(null)
 
@@ -97,12 +99,14 @@ export function NavigationContextProvider(props) {
 
     const navPush = (routePath, routeParams, isFunc) => {
         let foundParams = {}
+        let foundPath = routePath
+        let foundFunc = isFunc
         if (typeof routePath === 'object') {
             foundParams = { ...routePath }
-            route = navigationHistoryRef.current.at(-1).routePath
+            foundPath = navigationHistoryRef.current.at(-1).routePath
         }
         if (routeParams === true) {
-            isFunc = true
+            foundFunc = true
             foundParams = {}
         }
         if (!routeParams) {
@@ -112,23 +116,26 @@ export function NavigationContextProvider(props) {
             foundParams = { ...routeParams }
         }
         const func = () => {
+            if (DEBUG) {
+                prettyLog({ action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc })
+            }
             setNavigationHistory((prev) => {
                 let result = [...prev]
-                if (result.at(-1).routePath === routePath) {
+                if (result.at(-1).routePath === foundPath) {
                     result.at(-1).params = foundParams
                     if (Platform.OS === 'web') {
-                        window.history.replaceState(foundParams, '', util.stateToUrl(routePath, foundParams))
+                        window.history.replaceState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
                 } else {
-                    result.push({ routePath, params: foundParams })
+                    result.push({ routePath: foundPath, params: foundParams })
                     if (Platform.OS === 'web') {
-                        window.history.pushState(foundParams, '', util.stateToUrl(routePath, foundParams))
+                        window.history.pushState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
                 }
                 return result
             })
         }
-        if (isFunc) {
+        if (foundFunc) {
             return func
         }
         return func()
@@ -216,6 +223,9 @@ export function NavigationContextProvider(props) {
     }
 
     if (!initialPath || !pageLookup || !navigationHistory || !navigationHistory.at(-1).routePath) {
+        if (DEBUG) {
+            prettyLog({ action: 'Context->short circuit', initialPath, pageLookup, navigationHistory })
+        }
         return null
     }
 

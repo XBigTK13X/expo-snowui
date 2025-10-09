@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 export const getCircularReplacer = () => {
     const seen = new WeakSet()
     return (key, value) => {

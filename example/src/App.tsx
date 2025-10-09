@@ -37,9 +37,7 @@ function AppPage() {
           focusDown={`tab-entry`}
           items={components}
           renderItem={(item: any) => {
-            return <Snow.TextButton title={item[0]} onPress={() => {
-              navPush(item[1])
-            }} />
+            return <Snow.TextButton title={item[0]} onPress={navPush(item[1], true)} />
           }} />
         <Snow.Break />
       </Snow.View>
@@ -63,7 +61,7 @@ export default function App() {
   return (
     <Snow.App
       DEBUG_FOCUS={false}
-      DEBUG_NAVIGATION={false}
+      DEBUG_NAVIGATION={true}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}

@@ -8,6 +8,7 @@ import {
     UIManager,
     Dimensions
 } from 'react-native'
+import { prettyLog } from '../util'
 
 /*
 TODO
@@ -73,7 +74,7 @@ export function FocusContextProvider(props) {
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
 
-    let DEBUG_FOCUS = props.DEBUG_FOCUS
+    const DEBUG = props.DEBUG_FOCUS
     let SCROLL_OFFSET = 200
     if (props.focusVerticalOffset) {
         SCROLL_OFFSET = props.focusVersionOffset
@@ -98,7 +99,7 @@ export function FocusContextProvider(props) {
     // After focusMaps are added by components, decide at the focus layer level what should have the first focus
     React.useEffect(() => {
         let topLayer = focusLayers?.at(-1)
-        if (DEBUG_FOCUS === 'verbose') {
+        if (DEBUG === 'verbose') {
             prettyLog({ action: 'useEffect(focus)', topLayer, focusedKey })
         }
         const shouldFocus = !focusedKey || (!!focusedKey && !topLayer.directions.hasOwnProperty(focusedKey))
@@ -113,14 +114,14 @@ export function FocusContextProvider(props) {
     }, [focusedKey, focusLayers])
 
     const isFocused = (elementFocusKey) => {
-        if (DEBUG_FOCUS === 'verbose') {
+        if (DEBUG === 'verbose') {
             prettyLog({ action: 'isFocused', elementFocusKey, focusedKey })
         }
         return elementFocusKey && elementFocusKey === focusedKeyRef.current
     }
 
     const isFocusedLayer = (layerName) => {
-        if (DEBUG_FOCUS === 'verbose') {
+        if (DEBUG === 'verbose') {
             prettyLog({ action: 'isFocusedLayer', layerName, focusLayers })
         }
         return layerName && focusLayers.at(-1).layerName === layerName
@@ -140,7 +141,7 @@ export function FocusContextProvider(props) {
             else {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
             }
-            if (DEBUG_FOCUS === 'verbose') {
+            if (DEBUG === 'verbose') {
                 prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
             }
             return result
@@ -154,7 +155,7 @@ export function FocusContextProvider(props) {
             result.pop()
             setFocusedLayer(result.at(-1).layerName)
             setFocusedKey(result.at(-1).focusedKey)
-            if (DEBUG_FOCUS) {
+            if (DEBUG) {
                 prettyLog({ action: 'popFocusLayer', focusLayers: result })
             }
             return result
@@ -193,7 +194,7 @@ export function FocusContextProvider(props) {
     }
 
     const clearFocusLayers = () => {
-        if (DEBUG_FOCUS) {
+        if (DEBUG) {
             prettyLog({ action: 'clearfocusLayers' })
         }
         setFocusLayers(emptyLayers())
@@ -226,7 +227,7 @@ export function FocusContextProvider(props) {
         const directions = {
             [focusKey]: focus
         }
-        if (DEBUG_FOCUS === 'verbose') {
+        if (DEBUG === 'verbose') {
             prettyLog({ action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
         }
         setFocusLayers((prev) => {
@@ -278,7 +279,7 @@ export function FocusContextProvider(props) {
         if (!element) {
             return
         }
-        if (DEBUG_FOCUS === 'verbose') {
+        if (DEBUG === 'verbose') {
             prettyLog({ action: 'focusOn', elementRef, focusKey });
         }
 
@@ -312,7 +313,7 @@ export function FocusContextProvider(props) {
                         node,
                         scrollHandle,
                         (err) => {
-                            if (DEBUG_FOCUS === 'verbose') {
+                            if (DEBUG === 'verbose') {
                                 prettyLog({ action: 'focusOn', error: 'Measurement error', err });
                             }
                         },
@@ -346,16 +347,16 @@ export function FocusContextProvider(props) {
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
         if (Keyboard.isVisible()) {
-            if (DEBUG_FOCUS) {
+            if (DEBUG) {
                 prettyLog({ action: 'moveFocus FAIL Keyboard is visible' })
             }
             return false
         }
-        if (DEBUG_FOCUS) {
+        if (DEBUG) {
             prettyLog({ action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusLayers: focusLayersRef.current })
         }
         if (!focusedKeyRef.current || !focusLayersRef.current.length) {
-            if (DEBUG_FOCUS) {
+            if (DEBUG) {
                 prettyLog({ action: 'moveFocus FAIL no element currently focused' })
             }
             return false
@@ -378,7 +379,7 @@ export function FocusContextProvider(props) {
                 // The target is defined and isn't a cell in the grid
                 if (target && target.indexOf(sourceKey) === -1) {
                     destinationKey = target
-                    if (DEBUG_FOCUS) {
+                    if (DEBUG) {
                         prettyLog({ action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
                     }
                 }
@@ -389,20 +390,20 @@ export function FocusContextProvider(props) {
         // Use a normal lookup
         if (!destinationKey && !isGridCell && focusLayer.directions[sourceKey]) {
             destinationKey = focusLayer.directions[sourceKey][direction]
-            if (DEBUG_FOCUS) {
+            if (DEBUG) {
                 prettyLog({ action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusLayer })
             }
         }
 
 
         if (!destinationKey || !focusLayer.refs[destinationKey]) {
-            if (DEBUG_FOCUS) {
+            if (DEBUG) {
                 prettyLog({ action: 'moveFocus FAIL no destination found', destinationKey })
             }
             return false
         }
 
-        if (DEBUG_FOCUS) {
+        if (DEBUG) {
             prettyLog({ action: 'moveFocus SUCCESS', destinationKey })
         }
         focusOn(focusLayer.refs[destinationKey].element, destinationKey)
@@ -430,7 +431,7 @@ export function FocusContextProvider(props) {
         }
         const focusMap = focusLayersRef.current.at(-1)
         const shouldNotPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.[action])
-        if (DEBUG_FOCUS) {
+        if (DEBUG) {
             prettyLog({ action: 'focusedElementAction', kind: action, focusKey, shouldNotPress, keyboardVisible: Keyboard.isVisible(), [action]: focusMap?.refs?.[focusKey]?.[action] })
         }
         if (shouldNotPress) {
@@ -466,7 +467,7 @@ export function FocusContextProvider(props) {
                 }
                 callback(kind, action)
             }
-            if (DEBUG_FOCUS === 'verbose') {
+            if (DEBUG === 'verbose') {
                 prettyLog({ action: 'remoteHandler', kind, action, focusedKey: focusedKeyRef.current })
             }
             switch (kind) {
@@ -555,7 +556,7 @@ export function FocusContextProvider(props) {
     }
 
     const focusContext = {
-        DEBUG_FOCUS,
+        DEBUG,
         focusedKey,
         focusedLayer,
         isFocused,
