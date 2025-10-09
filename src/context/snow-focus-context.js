@@ -8,14 +8,9 @@ import {
     UIManager,
     Dimensions
 } from 'react-native'
-import { SnowSafeArea } from '../component/snow-safe-area'
 
 /*
 TODO
-Scrolling on the snowstream options page isn't working.
-
-The video player isn't showing up, no matter how I arrange an overlay.
-
 Focus can get lost if in a tabs element there is only text.
       Nothing inside the tab should be selectable, but the outer view gets a focusKey
 
@@ -44,32 +39,6 @@ export function useFocusContext() {
     return value;
 }
 
-function getCircularReplacer() {
-    const seen = new WeakSet()
-    return (key, value) => {
-        if (key.indexOf('__') !== -1 || key === '_viewConfig') {
-            // React garbage, discard key
-            return '[react node]';
-        }
-        if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-                // Circular reference found, discard key
-                return '[circular reference]';
-            }
-            seen.add(value);
-        }
-        return value;
-    };
-}
-
-const prettyLog = (payload) => {
-    if (Platform.OS !== 'web') {
-        console.log(JSON.stringify({ ...payload }, getCircularReplacer(), 4))
-    } else {
-        console.log({ ...payload })
-    }
-}
-
 const emptyLayers = () => {
     return [
         {
@@ -79,6 +48,7 @@ const emptyLayers = () => {
         }
     ]
 }
+
 
 /* Relevant props
 focusKey
@@ -608,9 +578,7 @@ export function FocusContextProvider(props) {
         <FocusContext.Provider
             style={{ flex: 1 }}
             value={focusContext}>
-            <SnowSafeArea style={{ flex: 1 }} >
-                {props.children}
-            </SnowSafeArea>
+            {props.children}
         </FocusContext.Provider>
     );
 }

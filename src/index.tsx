@@ -4,6 +4,10 @@ import { SnowApp } from './snow-app'
 
 export { useFocusContext } from './context/snow-focus-context'
 import { useFocusContext } from './context/snow-focus-context'
+export { useNavigationContext } from './context/snow-navigation-context'
+import { useNavigationContext } from './context/snow-navigation-context'
+export { useSnowContext } from './context/snow-context'
+import { useSnowContext } from './context/snow-context'
 export { useStyleContext } from './context/snow-style-context'
 import { useStyleContext } from './context/snow-style-context'
 
@@ -52,10 +56,16 @@ const useFocusLayerFunc = (name: string, uncloned: boolean = false) => {
 
 export const useFocusLayer = useFocusLayerFunc
 
+import util from './util'
+export * as util from './util'
+
 export default {
-  useFocusContext,
   useFocusLayer,
+  useFocusContext,
+  useNavigationContext,
+  useSnowContext,
   useStyleContext,
+  ...util,
   App: SnowApp,
   Break: SnowBreak,
   Dropdown: SnowDropdown,
