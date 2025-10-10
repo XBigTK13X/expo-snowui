@@ -134,7 +134,7 @@ export function NavigationContextProvider(props) {
                         window.history.replaceState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
                 } else {
-                    result.push({ routePath: foundPath, params: foundParams })
+                    result.push({ routePath: foundPath, routeParams: foundParams })
                     if (Platform.OS === 'web') {
                         window.history.pushState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
