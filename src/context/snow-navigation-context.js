@@ -252,7 +252,7 @@ export function NavigationContextProvider(props) {
         if (DEBUG) {
             prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory })
         }
-        return null
+        return <View style={{ flex: 1, backgroundColor: 'black' }} />
     }
 
     const currentRoute = navigationHistory.at(-1)
