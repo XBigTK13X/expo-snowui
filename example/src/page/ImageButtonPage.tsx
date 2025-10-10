@@ -5,7 +5,6 @@ const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_G
 const wideImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Double-alaskan-rainbow.jpg"
 
 export default function ImageButtonPage() {
-  Snow.useFocusLayer('tab-image-button')
   return (
     <View>
       <Snow.Label>Component: Image Button</Snow.Label>

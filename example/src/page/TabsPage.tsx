@@ -19,7 +19,7 @@ const imageItems = [
   }
 ]
 export default function TabsPage() {
-  Snow.useFocusLayer('tab-tabs')
+
   return (
     <View>
       <Snow.Label>Component: Tabs</Snow.Label>

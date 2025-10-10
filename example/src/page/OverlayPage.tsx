@@ -2,7 +2,7 @@ import React from 'react'
 import Snow from 'expo-snowui'
 
 export default function OverlayPage() {
-  Snow.useFocusLayer('tab-overlay')
+
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => { setShowModal(!showModal) }
   const [showOverlay, setShowOverlay] = React.useState(false)

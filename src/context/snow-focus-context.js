@@ -142,7 +142,7 @@ export function FocusContextProvider(props) {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
             }
             if (DEBUG === 'verbose') {
-                prettyLog({ action: 'pushFocusLayer', layerName, focusLayers: result })
+                prettyLog({ action: 'pushFocusLayer', layerName, prev, result })
             }
             return result
         })
@@ -156,7 +156,7 @@ export function FocusContextProvider(props) {
             setFocusedLayer(result.at(-1).layerName)
             setFocusedKey(result.at(-1).focusedKey)
             if (DEBUG) {
-                prettyLog({ action: 'popFocusLayer', focusLayers: result })
+                prettyLog({ action: 'popFocusLayer', prev, result })
             }
             return result
         })
@@ -543,8 +543,8 @@ export function FocusContextProvider(props) {
     }
 
     // If these are omitted, then TV remote doesn't work on first launch
-    // This is another low level helper for wired components
-    // Nothing outside snowui should need it
+    // This is a low level helper for wired components
+    // Most things outside snowui will not need it
     const tvRemoteProps = (elementProps) => {
         if (!Platform.isTV || !elementProps.focusStart) {
             return {}

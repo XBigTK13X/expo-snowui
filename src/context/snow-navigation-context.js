@@ -1,6 +1,8 @@
 import React from 'react'
 import { BackHandler, Platform } from 'react-native'
 
+import { useFocusContext } from './snow-focus-context'
+
 import util, { prettyLog } from '../util'
 
 const NavigationContext = React.createContext({});
@@ -46,8 +48,16 @@ export function NavigationContextProvider(props) {
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
 
+    const { pushFocusLayer, popFocusLayer } = useFocusContext()
+
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
+        if (navigationHistory?.at(-1)?.routePath) {
+            pushFocusLayer(pageLookup[navigationHistory?.at(-1).routePath].pathKey)
+            return () => {
+                popFocusLayer()
+            }
+        }
     }, [navigationHistory])
 
     React.useEffect(() => {
@@ -116,9 +126,6 @@ export function NavigationContextProvider(props) {
             foundParams = { ...routeParams }
         }
         const func = () => {
-            if (DEBUG) {
-                prettyLog({ action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc })
-            }
             setNavigationHistory((prev) => {
                 let result = [...prev]
                 if (result.at(-1).routePath === foundPath) {
@@ -131,6 +138,9 @@ export function NavigationContextProvider(props) {
                     if (Platform.OS === 'web') {
                         window.history.pushState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
+                }
+                if (DEBUG) {
+                    prettyLog({ action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc, prev, result })
                 }
                 return result
             })
@@ -148,6 +158,9 @@ export function NavigationContextProvider(props) {
                 if (result.length > 1) {
                     result.pop()
                 }
+                if (DEBUG) {
+                    prettyLog({ action: 'navPop', prev, result })
+                }
                 return result
             })
         }
@@ -158,9 +171,13 @@ export function NavigationContextProvider(props) {
     }
 
     const navReset = (isFunc) => {
+        const resetPath = props.resetRoutePath ? props.resetRoutePath : props.initialRoutePath
         const func = () => {
+            if (DEBUG) {
+                prettyLog({ action: 'navReset', prev, result, resetPath, props })
+            }
             setNavigationHistory([{
-                routePath: props.resetRoutePath ? props.resetRoutePath : props.initialRoutePath,
+                routePath: resetPath,
                 routeParams: {}
             }])
         }
@@ -173,6 +190,9 @@ export function NavigationContextProvider(props) {
     // When a modal is shown, prevent default event handlers from exiting the app
     React.useEffect(() => {
         const onBackPress = () => {
+            if (DEBUG) {
+                prettyLog({ action: 'navHardwareBackHandler', navigationAllowedRef })
+            }
             if (!navigationAllowedRef.current) {
                 return true
             }
@@ -191,6 +211,9 @@ export function NavigationContextProvider(props) {
 
     if (Platform.isTV) {
         useTVEventHandler(remoteEvent => {
+            if (DEBUG) {
+                prettyLog({ action: 'navTvRemoteHandler', remoteEvent, navigationAllowedRef })
+            }
             if (remoteEvent.eventType === 'menu' || remoteEvent.eventType === 'back') {
                 if (!navigationAllowedRef.current) {
                     BackHandler.exitApp = () => {
@@ -203,7 +226,10 @@ export function NavigationContextProvider(props) {
 
     if (Platform.OS === 'web') {
         React.useEffect(() => {
-            const onPopState = (e) => {
+            const onPopState = (evt) => {
+                if (DEBUG) {
+                    prettyLog({ action: 'navBrowserBackHandler', evt, navigationAllowedRef })
+                }
                 if (!navigationAllowedRef.current) {
                     return
                 }
@@ -224,13 +250,12 @@ export function NavigationContextProvider(props) {
 
     if (!initialPath || !pageLookup || !navigationHistory || !navigationHistory.at(-1).routePath) {
         if (DEBUG) {
-            prettyLog({ action: 'Context->short circuit', initialPath, pageLookup, navigationHistory })
+            prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory })
         }
         return null
     }
 
-
-    const currentRoute = { ...navigationHistory.at(-1) }
+    const currentRoute = navigationHistory.at(-1)
     const CurrentPage = pageLookup[currentRoute.routePath].page
 
     const context = {

@@ -4,7 +4,7 @@ import Snow from 'expo-snowui'
 
 export default function DropdownPage() {
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
-  Snow.useFocusLayer('tab-dropdown')
+
   const [form, setForm] = React.useState({
     playerChoice: 0,
     alwaysTranscode: 0,

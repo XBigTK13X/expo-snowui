@@ -4,7 +4,7 @@ import { View } from 'react-native'
 
 export default function RangeSliderPage() {
   const [rangeSliderValue, setRangeSliderValue] = React.useState(0.5)
-  Snow.useFocusLayer('tab-range-slider')
+
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>

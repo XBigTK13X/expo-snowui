@@ -2,7 +2,6 @@ import { View } from 'react-native'
 import Snow from 'expo-snowui'
 
 export default function GridPage() {
-  Snow.useFocusLayer('tab-grid')
   return (
     <View>
       <Snow.Label>Component: Grid</Snow.Label>

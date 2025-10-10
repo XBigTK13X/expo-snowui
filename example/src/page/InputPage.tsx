@@ -4,7 +4,7 @@ import { View } from 'react-native'
 
 export default function InputPage() {
   const [inputValue, setInputValue] = React.useState('')
-  Snow.useFocusLayer('tab-input')
+
   return (
     <View>
       <Snow.Label>Component: Input</Snow.Label>

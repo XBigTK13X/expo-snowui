@@ -1,7 +1,7 @@
 {
   "name": "expo-snowui",
-  "version": "1.3.5",
-  "description": "GUI components and contexts shared by the snowsuite apps",
+  "version": "1.4.0",
+  "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -153,8 +153,9 @@
     "version": "0.54.3"
   },
   "dependencies": {
-    "expo": "^54.0.9",
-    "expo-image": "^3.0.8",
+    "expo": "^54.0.13",
+    "expo-image": "^3.0.9",
+    "expo-secure-store": "^15.0.7",
     "lodash": "^4.17.21",
     "react": "19.1.0",
     "react-native": "npm:react-native-tvos@0.81.4-0",

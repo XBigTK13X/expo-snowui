@@ -1,4 +1,5 @@
 import { Platform } from 'react-native'
+import * as SecureStore from 'expo-secure-store';
 
 export const getCircularReplacer = () => {
     const seen = new WeakSet()
@@ -61,6 +62,50 @@ function fromBase64(input) {
     return result
 }
 
+const saveData = (key, value) => {
+    return new Promise(resolve => {
+        if (Platform.OS === 'web') {
+            if (value === null) {
+                localStorage.removeItem(key);
+                return resolve(true)
+            } else {
+                localStorage.setItem(key, value);
+                return resolve(true)
+            }
+        } else {
+            if (value == null) {
+                SecureStore.deleteItemAsync(key);
+                return resolve(true)
+            } else {
+                if (value === false) {
+                    value = 'false'
+                }
+                if (value === true) {
+                    value = 'true'
+                }
+                SecureStore.setItem(key, value);
+                return resolve(true)
+            }
+        }
+    })
+}
+
+const loadData = (key) => {
+    let value = null
+    if (Platform.OS === 'web') {
+        value = localStorage.getItem(key)
+    } else {
+        value = SecureStore.getItem(key)
+    }
+    if (value === 'true') {
+        return true
+    }
+    if (value === 'false') {
+        return false
+    }
+    return value
+}
+
 export default {
     getCircularReplacer,
     prettyLog,
@@ -68,5 +113,7 @@ export default {
     stateToUrl,
     queryToObject,
     toBase64,
-    fromBase64
+    fromBase64,
+    saveData,
+    loadData
 }

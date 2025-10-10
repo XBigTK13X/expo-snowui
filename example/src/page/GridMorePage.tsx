@@ -3,7 +3,6 @@ import { View } from 'react-native'
 import Snow from 'expo-snowui'
 
 export default function GridMorePage() {
-  Snow.useFocusLayer('tab-grid-more')
   const [showModal, setShowModal] = React.useState(false)
 
   if (showModal) {

@@ -21,7 +21,6 @@ const imageItems = [
 
 
 export default function ImageGridPage() {
-  Snow.useFocusLayer('tab-image-grid')
   return (
     <View>
       <Snow.Label>Component: Image Grid</Snow.Label>

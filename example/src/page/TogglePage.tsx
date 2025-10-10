@@ -3,7 +3,7 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function TogglePage() {
-  Snow.useFocusLayer('tab-toggle')
+
   const [toggleValue, setToggleValue] = React.useState(false)
   const togglePermitted = () => { setToggleValue(!toggleValue) }
   return (

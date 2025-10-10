@@ -3,7 +3,7 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function ModalPage() {
-  Snow.useFocusLayer('tab-modal')
+
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => { setShowModal(!showModal) }
   const [showFullscreen, setShowFullscreen] = React.useState(false)

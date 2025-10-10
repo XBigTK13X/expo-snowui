@@ -37,23 +37,23 @@ export function SnowApp(props) {
             style={styles.fill}
             contentContainerStyle={rootInnerStyle} >
 
-            <NavigationContextProvider
-                routePaths={props.routePaths}
-                routePages={props.routePages}
-                initialRoutePath={props.initialRoutePath}
-                resetRoutePath={props.resetRoutePath}
+            <StyleContextProvider
                 style={styles.fill}
-                DEBUG_NAVIGATION={props.DEBUG_NAVIGATION} >
+                snowStyle={props.snowStyle}
+                snowConfig={props.snowConfig} >
 
-                <StyleContextProvider
+                <FocusContextProvider
                     style={styles.fill}
-                    snowStyle={props.snowStyle}
-                    snowConfig={props.snowConfig} >
+                    scrollViewRef={scrollViewRef}
+                    DEBUG_FOCUS={props.DEBUG_FOCUS} >
 
-                    <FocusContextProvider
+                    <NavigationContextProvider
+                        routePaths={props.routePaths}
+                        routePages={props.routePages}
+                        initialRoutePath={props.initialRoutePath}
+                        resetRoutePath={props.resetRoutePath}
                         style={styles.fill}
-                        scrollViewRef={scrollViewRef}
-                        DEBUG_FOCUS={props.DEBUG_FOCUS} >
+                        DEBUG_NAVIGATION={props.DEBUG_NAVIGATION} >
 
                         <SnowContextProvider
                             style={styles.fill} >
@@ -62,9 +62,10 @@ export function SnowApp(props) {
                                 {props.children}
                             </SnowSafeArea>
                         </SnowContextProvider>
-                    </FocusContextProvider>
-                </StyleContextProvider>
-            </NavigationContextProvider>
+
+                    </NavigationContextProvider>
+                </FocusContextProvider>
+            </StyleContextProvider>
         </ScrollView>
     )
 }
