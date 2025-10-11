@@ -32,6 +32,7 @@ const SnowViewW = (props) => {
     return (<View
         {...readFocusProps(props)}
         {...styleProps}
+        style={props.style}
         children={children}
     />)
 }

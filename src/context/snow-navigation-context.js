@@ -1,12 +1,11 @@
 import React from 'react'
-import { BackHandler, Platform, View } from 'react-native'
+import { BackHandler, Platform, View, useTVEventHandler } from 'react-native'
 
 import { useFocusContext } from './snow-focus-context'
 
 import util, { prettyLog } from '../util'
 
 const NavigationContext = React.createContext({});
-
 
 export function useNavigationContext() {
     const value = React.useContext(NavigationContext);
@@ -48,12 +47,13 @@ export function NavigationContextProvider(props) {
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
 
-    const { pushFocusLayer, popFocusLayer } = useFocusContext()
+    const { pushFocusLayer, popFocusLayer, isFocusedLayer } = useFocusContext()
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
         if (navigationHistory?.at(-1)?.routePath) {
-            pushFocusLayer(pageLookup[navigationHistory?.at(-1).routePath].pathKey)
+            const layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey
+            pushFocusLayer(layerName)
             return () => {
                 popFocusLayer()
             }
@@ -211,7 +211,7 @@ export function NavigationContextProvider(props) {
 
     if (Platform.isTV) {
         useTVEventHandler(remoteEvent => {
-            if (DEBUG) {
+            if (DEBUG === 'verbose') {
                 prettyLog({ action: 'navTvRemoteHandler', remoteEvent, navigationAllowedRef })
             }
             if (remoteEvent.eventType === 'menu' || remoteEvent.eventType === 'back') {
@@ -248,7 +248,13 @@ export function NavigationContextProvider(props) {
         }, [])
     }
 
-    if (!initialPath || !pageLookup || !navigationHistory || !navigationHistory.at(-1).routePath) {
+    if (
+        !initialPath ||
+        !pageLookup ||
+        !navigationHistory ||
+        !navigationHistory.at(-1).routePath ||
+        !isFocusedLayer(pageLookup[navigationHistory?.at(-1).routePath].pathKey)
+    ) {
         if (DEBUG) {
             prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory })
         }

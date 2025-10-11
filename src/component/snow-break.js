@@ -4,9 +4,20 @@ import { useStyleContext } from '../context/snow-style-context'
 export function SnowBreak(props) {
     const { SnowStyle } = useStyleContext(props)
 
-    return (<View
-        style={SnowStyle.component.break}
-    />)
+    let style = [SnowStyle.component.break.horizontal]
+    if (props.vertical) {
+        style = [SnowStyle.component.break.vertical]
+    }
+
+    if (props.style) {
+        style.push(props.style)
+    }
+
+    return (
+        <View
+            style={style}
+        />
+    )
 }
 
 export default SnowBreak

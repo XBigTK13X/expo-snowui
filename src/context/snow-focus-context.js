@@ -575,6 +575,16 @@ export function FocusContextProvider(props) {
         focusPress
     }
 
+    if (
+        focusedLayer !== 'app' &&
+        !isFocusedLayer(focusedLayer)
+    ) {
+        if (DEBUG) {
+            prettyLog({ action: 'FocusContext->short circuit', focusedLayer })
+        }
+        return <View style={{ flex: 1, backgroundColor: 'black' }} />
+    }
+
     return (
         <FocusContext.Provider
             style={{ flex: 1 }}

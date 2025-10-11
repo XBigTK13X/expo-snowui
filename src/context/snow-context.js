@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Platform } from 'react-native'
+import { Platform, useTVEventHandler } from 'react-native'
 
 import { useFocusContext } from './snow-focus-context'
 import { useNavigationContext } from './snow-navigation-context'

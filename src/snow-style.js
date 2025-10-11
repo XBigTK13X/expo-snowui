@@ -122,8 +122,15 @@ export function createStyle(overrides) {
 
     AppStyle.component = {
         break: {
-            borderBottomColor: AppStyle.color.coreDark,
-            borderBottomWidth: 2,
+            horizontal: {
+                borderBottomColor: AppStyle.color.coreDark,
+                borderBottomWidth: 2,
+            },
+            vertical: {
+                borderRightColor: AppStyle.color.coreDark,
+                borderRightWidth: 2,
+            }
+
         },
         fillView: {
             default: {

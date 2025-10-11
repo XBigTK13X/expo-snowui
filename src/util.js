@@ -2,22 +2,31 @@ import { Platform } from 'react-native'
 import * as SecureStore from 'expo-secure-store';
 
 export const getCircularReplacer = () => {
-    const seen = new WeakSet()
-    return (key, value) => {
+    const seen = new WeakMap();
+
+    return function replacer(key, value) {
         if (key.indexOf('__') !== -1 || key === '_viewConfig') {
-            // React garbage, discard key
             return '[react node]';
         }
+
         if (typeof value === 'object' && value !== null) {
+            const parentDepth =
+                typeof this === 'object' && this !== null ? (seen.get(this) || 0) : 0;
+            const currentDepth = parentDepth + 1;
+
             if (seen.has(value)) {
-                // Circular reference found, discard key
-                return '[circular reference]';
+                const firstDepth = seen.get(value);
+                if (currentDepth > firstDepth + 1) {
+                    return '[circular reference]';
+                }
+            } else {
+                seen.set(value, currentDepth);
             }
-            seen.add(value);
         }
+
         return value;
     };
-}
+};
 
 export const stringifySafe = (input) => {
     return JSON.stringify({ ...input }, getCircularReplacer(), 4)

@@ -25,23 +25,24 @@ function AppPage() {
   ]
 
   return (
-    <Snow.View>
-      <Snow.View>
-        <Snow.TextButton focusKey="test-higher-focus" focusDown="component-picker" title="Focus Test Button" />
-        <Snow.Label>App Level entities</Snow.Label>
-        <Snow.Text>App, FillView, SafeArea, useSnowContext.</Snow.Text>
+    <Snow.View style={{ flexDirection: 'row', flex: 1 }}>
+      <Snow.View style={{ width: "25%" }}>
+        <Snow.TextButton focusKey="test-higher-focus" focusDown="component-picker" title="Focus Test" />
         <Snow.Label>Components</Snow.Label>
         <Snow.Grid
           focusStart
           focusKey={"component-picker"}
-          focusDown={`tab-entry`}
+          focusRight={`tab-entry`}
+          itemsPerRow={1}
           items={components}
           renderItem={(item: any) => {
             return <Snow.TextButton title={item[0]} onPress={navPush(item[1], true)} />
           }} />
-        <Snow.Break />
+        <Snow.Label>App Level entities</Snow.Label>
+        <Snow.Text>App, FillView, SafeArea, useSnowContext.</Snow.Text>
       </Snow.View>
-      <Snow.View>
+      <Snow.Break style={{ width: "5%" }} vertical />
+      <Snow.View style={{ width: "70%" }}>
         <CurrentPage />
       </Snow.View>
     </Snow.View>
@@ -60,8 +61,8 @@ const styleOverrides = {
 export default function App() {
   return (
     <Snow.App
-      DEBUG_FOCUS={false}
-      DEBUG_NAVIGATION={false}
+      DEBUG_FOCUS={true}
+      DEBUG_NAVIGATION={true}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}
