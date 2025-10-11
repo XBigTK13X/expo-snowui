@@ -57,7 +57,6 @@ export function SnowApp(props) {
 
                         <SnowContextProvider
                             style={styles.fill} >
-
                             <SnowSafeArea style={styles.fillWithGap} >
                                 {props.children}
                             </SnowSafeArea>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Modal, View } from 'react-native'
+import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowFillView from '../snow-fill-view'
@@ -34,7 +34,10 @@ const SnowModalW = (props) => {
                 children={props.children} />
         )
     }
-    let modalStyle = [SnowStyle.component.modal.prompt]
+    let modalStyle = [
+        SnowStyle.component.modal.default,
+        SnowStyle.component.modal.prompt
+    ]
     if (props.modalStyle) {
         modalStyle.push(props.modalStyle)
     }
@@ -63,14 +66,16 @@ const SnowModalW = (props) => {
         }
     }
 
-    return <Modal
-        style={modalStyle}
-        navigationBarTranslucent
-        statusBarTranslucent
-        transparent={props.transparent}
-        onRequestClose={props.onRequestClose}>
-        {modalContent}
-    </Modal>
+    return (
+        <View
+            style={modalStyle}
+            navigationBarTranslucent
+            statusBarTranslucent
+            transparent={props.transparent}
+            onRequestClose={props.onRequestClose}>
+            {modalContent}
+        </View>
+    )
 }
 
 SnowModalW.isSnowFocusWired = true

@@ -258,6 +258,15 @@ export function createStyle(overrides) {
             padding: 10
         },
         modal: {
+            default: {
+                position: 'absolute',
+                right: 0,
+                left: 0,
+                top: 0,
+                bottom: 0,
+                zIndex: 200,
+                elevation: 200
+            },
             prompt: {
                 backgroundColor: AppStyle.color.background
             },
@@ -272,6 +281,8 @@ export function createStyle(overrides) {
         },
         overlay: {
             touchable: {
+                zIndex: 300,
+                elevation: 300,
                 width: getWindowWidth(),
                 height: getWindowHeight(),
                 position: 'absolute',
@@ -332,7 +343,9 @@ export function createStyle(overrides) {
         safeArea: {
             padding: 30,
             backgroundColor: AppStyle.color.background,
-            flex: 1
+            flex: 1,
+            zIndex: 100,
+            elevation: 100
         },
         tabs: {
             panel: {
