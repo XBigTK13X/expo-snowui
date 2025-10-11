@@ -47,7 +47,7 @@ export function NavigationContextProvider(props) {
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
 
-    const { pushFocusLayer, popFocusLayer, isFocusedLayer } = useFocusContext()
+    const { pushFocusLayer, popFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
@@ -252,11 +252,10 @@ export function NavigationContextProvider(props) {
         !initialPath ||
         !pageLookup ||
         !navigationHistory ||
-        !navigationHistory.at(-1).routePath ||
-        !isFocusedLayer(pageLookup[navigationHistory?.at(-1).routePath].pathKey)
+        !navigationHistory.at(-1).routePath
     ) {
         if (DEBUG) {
-            prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory })
+            prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory, focusedLayer })
         }
         return <View style={{ flex: 1, backgroundColor: 'black' }} />
     }

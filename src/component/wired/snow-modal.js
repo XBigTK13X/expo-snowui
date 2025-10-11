@@ -11,10 +11,11 @@ const SnowModalW = (props) => {
             return <SnowText>SnowModal requires a focusLayer prop</SnowText>
         }
         const { useFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
-        useFocusLayer(props.focusLayer, true)
+        let focusLayer = `snow-modal-${props.focusLayer}`
+        useFocusLayer(focusLayer, true)
         console.log()
-        if (!isFocusedLayer(props.focusLayer)) {
-            console.log({ focusedLayer, focus: props.focusLayer })
+        if (!isFocusedLayer(focusLayer)) {
+            console.log({ focusedLayer, focusLayer })
             return null
         }
     }
