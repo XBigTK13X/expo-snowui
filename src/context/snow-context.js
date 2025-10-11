@@ -2,9 +2,12 @@ import React from 'react'
 
 import { Platform, useTVEventHandler } from 'react-native'
 
+import { useStyleContext } from './snow-style-context'
 import { useFocusContext } from './snow-focus-context'
 import { useNavigationContext } from './snow-navigation-context'
-import { useStyleContext } from './snow-style-context'
+import { useLayerContext } from './snow-layer-context'
+
+import util from '../util'
 
 const SnowContext = React.createContext({});
 
@@ -20,6 +23,7 @@ export function SnowContextProvider(props) {
     const StyleContext = useStyleContext(props)
     const FocusContext = useFocusContext(props)
     const NavigationContext = useNavigationContext(props)
+    const InteractionLayerContext = useLayerContext(props)
 
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef(remoteCallbacks)
@@ -48,17 +52,19 @@ export function SnowContextProvider(props) {
         ...StyleContext,
         ...FocusContext,
         ...NavigationContext,
+        ...InteractionLayerContext,
         setRemoteCallbacks
     }), [
         StyleContext,
         FocusContext,
         NavigationContext,
+        InteractionLayerContext,
         setRemoteCallbacks
     ]);
 
     return (
         <SnowContext.Provider
-            style={{ flex: 1 }}
+            style={util.blankStyle}
             value={context}
         >
             {props.children}

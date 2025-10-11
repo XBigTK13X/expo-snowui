@@ -115,7 +115,20 @@ const loadData = (key) => {
     return value
 }
 
+const blankStyle = {
+    flex: 1,
+    backgroundColor: 'black'
+}
+
+const blankStyleGap = {
+    flex: 1,
+    backgroundColor: 'black',
+    bottomMargin: 50
+}
+
 export default {
+    blankStyle,
+    blankStyleGap,
     getCircularReplacer,
     prettyLog,
     stringifySafe,

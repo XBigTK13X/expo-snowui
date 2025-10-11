@@ -61,8 +61,7 @@ const styleOverrides = {
 export default function App() {
   return (
     <Snow.App
-      DEBUG_FOCUS={true}
-      DEBUG_NAVIGATION={true}
+      DEBUG_SNOW={false}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}

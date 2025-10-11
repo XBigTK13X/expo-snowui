@@ -36,6 +36,7 @@ export default function ModalPage() {
       </Snow.Modal>
     )
   }
+
   return (
     <View>
       <Snow.Label>Component: Modal</Snow.Label>

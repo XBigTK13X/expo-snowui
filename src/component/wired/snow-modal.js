@@ -2,15 +2,16 @@ import React from 'react'
 import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import { useLayerContext } from '../../context/snow-layer-context'
+
 import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    if (props.assignFocus !== false) {
-        if (!props.focusLayer) {
-            return <SnowText>SnowModal requires a focusLayer prop</SnowText>
-        }
+    const { pushModal, popModal } = useLayerContext(props)
+    if (props.assignFocus !== false && !props.focusLayer) {
+        return <SnowText>SnowModal requires a focusLayer prop</SnowText>
     }
 
     let style = [SnowStyle.component.modal.prompt]
@@ -23,9 +24,10 @@ const SnowModalW = (props) => {
     if (props.contentStyle) {
         style.push(props.contentStyle)
     }
+    let modalView = null
     if (props.wrapper === false) {
-        return (
-            <Modal
+        modalView = (
+            <View
                 navigationBarTranslucent
                 statusBarTranslucent
                 transparent={props.transparent}
@@ -33,49 +35,42 @@ const SnowModalW = (props) => {
                 onRequestClose={props.onRequestClose}
                 children={props.children} />
         )
-    }
-    let modalStyle = [
-        SnowStyle.component.modal.default,
-        SnowStyle.component.modal.prompt
-    ]
-    if (props.modalStyle) {
-        modalStyle.push(props.modalStyle)
-    }
-
-    let modalContent = (
-        <SnowFillView
-            scroll={props.scroll}
-            children={props.children}
-            style={style} />
-    )
-
-    if (props.assignFocus !== false) {
-        const { pushFocusLayer, popFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
-        let focusLayer = `snow-modal-${props.focusLayer}`
-        React.useEffect(() => {
-
-            pushFocusLayer(focusLayer, true);
-            return () => {
-                popFocusLayer();
-            }
-        }, [props.focusLayer, pushFocusLayer, popFocusLayer]);
-
-        if (!isFocusedLayer(focusLayer)) {
-            console.log({ focusedLayer, focusLayer })
-            modalContent = <SnowText>Waiting for focus...</SnowText>
+    } else {
+        let modalStyle = [
+            SnowStyle.component.modal.default,
+            SnowStyle.component.modal.prompt
+        ]
+        if (props.modalStyle) {
+            modalStyle.push(props.modalStyle)
         }
-    }
 
-    return (
-        <View
-            style={modalStyle}
-            navigationBarTranslucent
-            statusBarTranslucent
-            transparent={props.transparent}
-            onRequestClose={props.onRequestClose}>
-            {modalContent}
-        </View>
-    )
+        let modalContent = (
+            <SnowFillView
+                scroll={props.scroll}
+                children={props.children}
+                style={style} />
+        )
+
+        modalView = (
+            <View
+                style={modalStyle}
+                navigationBarTranslucent
+                statusBarTranslucent
+                transparent={props.transparent}
+                onRequestClose={props.onRequestClose}>
+                {modalContent}
+            </View>
+        )
+    }
+    if (modalView) {
+        React.useEffect(() => {
+            pushModal(modalView)
+            return () => {
+                popModal()
+            }
+        }, [])
+    }
+    return null
 }
 
 SnowModalW.isSnowFocusWired = true

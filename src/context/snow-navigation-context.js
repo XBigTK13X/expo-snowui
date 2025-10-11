@@ -39,6 +39,8 @@ or it would create an import cycle
 export function NavigationContextProvider(props) {
     const DEBUG = props.DEBUG_NAVIGATION
 
+    const [isReady, setIsReady] = React.useState(false)
+
     const [pageLookup, setPageLookup] = React.useState({})
     const [initialPath, setInitialPath] = React.useState(null)
 
@@ -105,6 +107,7 @@ export function NavigationContextProvider(props) {
         }])
         setInitialPath(initialRoute)
         setPageLookup(lookup)
+        setIsReady(true)
     }, [props.initialRoutePath, props.routePaths, props.routePages])
 
     const navPush = (routePath, routeParams, isFunc) => {
@@ -140,7 +143,7 @@ export function NavigationContextProvider(props) {
                     }
                 }
                 if (DEBUG) {
-                    prettyLog({ action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc, prev, result })
+                    prettyLog({ context: 'navigation', action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc, prev, result })
                 }
                 return result
             })
@@ -159,7 +162,7 @@ export function NavigationContextProvider(props) {
                     result.pop()
                 }
                 if (DEBUG) {
-                    prettyLog({ action: 'navPop', prev, result })
+                    prettyLog({ context: 'navigation', action: 'navPop', prev, result })
                 }
                 return result
             })
@@ -174,7 +177,7 @@ export function NavigationContextProvider(props) {
         const resetPath = props.resetRoutePath ? props.resetRoutePath : props.initialRoutePath
         const func = () => {
             if (DEBUG) {
-                prettyLog({ action: 'navReset', prev, result, resetPath, props })
+                prettyLog({ context: 'navigation', action: 'navReset', prev, result, resetPath, props })
             }
             setNavigationHistory([{
                 routePath: resetPath,
@@ -191,7 +194,7 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         const onBackPress = () => {
             if (DEBUG) {
-                prettyLog({ action: 'navHardwareBackHandler', navigationAllowedRef })
+                prettyLog({ context: 'navigation', action: 'hardwareBackHandler', navigationAllowedRef })
             }
             if (!navigationAllowedRef.current) {
                 return true
@@ -212,7 +215,7 @@ export function NavigationContextProvider(props) {
     if (Platform.isTV) {
         useTVEventHandler(remoteEvent => {
             if (DEBUG === 'verbose') {
-                prettyLog({ action: 'navTvRemoteHandler', remoteEvent, navigationAllowedRef })
+                prettyLog({ context: 'navigation', action: 'tvRemoteHandler', remoteEvent, navigationAllowedRef })
             }
             if (remoteEvent.eventType === 'menu' || remoteEvent.eventType === 'back') {
                 if (!navigationAllowedRef.current) {
@@ -228,7 +231,7 @@ export function NavigationContextProvider(props) {
         React.useEffect(() => {
             const onPopState = (evt) => {
                 if (DEBUG) {
-                    prettyLog({ action: 'navBrowserBackHandler', evt, navigationAllowedRef })
+                    prettyLog({ context: 'navigation', action: 'browserBackHandler', evt, navigationAllowedRef })
                 }
                 if (!navigationAllowedRef.current) {
                     return
@@ -248,22 +251,22 @@ export function NavigationContextProvider(props) {
         }, [])
     }
 
-    if (
-        !navigationHistory ||
-        !navigationHistory.at(-1)?.routePath ||
-        !pageLookup[navigationHistory.at(-1).routePath] ||
-        !isFocusedLayer(pageLookup[navigationHistory.at(-1).routePath].pathKey)
-    ) {
+    if (!isReady) {
         if (DEBUG) {
-            prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory, focusedLayer })
+            prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer })
         }
-        return <View style={{ flex: 1, backgroundColor: 'black' }} />
+        return <View style={util.blankStyle} />
     }
 
     const currentRoute = navigationHistory.at(-1)
     const CurrentPage = pageLookup[currentRoute.routePath].page
 
+    if (DEBUG === 'verbose') {
+        prettyLog({ context: 'navigation', action: 'render', currentRoute, CurrentPage })
+    }
+
     const context = {
+        DEBUG_NAVIGATION: DEBUG,
         currentRoute,
         CurrentPage,
         navPush,
