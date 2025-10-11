@@ -8,8 +8,9 @@ export default function ModalPage() {
   const toggleModal = () => { setShowModal(!showModal) }
   const [showFullscreen, setShowFullscreen] = React.useState(false)
   const toggleFullscreen = () => { setShowFullscreen(!showFullscreen) }
+  let modal = null
   if (showModal) {
-    return (
+    modal = (
       <Snow.Modal focusLayer={'example-modal'} scroll onRequestClose={toggleModal}>
         <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
@@ -23,8 +24,9 @@ export default function ModalPage() {
       </Snow.Modal>
     )
   }
+
   if (showFullscreen) {
-    return (
+    modal = (
       <Snow.Modal assignFocus={false}>
         <Snow.FillView style={{ backgroundColor: 'green' }}>
           <Snow.Text>This should be fullscreen with no border.</Snow.Text>
@@ -39,6 +41,7 @@ export default function ModalPage() {
       <Snow.Label>Component: Modal</Snow.Label>
       <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
       <Snow.TextButton focusKey="modal-two" title="Test Fullscreen" onPress={toggleFullscreen} />
+      {modal}
     </View>
   )
 }

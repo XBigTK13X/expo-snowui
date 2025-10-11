@@ -1,4 +1,5 @@
-import { Modal } from 'react-native'
+import React from 'react'
+import { Modal, View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowFillView from '../snow-fill-view'
@@ -9,14 +10,6 @@ const SnowModalW = (props) => {
     if (props.assignFocus !== false) {
         if (!props.focusLayer) {
             return <SnowText>SnowModal requires a focusLayer prop</SnowText>
-        }
-        const { useFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
-        let focusLayer = `snow-modal-${props.focusLayer}`
-        useFocusLayer(focusLayer, true)
-        console.log()
-        if (!isFocusedLayer(focusLayer)) {
-            console.log({ focusedLayer, focusLayer })
-            return null
         }
     }
 
@@ -43,18 +36,40 @@ const SnowModalW = (props) => {
     }
     let modalStyle = [SnowStyle.component.modal.prompt]
     if (props.modalStyle) {
-        modalStyle.push(modalStyle)
+        modalStyle.push(props.modalStyle)
     }
+
+    let modalContent = (
+        <SnowFillView
+            scroll={props.scroll}
+            children={props.children}
+            style={style} />
+    )
+
+    if (props.assignFocus !== false) {
+        const { pushFocusLayer, popFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
+        let focusLayer = `snow-modal-${props.focusLayer}`
+        React.useEffect(() => {
+
+            pushFocusLayer(focusLayer, true);
+            return () => {
+                popFocusLayer();
+            }
+        }, [props.focusLayer, pushFocusLayer, popFocusLayer]);
+
+        if (!isFocusedLayer(focusLayer)) {
+            console.log({ focusedLayer, focusLayer })
+            modalContent = <SnowText>Waiting for focus...</SnowText>
+        }
+    }
+
     return <Modal
         style={modalStyle}
         navigationBarTranslucent
         statusBarTranslucent
         transparent={props.transparent}
         onRequestClose={props.onRequestClose}>
-        <SnowFillView
-            scroll={props.scroll}
-            children={props.children}
-            style={style} />
+        {modalContent}
     </Modal>
 }
 

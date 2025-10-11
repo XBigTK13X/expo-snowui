@@ -249,10 +249,10 @@ export function NavigationContextProvider(props) {
     }
 
     if (
-        !initialPath ||
-        !pageLookup ||
         !navigationHistory ||
-        !navigationHistory.at(-1).routePath
+        !navigationHistory.at(-1)?.routePath ||
+        !pageLookup[navigationHistory.at(-1).routePath] ||
+        !isFocusedLayer(pageLookup[navigationHistory.at(-1).routePath].pathKey)
     ) {
         if (DEBUG) {
             prettyLog({ action: 'NavigationContext->short circuit', initialPath, pageLookup, navigationHistory, focusedLayer })
