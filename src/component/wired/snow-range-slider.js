@@ -144,7 +144,8 @@ const SnowRangeSliderW = (props) => {
 
 
     React.useEffect(() => {
-        addActionListener(props?.listenerKey ?? 'range-slider', {
+        const listenerKey = props?.listenerKey ?? 'range-slider'
+        addActionListener(listenerKey, {
             onRight: () => {
                 if (isFocused(props.focusKey)) {
                     applyStep(step)
@@ -168,6 +169,9 @@ const SnowRangeSliderW = (props) => {
                 }
             }
         })
+        return () => {
+            removeActionListener(listenerKey)
+        }
     }, [])
 
     const handleLayout = (kind) => {

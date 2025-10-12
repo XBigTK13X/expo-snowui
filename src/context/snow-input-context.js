@@ -40,7 +40,7 @@ export function InputContextProvider(props) {
 
     const addBackListener = (ownerKey, onListen) => {
         if (DEBUG === 'verbose') {
-            prettyLog({ 'context': 'input', 'action': 'addBackListener', ownerKey, onListen })
+            prettyLog({ 'context': 'input', action: 'addBackListener', ownerKey, onListen })
         }
         setBackListeners((prev) => {
             let result = { ...prev, [ownerKey]: onListen }
@@ -50,7 +50,7 @@ export function InputContextProvider(props) {
 
     const removeBackListener = (ownerKey) => {
         if (DEBUG === 'verbose') {
-            prettyLog({ 'context': 'input', 'action': 'removeBackListener', ownerKey })
+            prettyLog({ 'context': 'input', action: 'removeBackListener', ownerKey })
         }
         setBackListeners((prev) => {
             let result = { ...prev }
@@ -62,7 +62,7 @@ export function InputContextProvider(props) {
 
     const addActionListener = (ownerKey, onListen) => {
         if (DEBUG === 'verbose') {
-            prettyLog({ 'context': 'input', 'action': 'addActionListener', ownerKey, onListen })
+            prettyLog({ 'context': 'input', action: 'addActionListener', ownerKey, onListen })
         }
         setActionListeners((prev) => {
             let result = { ...prev, [ownerKey]: onListen }
@@ -72,7 +72,7 @@ export function InputContextProvider(props) {
 
     const removeActionListener = (ownerKey) => {
         if (DEBUG === 'verbose') {
-            prettyLog({ 'context': 'input', 'action': 'removeActionListener', ownerKey })
+            prettyLog({ 'context': 'input', action: 'removeActionListener', ownerKey })
         }
         setActionListeners((prev) => {
             let result = { ...prev }
@@ -90,7 +90,7 @@ export function InputContextProvider(props) {
                 let result = false
                 for (const [ownerKey, onListen] of Object.entries(backListenersRef.current)) {
                     if (DEBUG) {
-                        prettyLog({ 'context': 'input', 'action': 'androidBackListener', ownerKey })
+                        prettyLog({ 'context': 'input', action: 'androidBackListener', ownerKey })
                     }
                     if (onListen()) {
                         result = true
@@ -114,7 +114,7 @@ export function InputContextProvider(props) {
                 let result = false
                 for (const [ownerKey, onListen] of Object.entries(backListenersRef.current)) {
                     if (DEBUG) {
-                        prettyLog({ 'context': 'input', 'action': 'webBackListener', ownerKey })
+                        prettyLog({ 'context': 'input', action: 'webBackListener', ownerKey })
                     }
                     if (onListen()) {
                         result = true
@@ -145,7 +145,7 @@ export function InputContextProvider(props) {
                 let result = false
                 for (const [ownerKey, onListen] of Object.entries(backListenersRef.current)) {
                     if (DEBUG) {
-                        prettyLog({ 'context': 'input', 'action': 'tvBackListener', ownerKey })
+                        prettyLog({ 'context': 'input', action: 'tvBackListener', ownerKey })
                     }
                     if (onListen()) {
                         result = true
@@ -160,7 +160,7 @@ export function InputContextProvider(props) {
                 // TV Remote any other button
                 for (const [ownerKey, listener] of Object.entries(actionListenersRef.current)) {
                     if (DEBUG) {
-                        prettyLog({ 'context': 'input', 'action': 'tvActionListener', ownerKey, kind, action })
+                        prettyLog({ 'context': 'input', action: 'tvActionListener', ownerKey, kind, action })
                     }
                     switch (kind) {
                         case 'up':
@@ -197,31 +197,32 @@ export function InputContextProvider(props) {
     if (Platform.OS === 'web') {
         React.useEffect(() => {
             const keyboardHandler = (event) => {
+                const pressedKey = event.key
                 for (const [ownerKey, listener] of Object.entries(actionListenersRef.current)) {
-                    switch (event.key) {
+                    switch (pressedKey) {
                         case 'ArrowUp':
                             if (DEBUG) {
-                                prettyLog({ 'context': 'input', 'action': 'webActionUp', ownerKey, keyPress: event.key })
+                                prettyLog({ 'context': 'input', action: 'webActionUp', ownerKey, keyPress: event.key })
                             }
-                            listener.onUp()
+                            listener.onUp?.()
                             break
                         case 'ArrowDown':
                             if (DEBUG) {
-                                prettyLog({ 'context': 'input', 'action': 'webActionDown', ownerKey, keyPress: event.key })
+                                prettyLog({ 'context': 'input', action: 'webActionDown', ownerKey, keyPress: event.key })
                             }
-                            listener.onDown()
+                            listener.onDown?.()
                             break
                         case 'ArrowRight':
                             if (DEBUG) {
-                                prettyLog({ 'context': 'input', 'action': 'webActionRight', ownerKey, keyPress: event.key })
+                                prettyLog({ 'context': 'input', action: 'webActionRight', ownerKey, keyPress: event.key })
                             }
-                            listener.onRight()
+                            listener.onRight?.()
                             break
                         case 'ArrowLeft':
                             if (DEBUG) {
-                                prettyLog({ 'context': 'input', 'action': 'webActionLeft', ownerKey, keyPress: event.key })
+                                prettyLog({ 'context': 'input', action: 'webActionLeft', ownerKey, keyPress: event.key })
                             }
-                            listener.onLeft()
+                            listener.onLeft?.()
                             break
                         default:
                             break
@@ -236,6 +237,7 @@ export function InputContextProvider(props) {
     }
 
     const context = {
+        DEBUG_INPUT: DEBUG,
         addBackListener,
         removeBackListener,
         addActionListener,
