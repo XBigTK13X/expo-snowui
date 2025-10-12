@@ -31,8 +31,10 @@ export default function ModalPage() {
         <Snow.FillView style={{ backgroundColor: 'green' }}>
           <Snow.Text>This should be fullscreen with no border.</Snow.Text>
         </Snow.FillView>
-        <Snow.Overlay focusKey="fullscreen-overlay" focusLayer="fullscreen-modal" onPress={toggleFullscreen}>
-        </Snow.Overlay>
+        <Snow.Overlay
+          focusKey="fullscreen-overlay"
+          focusLayer="fullscreen-modal"
+          onPress={toggleFullscreen} />
       </Snow.Modal>
     )
   }

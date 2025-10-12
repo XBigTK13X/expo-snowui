@@ -49,7 +49,7 @@ export function NavigationContextProvider(props) {
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
 
-    const { pushFocusLayer, popFocusLayer, isFocusedLayer, focusedLayer } = useFocusContext()
+    const { pushFocusLayer, popFocusLayer, focusedLayer } = useFocusContext()
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory

@@ -9,10 +9,23 @@ import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
     const { SnowStyle } = useStyleContext(props)
+    const { pushFocusLayer, popFocusLayer } = useFocusContext(props)
     const { pushModal, popModal } = useLayerContext(props)
-    if (props.assignFocus !== false && !props.focusLayer) {
-        return <SnowText>SnowModal requires a focusLayer prop</SnowText>
+
+    if (props.assignFocus !== false) {
+        if (!props.focusLayer) {
+            return <SnowText>SnowModal requires a focusLayer prop</SnowText>
+        }
+        else {
+            React.useEffect(() => {
+                pushFocusLayer(props.focusLayer)
+                return () => {
+                    popFocusLayer()
+                }
+            }, [])
+        }
     }
+
 
     let style = [SnowStyle.component.modal.prompt]
     if (props.transparent) {

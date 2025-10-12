@@ -341,6 +341,7 @@ export function createStyle(overrides) {
             }
         },
         safeArea: {
+            bottomMargin: 50,
             padding: 30,
             backgroundColor: AppStyle.color.background,
             flex: 1,

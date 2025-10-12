@@ -120,15 +120,8 @@ const blankStyle = {
     backgroundColor: 'black'
 }
 
-const blankStyleGap = {
-    flex: 1,
-    backgroundColor: 'black',
-    bottomMargin: 50
-}
-
 export default {
     blankStyle,
-    blankStyleGap,
     getCircularReplacer,
     prettyLog,
     stringifySafe,
