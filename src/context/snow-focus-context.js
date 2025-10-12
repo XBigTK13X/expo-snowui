@@ -77,6 +77,7 @@ export function FocusContextProvider(props) {
     const focusedLayerRef = React.useRef(focusedLayer)
     const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
     const remoteCallbacksRef = React.useRef({});
+    const [scrollViewRef, setScrollViewRef] = React.useState(null)
 
     const DEBUG = props.DEBUG_FOCUS
     let SCROLL_OFFSET = 200
@@ -141,7 +142,7 @@ export function FocusContextProvider(props) {
         setFocusLayers((prev) => {
             let result = [...prev]
             if (layerIsUncloned) {
-                result.push({ layerName, refs: {}, directions: {}, isUncloned: true, focusedKey })
+                result.push({ layerName, refs: {}, directions: {}, isUncloned: true })
             }
             else {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
@@ -152,6 +153,9 @@ export function FocusContextProvider(props) {
             return result
         })
         setFocusedLayer(layerName)
+        if (layerIsUncloned) {
+            setFocusedKey(null)
+        }
     }
 
     const popFocusLayer = () => {
@@ -192,7 +196,8 @@ export function FocusContextProvider(props) {
             elementProps.focusUp,
             elementProps.focusRight,
             elementProps.focusLeft,
-            focusedLayer
+            focusedLayer,
+            elementRef
         ]);
 
         return elementRef;
@@ -291,7 +296,7 @@ export function FocusContextProvider(props) {
         element.requestTVFocus?.();
         element.focus?.();
 
-        const scroll = props?.scrollViewRef?.current;
+        const scroll = scrollViewRef?.current
 
         if (Platform.OS === 'web') {
             if (element && scroll) {
@@ -437,7 +442,15 @@ export function FocusContextProvider(props) {
         const focusMap = focusLayersRef.current.at(-1)
         const shouldNotPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.[action])
         if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'focusedElementAction', kind: action, focusKey, shouldNotPress, keyboardVisible: Keyboard.isVisible(), [action]: focusMap?.refs?.[focusKey]?.[action] })
+            prettyLog({
+                context: 'focus',
+                action: 'focusedElementAction',
+                kind: action,
+                focusKey,
+                shouldNotPress,
+                focusMap,
+                keyboardVisible: Keyboard.isVisible(), [action]: focusMap?.refs?.[focusKey]?.[action]
+            })
         }
         if (shouldNotPress) {
             return false
@@ -577,7 +590,8 @@ export function FocusContextProvider(props) {
         setRemoteCallbacks,
         focusLongPress,
         focusOn,
-        focusPress
+        focusPress,
+        setScrollViewRef
     }
 
     if (!isReady) {

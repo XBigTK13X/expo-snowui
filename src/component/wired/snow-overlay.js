@@ -2,37 +2,58 @@ import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import { useLayerContext } from '../../context/snow-layer-context'
 import SnowText from '../snow-text'
 
 const SnowOverlayW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const {
-        focusedLayer,
-        focusedKey,
-        focusOn,
         focusLongPress,
         focusPress,
-        isFocused,
-        isFocusedLayer,
         tvRemoteProps,
-        useFocusLayer,
-        useFocusWiring,
+        pushFocusLayer,
+        popFocusLayer,
+        focusedLayer,
+        addFocusMap
     } = useFocusContext()
-    const elementRef = useFocusWiring(props)
+    const { pushOverlay, popOverlay } = useLayerContext(props)
 
-    if (props.focusLayer) {
-        useFocusLayer(props.focusLayer, true)
+    if (!props.focusLayer) {
+        return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
     }
+
+    const [isReady, setIsReady] = React.useState(false)
+
+    const elementRef = React.useRef(null);
+    const focusLayerName = `snow-overlay-${props.focusLayer}`
 
     React.useEffect(() => {
-        if ((!props.focusLayer || isFocusedLayer(props.focusLayer)) && !isFocused(props.focusKey) && props.stealFocus !== false) {
-            focusOn(elementRef, props.focusKey)
+        pushFocusLayer(focusLayerName, true)
+        setIsReady(true)
+        return () => {
+            popFocusLayer()
         }
-    }, [focusedLayer, focusedKey, elementRef, props.focusKey, props.focusLayer, props.stealFocus])
+    }, [])
 
-    if (!isFocusedLayer(props.focusLayer)) {
-        return null
-    }
+    React.useEffect(() => {
+
+        if (isReady && elementRef.current) {
+            addFocusMap(elementRef, props);
+        }
+    }, [
+        props.focusStart,
+        props.focusKey,
+        props.focusDown,
+        props.focusUp,
+        props.focusRight,
+        props.focusLeft,
+        focusedLayer,
+        elementRef,
+        isReady
+    ]);
+
+
+
 
     let style = [SnowStyle.component.overlay.touchable]
     if (props.transparent) {
@@ -42,7 +63,7 @@ const SnowOverlayW = (props) => {
         style.push(SnowStyle.component.overlay.black)
     }
 
-    return (
+    const overlayView = (
         <TouchableOpacity
             ref={elementRef}
             {...tvRemoteProps}
@@ -53,6 +74,15 @@ const SnowOverlayW = (props) => {
             children={props.children}
         />
     )
+
+    React.useEffect(() => {
+        pushOverlay(overlayView)
+        return () => {
+            popOverlay()
+        }
+    }, [])
+
+    return null
 }
 
 SnowOverlayW.isSnowFocusWired = true

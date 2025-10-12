@@ -1,9 +1,7 @@
-import React from 'react'
-import { ScrollView, Platform, Dimensions } from 'react-native'
 
 import util from './util'
 
-import { StyleContextProvider, useStyleContext } from './context/snow-style-context'
+import { StyleContextProvider } from './context/snow-style-context'
 import { FocusContextProvider } from './context/snow-focus-context'
 import { NavigationContextProvider } from './context/snow-navigation-context'
 import { LayerContextProvider } from './context/snow-layer-context'
@@ -12,8 +10,6 @@ import { SnowContextProvider } from './context/snow-context'
 import { SnowSafeArea } from './component/snow-safe-area'
 
 export function SnowApp(props) {
-    const scrollViewRef = React.useRef(null)
-
     return (
         <StyleContextProvider
             style={util.blankStyle}
@@ -22,7 +18,6 @@ export function SnowApp(props) {
 
             <FocusContextProvider
                 style={util.blankStyle}
-                scrollViewRef={scrollViewRef}
                 DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW} >
 
                 <NavigationContextProvider

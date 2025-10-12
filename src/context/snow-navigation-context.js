@@ -49,15 +49,17 @@ export function NavigationContextProvider(props) {
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
 
-    const { pushFocusLayer, popFocusLayer, focusedLayer } = useFocusContext()
+    const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
         if (navigationHistory?.at(-1)?.routePath) {
             const layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey
-            pushFocusLayer(layerName)
-            return () => {
-                popFocusLayer()
+            if (!isFocusedLayer(layerName)) {
+                pushFocusLayer(layerName)
+                return () => {
+                    popFocusLayer()
+                }
             }
         }
     }, [navigationHistory])

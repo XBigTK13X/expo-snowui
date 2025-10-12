@@ -15,6 +15,8 @@ export function useLayerContext() {
 export function LayerContextProvider(props) {
     const [modals, setModals] = React.useState([])
     const [overlays, setOverlays] = React.useState([])
+    const modalRef = React.useRef(null)
+    const overlayRef = React.useRef(null)
 
     const DEBUG = props.DEBUG_LAYERS
 
@@ -23,6 +25,7 @@ export function LayerContextProvider(props) {
             if (DEBUG) {
                 prettyLog({ context: 'layer', action: 'pushOverlay', prev, overlay })
             }
+            overlayRef.current = overlay
             return [...prev, overlay]
         })
     }
@@ -32,6 +35,9 @@ export function LayerContextProvider(props) {
             let result = [...prev]
             if (result.length) {
                 result.pop()
+                overlayRef.current = result?.at(-1)
+            } else {
+                overlayRef.current = null
             }
             if (DEBUG) {
                 prettyLog({ context: 'layer', action: 'popOverlay', prev, result })
@@ -57,6 +63,7 @@ export function LayerContextProvider(props) {
             if (DEBUG) {
                 prettyLog({ context: 'layer', action: 'pushModal', prev, modal })
             }
+            modalRef.current = modal
             return [...prev, modal]
         })
     }
@@ -66,6 +73,9 @@ export function LayerContextProvider(props) {
             let result = [...prev]
             if (result.length) {
                 result.pop()
+                modalRef.current = result?.at(-1)
+            } else {
+                modalRef.current = null
             }
             if (DEBUG) {
                 prettyLog({ context: 'layer', action: 'popModal', prev, result })
@@ -74,17 +84,12 @@ export function LayerContextProvider(props) {
         })
     }
 
-    let currentModal = null
-    if (modals.length) {
-        currentModal = modals.at(-1)
-    }
-
     const clearModals = () => {
         setModals([])
     }
 
     if (DEBUG === 'verbose') {
-        prettyLog({ context: 'layer', action: 'render', currentModal, currentOverlay })
+        prettyLog({ context: 'layer', action: 'render', currentModal: modalRef?.current, currentOverlay: overlayRef?.current })
     }
 
 
@@ -96,8 +101,8 @@ export function LayerContextProvider(props) {
         popOverlay,
         clearModals,
         clearOverlays,
-        currentModal,
-        currentOverlay
+        currentModal: modalRef?.current,
+        currentOverlay: overlayRef?.current
     }
     return (
         <LayerContext.Provider style={{ flex: 1 }} value={context}>

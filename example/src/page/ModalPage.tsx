@@ -8,6 +8,7 @@ export default function ModalPage() {
   const toggleModal = () => { setShowModal(!showModal) }
   const [showFullscreen, setShowFullscreen] = React.useState(false)
   const toggleFullscreen = () => { setShowFullscreen(!showFullscreen) }
+
   let modal = null
   if (showModal) {
     modal = (
@@ -32,6 +33,7 @@ export default function ModalPage() {
           <Snow.Text>This should be fullscreen with no border.</Snow.Text>
         </Snow.FillView>
         <Snow.Overlay
+          focusStart
           focusKey="fullscreen-overlay"
           focusLayer="fullscreen-modal"
           onPress={toggleFullscreen} />

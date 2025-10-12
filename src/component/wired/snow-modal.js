@@ -18,7 +18,7 @@ const SnowModalW = (props) => {
         }
         else {
             React.useEffect(() => {
-                pushFocusLayer(props.focusLayer)
+                pushFocusLayer(`snow-modal-${props.focusLayer}`, true)
                 return () => {
                     popFocusLayer()
                 }
