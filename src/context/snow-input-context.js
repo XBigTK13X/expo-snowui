@@ -16,27 +16,11 @@ export function useInputContext() {
 export function InputContextProvider(props) {
     const DEBUG = props.DEBUG_INPUT
 
-    const [defaultBack, setDefaultBack] = React.useState(null)
-    const [blockBack, setBlockBack] = React.useState(false)
-    const blockBackRef = React.useRef(blockBack)
-
     const [actionListeners, setActionListeners] = React.useState({})
     const actionListenersRef = React.useRef(actionListeners)
     const [backListeners, setBackListeners] = React.useState({})
     const backListenersRef = React.useRef(backListeners)
 
-    React.useEffect(() => {
-        setDefaultBack(BackHandler.exitApp)
-    }, [])
-
-    React.useEffect(() => {
-        blockBackRef.current = blockBack
-        if (blockBack) {
-            BackHandler.exitApp = () => { }
-        } else {
-            BackHandler.exitApp = defaultBack
-        }
-    }, [blockBack])
 
     const addBackListener = (ownerKey, onListen) => {
         if (DEBUG === 'verbose') {
@@ -83,7 +67,7 @@ export function InputContextProvider(props) {
     }
 
     // Android back button press
-    if (Platform.OS === 'android' && !Platform.isTV) {
+    if (Platform.OS === 'android') {
         React.useEffect(() => {
             const onBackPress = () => {
                 // If a listener returns true, then block the native Android back event
@@ -140,23 +124,7 @@ export function InputContextProvider(props) {
             // action 0  = start, action 1 = end for longpresses
             const action = remoteEvent.eventKeyAction
             // TV Remote back button
-            if (kind === 'menu' || kind === 'back') {
-                // If a listener returns true, then block the tv back event
-                let result = false
-                for (const [ownerKey, onListen] of Object.entries(backListenersRef.current)) {
-                    if (DEBUG) {
-                        prettyLog({ 'context': 'input', action: 'tvBackListener', ownerKey })
-                    }
-                    if (onListen()) {
-                        result = true
-                    }
-                }
-                if (result) {
-                    BackHandler.exitApp = () => { }
-                } else {
-                    BackHandler.exitApp = defaultBack
-                }
-            } else {
+            if (kind !== 'menu' && kind !== 'back') {
                 // TV Remote any other button
                 for (const [ownerKey, listener] of Object.entries(actionListenersRef.current)) {
                     if (DEBUG) {

@@ -353,7 +353,6 @@ export function FocusContextProvider(props) {
 
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
-        console.log({ direction })
         if (Keyboard.isVisible()) {
             if (DEBUG) {
                 prettyLog({ context: 'focus', action: 'moveFocus FAIL Keyboard is visible' })

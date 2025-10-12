@@ -8,7 +8,8 @@ export default function RangeSliderPage() {
   return (
     <View>
       <Snow.Label>Component: Range Slider</Snow.Label>
-      <Snow.RangeSlider focusKey="tab-entry" onValueChange={setRangeSliderValue} percent={rangeSliderValue} />
+      <Snow.Target focusKey="tab-entry" focusDown="range-slider" />
+      <Snow.RangeSlider focusKey="range-slider" onValueChange={setRangeSliderValue} percent={rangeSliderValue} />
     </View>
   )
 }
