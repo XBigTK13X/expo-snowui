@@ -6,11 +6,12 @@ import {
     Keyboard,
     Platform,
     UIManager,
-    useTVEventHandler,
     View,
 } from 'react-native'
 
 import { prettyLog, blankStyle } from '../util'
+
+import { useInputContext } from './snow-input-context'
 
 /*
 TODO
@@ -67,6 +68,8 @@ focusUp,focusRight,focusDown,focusLeft
     Not setting a specific direction tells the provider to ignore keypresses from that element in that direction.
 */
 export function FocusContextProvider(props) {
+    const { addActionListener, removeActionListener } = useInputContext()
+
     const [isReady, setIsReady] = React.useState(false)
 
     const [focusedKey, setFocusedKey] = React.useState(null)
@@ -75,8 +78,6 @@ export function FocusContextProvider(props) {
     const focusLayersRef = React.useRef(focusLayers)
     const [focusedLayer, setFocusedLayer] = React.useState('app')
     const focusedLayerRef = React.useRef(focusedLayer)
-    const [remoteCallbacks, setRemoteCallbacks] = React.useState({})
-    const remoteCallbacksRef = React.useRef({});
     const [scrollViewRef, setScrollViewRef] = React.useState(null)
 
     const DEBUG = props.DEBUG_FOCUS
@@ -96,10 +97,6 @@ export function FocusContextProvider(props) {
     React.useEffect(() => {
         focusLayersRef.current = focusLayers
     }, [focusLayers])
-
-    React.useEffect(() => {
-        remoteCallbacksRef.current = remoteCallbacks
-    }, [remoteCallbacks])
 
     // After focusMaps are added by components, decide at the focus layer level what should have the first focus
     React.useEffect(() => {
@@ -435,6 +432,18 @@ export function FocusContextProvider(props) {
         moveFocus('down')
     }
 
+    React.useEffect(() => {
+        addActionListener('focus-context', {
+            onUp: moveFocusUp,
+            onDown: moveFocusDown,
+            onRight: moveFocusRight,
+            onLeft: moveFocusLeft
+        })
+        return () => {
+            removeActionListener('focus-context')
+        }
+    }, [])
+
     const focusedElementAction = (focusKey, action) => {
         if (!focusKey) {
             focusKey = focusedKeyRef.current
@@ -471,70 +480,6 @@ export function FocusContextProvider(props) {
 
     const focusLongPress = (elementRef, focusKey) => {
         return focusAction(elementRef, focusKey, 'onLongPress')
-    }
-
-    if (Platform.isTV) {
-        const remoteHandler = (remoteEvent) => {
-            const callbacks = remoteCallbacksRef.current
-            // action 0  = start, action 1 = end for longpresses
-            const kind = remoteEvent.eventType
-            const action = remoteEvent.eventKeyAction
-            for (const [_, callback] of Object.entries(callbacks)) {
-                if (callback == null) {
-                    continue
-                }
-                callback(kind, action)
-            }
-            if (DEBUG === 'verbose') {
-                prettyLog({ context: 'focus', action: 'remoteHandler', kind, action, focusedKey: focusedKeyRef.current })
-            }
-            switch (kind) {
-                case 'up':
-                    moveFocusUp()
-                    break
-                case 'down':
-                    moveFocusDown()
-                    break
-                case 'right':
-                    moveFocusRight()
-                    break
-                case 'left':
-                    moveFocusLeft()
-                    break
-                default:
-                    break
-
-            }
-
-        }
-        useTVEventHandler(remoteHandler);
-    }
-
-    if (Platform.OS === 'web') {
-        React.useEffect(() => {
-            const focusKeyboardHandler = (event) => {
-                switch (event.key) {
-                    case 'ArrowUp':
-                        moveFocusUp()
-                        break
-                    case 'ArrowDown':
-                        moveFocusDown()
-                        break
-                    case 'ArrowLeft':
-                        moveFocusLeft()
-                        break
-                    case 'ArrowRight':
-                        moveFocusRight()
-                        break
-                    default:
-                        break
-                }
-            };
-            window.addEventListener('keydown', focusKeyboardHandler);
-            return () => {
-                window.removeEventListener('keydown', focusKeyboardHandler);
-            };
-        }, []);
     }
 
     const readFocusProps = (elementProps) => {
@@ -587,7 +532,6 @@ export function FocusContextProvider(props) {
         pushFocusLayer,
         clearFocusLayers,
         readFocusProps,
-        setRemoteCallbacks,
         focusLongPress,
         focusOn,
         focusPress,

@@ -36,7 +36,6 @@ const SnowOverlayW = (props) => {
     }, [])
 
     React.useEffect(() => {
-
         if (isReady && elementRef.current) {
             addFocusMap(elementRef, props);
         }

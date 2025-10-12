@@ -6,6 +6,7 @@ import {
     View
 } from "react-native";
 import { useDebouncedCallback } from 'use-debounce'
+import { useInputContext } from '../../context/snow-input-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
@@ -32,7 +33,8 @@ const step = 0.01
 // After a handful of other libraries still had problems, I rolled my own
 const SnowRangeSliderW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { setRemoteCallbacks, useFocusWiring, isFocused } = useFocusContext()
+    const { addActionListener, removeActionListener } = useInputContext()
+    const { useFocusWiring, isFocused } = useFocusContext()
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(0)
     const percentRef = React.useRef(percent)
@@ -117,44 +119,6 @@ const SnowRangeSliderW = (props) => {
         percentRef.current = percent
     }, [percent])
 
-    if (Platform.isTV) {
-        React.useEffect(() => {
-            setRemoteCallbacks((callbacks) => {
-                callbacks['slider'] = sliderHandleRemote
-                return callbacks
-            })
-            return () => {
-                setRemoteCallbacks((callbacks) => {
-                    callbacks['slider'] = null
-                    return callbacks
-                })
-            }
-        }, [])
-    }
-
-    if (Platform.OS === 'web') {
-        React.useEffect(() => {
-            const rangeSliderKeyboardHandler = (event) => {
-                if (isFocused(props.focusKey)) {
-                    switch (event.key) {
-                        case 'ArrowLeft':
-                            applyStep(-step)
-                            break
-                        case 'ArrowRight':
-                            applyStep(step)
-                            break
-                        default:
-                            break
-                    }
-                }
-            };
-            window.addEventListener('keydown', rangeSliderKeyboardHandler);
-            return () => {
-                window.removeEventListener('keydown', rangeSliderKeyboardHandler);
-            };
-        }, []);
-    }
-
     const applyStep = (amount) => {
         let result = percentRef.current + amount
         if (result < min) {
@@ -169,33 +133,42 @@ const SnowRangeSliderW = (props) => {
     }
 
     const longPress = (amount, action) => {
-        if (action === 0) {
+        if (action === 'start') {
             applyStep(amount)
             setApplyStepInterval(setInterval(() => { applyStep(amount) }, 100))
         }
-        if (action === 1) {
+        if (action === 'finish') {
             clearInterval(applyStepInterval)
         }
     }
 
-    const sliderHandleRemote = (kind, action) => {
-        if (isFocused(props.focusKey)) {
-            if (kind === 'right') {
-                applyStep(step)
-                clearInterval(applyStepInterval)
+
+    React.useEffect(() => {
+        addActionListener(props?.listenerKey ?? 'range-slider', {
+            onRight: () => {
+                if (isFocused(props.focusKey)) {
+                    applyStep(step)
+                    clearInterval(applyStepInterval)
+                }
+            },
+            onLongRight: (action) => {
+                if (isFocused(props.focusKey)) {
+                    longPress(step * 2, action)
+                }
+            },
+            onLeft: () => {
+                if (isFocused(props.focusKey)) {
+                    applyStep(-step)
+                    clearInterval(applyStepInterval)
+                }
+            },
+            onLongLeft: (action) => {
+                if (isFocused(props.focusKey)) {
+                    longPress(-step * 2, action)
+                }
             }
-            else if (kind === 'longRight') {
-                longPress(step * 2, action)
-            }
-            else if (kind === 'left') {
-                applyStep(-step)
-                clearInterval(applyStepInterval)
-            }
-            else if (kind === 'longLeft') {
-                longPress(-step * 2, action)
-            }
-        }
-    }
+        })
+    }, [])
 
     const handleLayout = (kind) => {
         return (event) => {

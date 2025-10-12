@@ -1,7 +1,8 @@
 import React from 'react'
-import { BackHandler, Platform, View, useTVEventHandler } from 'react-native'
+import { Platform, View } from 'react-native'
 
 import { useFocusContext } from './snow-focus-context'
+import { useInputContext } from './snow-input-context'
 
 import util, { prettyLog } from '../util'
 
@@ -39,6 +40,9 @@ or it would create an import cycle
 export function NavigationContextProvider(props) {
     const DEBUG = props.DEBUG_NAVIGATION
 
+    const { addBackListener, removeBackListener } = useInputContext()
+    const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
+
     const [isReady, setIsReady] = React.useState(false)
 
     const [pageLookup, setPageLookup] = React.useState({})
@@ -48,8 +52,6 @@ export function NavigationContextProvider(props) {
     const navigationHistoryRef = React.useRef(navigationHistory)
     const [navigationAllowed, setNavigationAllowed] = React.useState(true)
     const navigationAllowedRef = React.useRef(navigationAllowed)
-
-    const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
@@ -192,11 +194,12 @@ export function NavigationContextProvider(props) {
         return func()
     }
 
+    // TODO If navigation blocked, Android back does nothing.
     // When a modal is shown, prevent default event handlers from exiting the app
     React.useEffect(() => {
-        const onBackPress = () => {
+        addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'hardwareBackHandler', navigationAllowedRef })
+                prettyLog({ context: 'navigation', action: 'backListener', navigationAllowedRef })
             }
             if (!navigationAllowedRef.current) {
                 return true
@@ -206,52 +209,11 @@ export function NavigationContextProvider(props) {
                 return true;
             }
             return false;
-        };
-
-        const backListener = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-        return () => {
-            backListener.remove()
-        }
-    }, []);
-
-    if (Platform.isTV) {
-        useTVEventHandler(remoteEvent => {
-            if (DEBUG === 'verbose') {
-                prettyLog({ context: 'navigation', action: 'tvRemoteHandler', remoteEvent, navigationAllowedRef })
-            }
-            if (remoteEvent.eventType === 'menu' || remoteEvent.eventType === 'back') {
-                if (!navigationAllowedRef.current) {
-                    BackHandler.exitApp = () => {
-
-                    }
-                }
-            }
         })
-    }
-
-    if (Platform.OS === 'web') {
-        React.useEffect(() => {
-            const onPopState = (evt) => {
-                if (DEBUG) {
-                    prettyLog({ context: 'navigation', action: 'browserBackHandler', evt, navigationAllowedRef })
-                }
-                if (!navigationAllowedRef.current) {
-                    return
-                }
-                if (navigationHistoryRef.current.length > 1) {
-                    navPop()
-                } else {
-                    // This prevents back from leaving the app
-                    window.history.pushState(null, '', window.location.pathname + window.location.search)
-                }
-            }
-
-            window.addEventListener('popstate', onPopState)
-            window.history.pushState(null, '', window.location.pathname + window.location.search)
-
-            return () => window.removeEventListener('popstate', onPopState)
-        }, [])
-    }
+        return () => {
+            removeBackListener('navigation-context')
+        }
+    }, [])
 
     if (!isReady) {
         if (DEBUG) {
