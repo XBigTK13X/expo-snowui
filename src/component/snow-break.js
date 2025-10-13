@@ -14,9 +14,7 @@ export function SnowBreak(props) {
     }
 
     return (
-        <View
-            style={style}
-        />
+        <View style={style} />
     )
 }
 

@@ -18,14 +18,14 @@ export function SnowSafeArea(props) {
     // It requires a rendering function instead of computed JSX
     // Otherwise controlled forms inside a modal would not update their state
     let modals = null
-    console.log({ modalPayloads })
     if (modalPayloads?.length) {
         modals = (
-            <View style={{ flex: 1, position: 'absolute', right: 0, left: 0, top: 0, bottom: 0 }}>
+            <>
                 {modalPayloads.map((modalPayload, modalIndex) => {
-                    return <SnowModal key={modalIndex} {...modalPayload.props} render={modalPayload.render} />
+                    return <SnowModal
+                        key={modalIndex} {...modalPayload.props} render={modalPayload.render} />
                 })}
-            </View>
+            </>
         )
     }
 
@@ -45,7 +45,7 @@ export function SnowSafeArea(props) {
     }
 
     return (
-        <View style={util.blankStyle}>
+        <>
             <ScrollView
                 ref={scrollViewRef}
                 style={SnowStyle.component.safeArea}
@@ -55,7 +55,7 @@ export function SnowSafeArea(props) {
             </ScrollView>
             {modals}
             {overlay}
-        </View>
+        </>
     )
 }
 

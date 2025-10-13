@@ -1,5 +1,4 @@
 import Snow from 'expo-snowui'
-import { View } from 'react-native'
 
 const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg"
 const wideImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Double-alaskan-rainbow.jpg"
@@ -21,7 +20,7 @@ const imageItems = [
 export default function TabsPage() {
 
   return (
-    <View>
+    <>
       <Snow.Label>Component: Tabs</Snow.Label>
       <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
@@ -33,6 +32,6 @@ export default function TabsPage() {
           getItemName={(item: any) => { return item.title }}
         />
       </Snow.Tabs>
-    </View>
+    </>
   )
 }

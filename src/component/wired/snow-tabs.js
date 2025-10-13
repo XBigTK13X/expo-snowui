@@ -54,7 +54,7 @@ const SnowTabsW = (props) => {
     }).filter(child => child !== null);
 
     return (
-        <View>
+        <>
             <SnowDropdown
                 {...outerFocusProps}
                 snowStyle={tabStyle}
@@ -66,7 +66,7 @@ const SnowTabsW = (props) => {
             <View style={SnowStyle.component.tabs.panel}>
                 {tabs[tabIndex]}
             </View>
-        </View>
+        </>
     )
 
 }

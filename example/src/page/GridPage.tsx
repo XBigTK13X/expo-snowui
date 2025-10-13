@@ -1,9 +1,8 @@
-import { View } from 'react-native'
 import Snow from 'expo-snowui'
 
 export default function GridPage() {
   return (
-    <View>
+    <>
       <Snow.Label>Component: Grid</Snow.Label>
       <Snow.Grid
         focusKey="tab-entry"
@@ -38,6 +37,6 @@ export default function GridPage() {
         <Snow.TextButton title={"Below"} />
         <Snow.TextButton title={"Here"} />
       </Snow.Grid>
-    </View>
+    </>
   )
 }

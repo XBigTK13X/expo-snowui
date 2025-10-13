@@ -8,7 +8,6 @@ import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
-    console.log({ props })
     const { SnowStyle } = useStyleContext(props)
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer } = useFocusContext(props)
@@ -42,54 +41,30 @@ const SnowModalW = (props) => {
         }
     }, [])
 
-    let style = [SnowStyle.component.modal.prompt]
-    if (props.transparent) {
-        style.push(SnowStyle.component.modal.transparent)
+    let style = [SnowStyle.component.modal.default]
+    if (props.obscure) {
+        style.push(SnowStyle.component.modal.obscure)
+    }
+    else if (props.transparent) {
+
+    }
+    else {
+        style.push(SnowStyle.component.modal.black)
     }
     if (props.center) {
         style.push(SnowStyle.component.modal.center)
     }
-    if (props.contentStyle) {
-        style.push(props.contentStyle)
+    if (props.style) {
+        style.push(props.style)
     }
-    let modalContent = null
-    if (props.wrapper === false) {
-        modalContent = (
-            <View
-                navigationBarTranslucent
-                statusBarTranslucent
-                transparent={props.transparent}
-                style={style}
-            >
-                {props.render()}
-            </View>
-        )
-    } else {
-        let modalStyle = [
-            SnowStyle.component.modal.default,
-            SnowStyle.component.modal.prompt
-        ]
-        if (props.modalStyle) {
-            modalStyle.push(props.modalStyle)
-        }
-
-        modalContent =
-            (
-                <View
-                    style={modalStyle}
-                    navigationBarTranslucent
-                    statusBarTranslucent
-                    transparent={props.transparent}
-                >
-                    <SnowFillView
-                        scroll={props.scroll}
-                        style={style}>
-                        {props.render()}
-                    </SnowFillView>
-                </View>
-            )
-    }
-    return modalContent
+    return (
+        <SnowFillView
+            scroll={props.scroll}
+            style={style}
+        >
+            {props.render()}
+        </SnowFillView>
+    )
 }
 
 SnowModalW.isSnowFocusWired = true

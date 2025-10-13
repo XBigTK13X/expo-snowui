@@ -69,7 +69,7 @@ const SnowImageGridW = (props) => {
         gridProps.itemsPerPage = props.itemsPerPage
     }
     return (
-        <View>
+        <>
             {props.title ?
                 <SnowLabel>
                     {props.title} ({props.items.length})
@@ -82,7 +82,7 @@ const SnowImageGridW = (props) => {
                 renderItem={renderItem}
                 itemsPerRow={itemsPerRow}
             />
-        </View>
+        </>
     )
 }
 

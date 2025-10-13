@@ -1,9 +1,3 @@
-import React from 'react'
-
-import { View } from 'react-native'
-
-import util from './util'
-
 import { InputContextProvider } from './context/snow-input-context'
 import { StyleContextProvider } from './context/snow-style-context'
 import { FocusContextProvider } from './context/snow-focus-context'
@@ -16,20 +10,16 @@ import { SnowSafeArea } from './component/snow-safe-area'
 export function SnowApp(props) {
     return (
         <StyleContextProvider
-            style={util.blankStyle}
             snowStyle={props.snowStyle}
             snowConfig={props.snowConfig} >
 
             <InputContextProvider
-                style={util.blankStyle}
                 DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
                 <LayerContextProvider
-                    style={util.blankStyle}
                     DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
 
                     <FocusContextProvider
-                        style={util.blankStyle}
                         DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW} >
 
                         <NavigationContextProvider
@@ -37,13 +27,12 @@ export function SnowApp(props) {
                             routePages={props.routePages}
                             initialRoutePath={props.initialRoutePath}
                             resetRoutePath={props.resetRoutePath}
-                            style={util.blankStyle}
                             DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
 
 
 
-                            <SnowContextProvider style={util.blankStyle}>
-                                <SnowSafeArea style={util.blankStyle} >
+                            <SnowContextProvider >
+                                <SnowSafeArea >
                                     {props.children}
                                 </SnowSafeArea>
                             </SnowContextProvider>

@@ -1,5 +1,4 @@
 import React from 'react'
-import { View } from 'react-native'
 import Snow from 'expo-snowui'
 
 export default function DropdownPage() {
@@ -22,7 +21,7 @@ export default function DropdownPage() {
     }
   }
   return (
-    <View>
+    <>
       <Snow.Label>Component: Dropdown</Snow.Label>
       <Snow.Dropdown
         focusKey="tab-entry"
@@ -68,6 +67,6 @@ export default function DropdownPage() {
           onValueChange={changeForm('fastMpv')}
           valueIndex={form.fastMpv} />
       </Snow.Grid>
-    </View>
+    </>
   )
 }

@@ -35,7 +35,7 @@ const SnowDropdownW = (props) => {
     }
 
     if (props.title) {
-        return <View>
+        return <>
             <SnowLabel center>{props.title}</SnowLabel>
             <SnowGrid
                 {...readFocusProps(props)}
@@ -43,7 +43,7 @@ const SnowDropdownW = (props) => {
                 items={props.options}
                 renderItem={renderItem}
             />
-        </View>
+        </>
     }
     return (
         <SnowGrid

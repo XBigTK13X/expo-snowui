@@ -265,10 +265,10 @@ export function createStyle(overrides) {
                 top: 0,
                 bottom: 0,
             },
-            prompt: {
+            black: {
                 backgroundColor: AppStyle.color.background
             },
-            transparent: {
+            obscure: {
                 backgroundColor: AppStyle.color.transparentDark
             },
             center: {

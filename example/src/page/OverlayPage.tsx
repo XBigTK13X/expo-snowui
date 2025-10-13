@@ -1,5 +1,4 @@
 import React from 'react'
-import { View } from 'react-native'
 import Snow from 'expo-snowui'
 
 export default function OverlayPage() {
@@ -62,21 +61,21 @@ export default function OverlayPage() {
 
   if (!hasOverlay) {
     return (
-      <View>
+      <>
         <Snow.TextButton
           focusStart
           focusKey="tab-entry"
           title="Toggle Overlay"
           onPress={() => { setHasOverlay(true) }}
         />
-      </View>
+      </>
     )
   }
   return (
-    <View>
+    <>
       <Snow.Text>There is now an invisible overlay over the app.</Snow.Text>
       <Snow.Text>If you press ENTER or click the screen, a modal will display with a different overlay.</Snow.Text>
-    </View>
+    </>
   )
 
 }

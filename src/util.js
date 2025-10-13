@@ -109,17 +109,11 @@ export const loadData = (key) => {
     return value
 }
 
-export const blankStyle = {
-    flex: 1,
-    backgroundColor: 'black'
-}
-
 export const getUuid = () => {
     return uuid.v4()
 }
 
 export default {
-    blankStyle,
     getCircularReplacer,
     getUuid,
     prettyLog,

@@ -45,9 +45,9 @@ export function NavigationContextProvider(props) {
 
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
-    const { modalRender } = useLayerContext()
+    const { modalPayloads } = useLayerContext()
 
-    const modalRenderRef = React.useRef()
+    const modalsVisibleRef = React.useRef()
 
     const [isReady, setIsReady] = React.useState(false)
 
@@ -71,8 +71,8 @@ export function NavigationContextProvider(props) {
     }, [navigationHistory])
 
     React.useEffect(() => {
-        modalRenderRef.current = modalRender
-    }, [modalRender])
+        modalsVisibleRef.current = !!modalPayloads?.length
+    }, [modalPayloads])
 
     React.useEffect(() => {
         let lookup = {}
@@ -202,9 +202,9 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'backListener', modal: modalRenderRef.current })
+                prettyLog({ context: 'navigation', action: 'backListener', modal: modalsVisibleRef.current })
             }
-            if (modalRenderRef.current) {
+            if (modalsVisibleRef.current) {
                 // When a modal is shown, prevent default event handlers from exiting the app/page
                 return true
             }
@@ -232,7 +232,7 @@ export function NavigationContextProvider(props) {
         if (DEBUG) {
             prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer, props })
         }
-        return <View style={util.blankStyle} />
+        return <></>
     }
 
     const currentRoute = { ...navigationHistory.at(-1) }

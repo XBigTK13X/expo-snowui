@@ -42,10 +42,7 @@ export function SnowContextProvider(props) {
     ]);
 
     return (
-        <SnowContext.Provider
-            style={util.blankStyle}
-            value={context}
-        >
+        <SnowContext.Provider value={context}>
             {props.children}
         </SnowContext.Provider>
     )

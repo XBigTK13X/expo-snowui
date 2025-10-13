@@ -1,5 +1,4 @@
 import Snow from 'expo-snowui'
-import { View } from 'react-native'
 
 const tallImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/51/This_Gun_for_Hire_%281942%29_poster.jpg"
 const wideImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Double-alaskan-rainbow.jpg"
@@ -22,7 +21,7 @@ const imageItems = [
 
 export default function ImageGridPage() {
   return (
-    <View>
+    <>
       <Snow.Label>Component: Image Grid</Snow.Label>
       <Snow.ImageGrid
         focusKey="tab-entry"
@@ -49,6 +48,6 @@ export default function ImageGridPage() {
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}
       />
-    </View>
+    </>
   )
 }

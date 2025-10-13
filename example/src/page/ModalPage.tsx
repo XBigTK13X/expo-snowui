@@ -3,7 +3,7 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function ModalPage() {
-  const { pushModal, popModal, enableOverlay, disableOverlay } = Snow.useLayerContext()
+  const { pushModal, popModal, clearModals, enableOverlay, disableOverlay } = Snow.useLayerContext()
 
   const [showExample, setShowExample] = React.useState(false)
   const toggleModal = () => { setShowExample(!showExample) }
@@ -20,7 +20,7 @@ export default function ModalPage() {
 
   const RegularModal = () => {
     return (
-      <Snow.View>
+      <>
         <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 1000 }}>
@@ -30,7 +30,7 @@ export default function ModalPage() {
         <Snow.Target focusKey="modal-target" focusDown="modal-bottom" />
         <Snow.Text>And then the end</Snow.Text>
         <Snow.TextButton focusKey="modal-bottom" title="Close" onPress={toggleModal} />
-      </Snow.View>
+      </>
     )
   }
 
@@ -56,7 +56,7 @@ export default function ModalPage() {
 
   const InputsModal = () => {
     return (
-      <Snow.View>
+      <>
         <Snow.TextButton
           focusStart
           focusKey="close-button"
@@ -65,35 +65,37 @@ export default function ModalPage() {
           onPress={toggleInputs}
         />
         <Snow.Input focusKey="modal-input" value={textInput} onValueChange={setTextInput} />
-      </Snow.View>
+      </>
     )
   }
 
   const NestedModal = () => {
-    console.log("NEsted")
     React.useEffect(() => {
       pushModal({
         render: () => {
           return (
-            <Snow.View>
+            <>
               <Snow.Text>This is the second layer of modal. Should be on top.</Snow.Text>
-              <Snow.TextButton focusStart focusKey="close-nested-button" title="Close Nested" onPress={() => { setShowNested(false) }} />
-            </Snow.View>
+              <Snow.TextButton focusStart focusKey="close-top-button" title="Close Top" onPress={() => { setShowNested(false); clearModals() }} />
+            </>
           )
         },
         props: {
           focusLayer: 'nested-controls',
-          focusStart: true
+          focusStart: true,
+          center: true,
+          obscure: true,
+          onRequestClose: () => {
+            setShowNested(false)
+          }
         }
       })
-      return () => {
-        popModal()
-      }
     }, [])
     return (
-      <Snow.View>
-        <Snow.Text>This is the first layer of modal. Should be on the bottom.</Snow.Text>
-      </Snow.View>
+      <>
+        <Snow.Text>This is the first layer of modal. Should be on bottom.</Snow.Text>
+        <Snow.TextButton focusStart focusKey="close-bottom-button" title="Close Bottom" onPress={() => { setShowNested(false); clearModals(); }} />
+      </>
     )
   }
 
@@ -119,12 +121,12 @@ export default function ModalPage() {
   }, [showExample, showFullscreen, showInputs, showNested, textInput])
 
   return (
-    <View>
+    <>
       <Snow.Label>Component: Modal</Snow.Label>
       <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
       <Snow.TextButton focusKey="modal-two" focusDown="modal-three" title="Test Fullscreen" onPress={toggleFullscreen} />
       <Snow.TextButton focusKey="modal-three" title="Inputs" onPress={toggleInputs} />
       <Snow.TextButton focusKey="nested-modal" title="Nested Modal" onPress={toggleNested} />
-    </View>
+    </>
   )
 }

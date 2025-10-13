@@ -9,7 +9,7 @@ import {
     View,
 } from 'react-native'
 
-import { prettyLog, blankStyle } from '../util'
+import { prettyLog } from '../util'
 
 import { useInputContext } from './snow-input-context'
 
@@ -542,7 +542,7 @@ export function FocusContextProvider(props) {
         if (DEBUG) {
             prettyLog({ context: 'focus', action: 'render short circuit', focusedLayer, props })
         }
-        return <View style={blankStyle} />
+        return <></>
     }
 
     if (DEBUG === 'verbose') {

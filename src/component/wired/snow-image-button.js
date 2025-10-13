@@ -54,7 +54,7 @@ const SnowImageButtonW = (props) => {
     }
 
     return (
-        <View>
+        <>
             <Pressable
                 ref={elementRef}
                 {...tvRemoteProps(props)}
@@ -73,7 +73,7 @@ const SnowImageButtonW = (props) => {
                 </View>
 
             </Pressable>
-        </View>
+        </>
     )
 }
 
