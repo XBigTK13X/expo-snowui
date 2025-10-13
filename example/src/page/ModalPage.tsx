@@ -3,15 +3,20 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function ModalPage() {
-  const { showModal, hideModal, enableOverlay, disableOverlay } = Snow.useLayerContext()
+  const { pushModal, popModal, enableOverlay, disableOverlay } = Snow.useLayerContext()
 
   const [showExample, setShowExample] = React.useState(false)
   const toggleModal = () => { setShowExample(!showExample) }
+
   const [showFullscreen, setShowFullscreen] = React.useState(false)
   const toggleFullscreen = () => { setShowFullscreen(!showFullscreen) }
+
   const [showInputs, setShowInputs] = React.useState(false)
   const toggleInputs = () => { setShowInputs(!showInputs) }
   const [textInput, setTextInput] = React.useState('')
+
+  const [showNested, setShowNested] = React.useState(false)
+  const toggleNested = () => { setShowNested(!showNested) }
 
   const RegularModal = () => {
     return (
@@ -64,23 +69,54 @@ export default function ModalPage() {
     )
   }
 
+  const NestedModal = () => {
+    console.log("NEsted")
+    React.useEffect(() => {
+      pushModal({
+        render: () => {
+          return (
+            <Snow.View>
+              <Snow.Text>This is the second layer of modal. Should be on top.</Snow.Text>
+              <Snow.TextButton focusStart focusKey="close-nested-button" title="Close Nested" onPress={() => { setShowNested(false) }} />
+            </Snow.View>
+          )
+        },
+        props: {
+          focusLayer: 'nested-controls',
+          focusStart: true
+        }
+      })
+      return () => {
+        popModal()
+      }
+    }, [])
+    return (
+      <Snow.View>
+        <Snow.Text>This is the first layer of modal. Should be on the bottom.</Snow.Text>
+      </Snow.View>
+    )
+  }
+
   React.useEffect(() => {
-    const hasModal = showExample || showFullscreen || showInputs
+    const hasModal = showExample || showFullscreen || showInputs || showNested
     if (showExample) {
-      showModal({ render: RegularModal, props: { focusLayer: 'example-modal', scroll: true, onRequestClose: toggleModal } })
+      pushModal({ render: RegularModal, props: { focusLayer: 'example-modal', scroll: true, onRequestClose: toggleModal } })
     }
     if (showFullscreen) {
-      showModal({ render: FullscreenModal, props: { assignFocus: false, onRequestClose: toggleFullscreen } })
+      pushModal({ render: FullscreenModal, props: { assignFocus: false, onRequestClose: toggleFullscreen } })
     }
     if (showInputs) {
-      showModal({ render: InputsModal, props: { focusLayer: 'inputs-modal', onRequestClose: toggleInputs } })
+      pushModal({ render: InputsModal, props: { focusLayer: 'inputs-modal', onRequestClose: toggleInputs } })
+    }
+    if (showNested) {
+      pushModal({ render: NestedModal, props: { focusLayer: 'nested-modal', onRequestClose: () => { setShowNested(false) } } })
     }
     return () => {
       if (hasModal) {
-        hideModal()
+        popModal()
       }
     }
-  }, [showExample, showFullscreen, showInputs, textInput])
+  }, [showExample, showFullscreen, showInputs, showNested, textInput])
 
   return (
     <View>
@@ -88,6 +124,7 @@ export default function ModalPage() {
       <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
       <Snow.TextButton focusKey="modal-two" focusDown="modal-three" title="Test Fullscreen" onPress={toggleFullscreen} />
       <Snow.TextButton focusKey="modal-three" title="Inputs" onPress={toggleInputs} />
+      <Snow.TextButton focusKey="nested-modal" title="Nested Modal" onPress={toggleNested} />
     </View>
   )
 }

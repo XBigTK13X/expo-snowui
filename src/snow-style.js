@@ -264,8 +264,6 @@ export function createStyle(overrides) {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                zIndex: 200,
-                elevation: 200
             },
             prompt: {
                 backgroundColor: AppStyle.color.background
@@ -281,8 +279,6 @@ export function createStyle(overrides) {
         },
         overlay: {
             touchable: {
-                zIndex: 300,
-                elevation: 300,
                 width: getWindowWidth(),
                 height: getWindowHeight(),
                 position: 'absolute',
@@ -345,8 +341,6 @@ export function createStyle(overrides) {
             padding: 30,
             backgroundColor: AppStyle.color.background,
             flex: 1,
-            zIndex: 100,
-            elevation: 100
         },
         tabs: {
             panel: {

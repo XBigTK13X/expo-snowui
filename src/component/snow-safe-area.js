@@ -9,7 +9,7 @@ import { SnowOverlay } from './wired/snow-overlay'
 
 export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { modalPayload, overlayPayload, DEBUG_LAYERS } = useLayerContext()
+    const { modalPayloads, overlayPayload, DEBUG_LAYERS } = useLayerContext()
     const { setScrollViewRef } = useFocusContext()
     const scrollViewRef = React.useRef(null)
 
@@ -17,9 +17,16 @@ export function SnowSafeArea(props) {
     // Enabling things like fullscreen video
     // It requires a rendering function instead of computed JSX
     // Otherwise controlled forms inside a modal would not update their state
-    let modal = null
-    if (modalPayload) {
-        modal = <SnowModal {...modalPayload.props} render={modalPayload.render} />
+    let modals = null
+    console.log({ modalPayloads })
+    if (modalPayloads?.length) {
+        modals = (
+            <View style={{ flex: 1, position: 'absolute', right: 0, left: 0, top: 0, bottom: 0 }}>
+                {modalPayloads.map((modalPayload, modalIndex) => {
+                    return <SnowModal key={modalIndex} {...modalPayload.props} render={modalPayload.render} />
+                })}
+            </View>
+        )
     }
 
     let overlay = null
@@ -34,7 +41,7 @@ export function SnowSafeArea(props) {
     }, [scrollViewRef])
 
     if (DEBUG_LAYERS) {
-        util.prettyLog({ component: 'safe-area', action: 'render', modalPayload, overlayPayload })
+        util.prettyLog({ component: 'safe-area', action: 'render', modalPayloads, overlayPayload })
     }
 
     return (
@@ -43,10 +50,10 @@ export function SnowSafeArea(props) {
                 ref={scrollViewRef}
                 style={SnowStyle.component.safeArea}
                 snowStyle={SnowStyle}
-                showsVerticalScrollIndicator={!modalPayload} >
+                showsVerticalScrollIndicator={!modals} >
                 {props.children}
             </ScrollView>
-            {modal}
+            {modals}
             {overlay}
         </View>
     )

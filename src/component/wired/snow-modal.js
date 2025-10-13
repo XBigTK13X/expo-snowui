@@ -8,6 +8,7 @@ import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
+    console.log({ props })
     const { SnowStyle } = useStyleContext(props)
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer } = useFocusContext(props)
