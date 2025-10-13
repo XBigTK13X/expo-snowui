@@ -219,7 +219,7 @@ export function NavigationContextProvider(props) {
 
     if (!isReady) {
         if (DEBUG) {
-            prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer })
+            prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer, props })
         }
         return <View style={util.blankStyle} />
     }

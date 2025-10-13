@@ -540,7 +540,7 @@ export function FocusContextProvider(props) {
 
     if (!isReady) {
         if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'render short circuit', focusedLayer })
+            prettyLog({ context: 'focus', action: 'render short circuit', focusedLayer, props })
         }
         return <View style={blankStyle} />
     }
