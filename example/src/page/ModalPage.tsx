@@ -28,7 +28,7 @@ export default function ModalPage() {
 
   if (showFullscreen) {
     modal = (
-      <Snow.Modal assignFocus={false}>
+      <Snow.Modal assignFocus={false} onRequestClose={toggleFullscreen}>
         <Snow.FillView style={{ backgroundColor: 'green' }}>
           <Snow.Text>This should be fullscreen with no border.</Snow.Text>
         </Snow.FillView>

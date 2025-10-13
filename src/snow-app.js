@@ -24,21 +24,23 @@ export function SnowApp(props) {
                 style={util.blankStyle}
                 DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
-                <FocusContextProvider
+                <LayerContextProvider
                     style={util.blankStyle}
-                    DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW} >
+                    DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
 
-                    <NavigationContextProvider
-                        routePaths={props.routePaths}
-                        routePages={props.routePages}
-                        initialRoutePath={props.initialRoutePath}
-                        resetRoutePath={props.resetRoutePath}
+                    <FocusContextProvider
                         style={util.blankStyle}
-                        DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+                        DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW} >
 
-                        <LayerContextProvider
+                        <NavigationContextProvider
+                            routePaths={props.routePaths}
+                            routePages={props.routePages}
+                            initialRoutePath={props.initialRoutePath}
+                            resetRoutePath={props.resetRoutePath}
                             style={util.blankStyle}
-                            DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
+                            DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+
+
 
                             <SnowContextProvider style={util.blankStyle}>
                                 <SnowSafeArea style={util.blankStyle} >
@@ -46,9 +48,10 @@ export function SnowApp(props) {
                                 </SnowSafeArea>
                             </SnowContextProvider>
 
-                        </LayerContextProvider>
-                    </NavigationContextProvider>
-                </FocusContextProvider>
+
+                        </NavigationContextProvider>
+                    </FocusContextProvider>
+                </LayerContextProvider>
             </InputContextProvider>
         </StyleContextProvider >
     )

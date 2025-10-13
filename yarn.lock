@@ -6702,6 +6702,7 @@ __metadata:
     react: 19.1.0
     react-native: "npm:react-native-tvos@0.81.4-0"
     react-native-builder-bob: ^0.40.13
+    react-native-uuid: ^2.0.3
     release-it: ^19.0.4
     typescript: ^5.9.2
     use-debounce: ^10.0.6
@@ -11318,6 +11319,13 @@ __metadata:
     escape-string-regexp: ^5.0.0
     fast-glob: ^3.3.3
   checksum: 9b1c6fefb4d67e4a9f3f11554d33072c2112f56d578b8e9b68becc3457383e4f487f31af00d9e85cd43f0b23996c1b22e10cbec57e80c3fb2e4557a0e3db176d
+  languageName: node
+  linkType: hard
+
+"react-native-uuid@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "react-native-uuid@npm:2.0.3"
+  checksum: e47774481feaed5d38f75fb4b03f5189c03e7452038f1b0fa56677add8a8bdef64ec7ad5e83f9fa761d8788cac5c8e554ade07e82a2818145337df7c883e2124
   languageName: node
   linkType: hard
 

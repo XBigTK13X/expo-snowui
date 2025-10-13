@@ -12,8 +12,9 @@ export default function OverlayPage() {
   let modal = null
   if (showModal) {
     modal = (
-      <Snow.Modal assignFocus={false}>
+      <Snow.Modal assignFocus={false} onRequestClose={toggleModal}>
         <Snow.Text>There is a hidden overlay covering the screen.</Snow.Text>
+        <Snow.Text>If you press ENTER for click the screen, this modal will dismiss.</Snow.Text>
         <Snow.Overlay
           focusLayer="hidden-overlay"
           focusStart
@@ -31,6 +32,7 @@ export default function OverlayPage() {
     overlay = (
       <View>
         <Snow.Text>There is now an invisible overlay on screen that should be focused.</Snow.Text>
+        <Snow.Text>If you press ENTER or click the screen, a second overlay will display inside a modal.</Snow.Text>
         <Snow.Overlay
           focusStart
           focusKey="overlay"

@@ -39,6 +39,7 @@ const SnowRangeSliderW = (props) => {
     const [percent, setPercent] = React.useState(0)
     const percentRef = React.useRef(percent)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
+    const applyIntervalRef = React.useRef(applyStepInterval)
     const elementRef = useFocusWiring(props)
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
@@ -119,6 +120,10 @@ const SnowRangeSliderW = (props) => {
         percentRef.current = percent
     }, [percent])
 
+    React.useEffect(() => {
+        applyIntervalRef.current = applyStepInterval
+    }, [applyStepInterval])
+
     const applyStep = (amount) => {
         let result = percentRef.current + amount
         if (result < min) {
@@ -132,45 +137,52 @@ const SnowRangeSliderW = (props) => {
         onValueChange(result)
     }
 
-    const longPress = (amount, action) => {
-        if (action === 'start') {
-            applyStep(amount)
-            setApplyStepInterval(setInterval(() => { applyStep(amount) }, 100))
+    const longPress = (amount) => {
+        if (applyIntervalRef.current) {
+            clearInterval(applyIntervalRef.current)
         }
-        if (action === 'finish') {
-            clearInterval(applyStepInterval)
-        }
+        applyStep(amount)
+        setApplyStepInterval(setInterval(() => { applyStep(amount) }, 100))
     }
 
 
     React.useEffect(() => {
-        const listenerKey = props?.listenerKey ?? 'range-slider'
-        addActionListener(listenerKey, {
+        const actionListenerKey = addActionListener({
             onRight: () => {
                 if (isFocused(props.focusKey)) {
                     applyStep(step)
-                    clearInterval(applyStepInterval)
+                    clearInterval(applyIntervalRef.current)
                 }
             },
-            onLongRight: (action) => {
+            onLongRightStart: () => {
                 if (isFocused(props.focusKey)) {
-                    longPress(step * 2, action)
+                    longPress(step * 2, 'start')
+                }
+            },
+            onLongRightEnd: () => {
+                if (isFocused(props.focusKey)) {
+                    clearInterval(applyIntervalRef.current)
                 }
             },
             onLeft: () => {
                 if (isFocused(props.focusKey)) {
                     applyStep(-step)
-                    clearInterval(applyStepInterval)
+                    clearInterval(applyIntervalRef.current)
                 }
             },
-            onLongLeft: (action) => {
+            onLongLeftStart: () => {
                 if (isFocused(props.focusKey)) {
-                    longPress(-step * 2, action)
+                    longPress(-step * 2, 'start')
                 }
-            }
+            },
+            onLongLeftEnd: () => {
+                if (isFocused(props.focusKey)) {
+                    clearInterval(applyIntervalRef.current)
+                }
+            },
         })
         return () => {
-            removeActionListener(listenerKey)
+            removeActionListener(actionListenerKey)
         }
     }, [])
 

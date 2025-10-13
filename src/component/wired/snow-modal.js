@@ -1,16 +1,23 @@
 import React from 'react'
 import { View } from 'react-native'
-import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import { useInputContext } from '../../context/snow-input-context'
 import { useLayerContext } from '../../context/snow-layer-context'
+import { useNavigationContext } from '../../context/snow-navigation-context'
+import { useStyleContext } from '../../context/snow-style-context'
 
 import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 const SnowModalW = (props) => {
     const { SnowStyle } = useStyleContext(props)
+    const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer } = useFocusContext(props)
     const { pushModal, popModal } = useLayerContext(props)
+
+    if (!props.onRequestClose) {
+        return <SnowText>SnowModal requires an onRequestClose prop</SnowText>
+    }
 
     if (props.assignFocus !== false) {
         if (!props.focusLayer) {
@@ -45,7 +52,6 @@ const SnowModalW = (props) => {
                 statusBarTranslucent
                 transparent={props.transparent}
                 style={style}
-                onRequestClose={props.onRequestClose}
                 children={props.children} />
         )
     } else {
@@ -70,7 +76,7 @@ const SnowModalW = (props) => {
                 navigationBarTranslucent
                 statusBarTranslucent
                 transparent={props.transparent}
-                onRequestClose={props.onRequestClose}>
+            >
                 {modalContent}
             </View>
         )
@@ -78,7 +84,12 @@ const SnowModalW = (props) => {
     if (modalView) {
         React.useEffect(() => {
             pushModal(modalView)
+            const backListenerKey = addBackListener(() => {
+                props.onRequestClose()
+                return true
+            })
             return () => {
+                removeBackListener(backListenerKey)
                 popModal()
             }
         }, [])

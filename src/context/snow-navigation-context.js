@@ -3,6 +3,7 @@ import { Platform, View } from 'react-native'
 
 import { useFocusContext } from './snow-focus-context'
 import { useInputContext } from './snow-input-context'
+import { useLayerContext } from './snow-layer-context'
 
 import util, { prettyLog } from '../util'
 
@@ -42,6 +43,9 @@ export function NavigationContextProvider(props) {
 
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
+    const { currentModal } = useLayerContext()
+
+    const currentModalRef = React.useRef()
 
     const [isReady, setIsReady] = React.useState(false)
 
@@ -50,8 +54,6 @@ export function NavigationContextProvider(props) {
 
     const [navigationHistory, setNavigationHistory] = React.useState(null)
     const navigationHistoryRef = React.useRef(navigationHistory)
-    const [navigationAllowed, setNavigationAllowed] = React.useState(true)
-    const navigationAllowedRef = React.useRef(navigationAllowed)
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
@@ -67,8 +69,8 @@ export function NavigationContextProvider(props) {
     }, [navigationHistory])
 
     React.useEffect(() => {
-        navigationAllowedRef.current = navigationAllowed
-    }, [navigationAllowed])
+        currentModalRef.current = currentModal
+    }, [currentModal])
 
     React.useEffect(() => {
         let lookup = {}
@@ -195,13 +197,13 @@ export function NavigationContextProvider(props) {
     }
 
     // TODO If navigation blocked, Android back does nothing.
-    // When a modal is shown, prevent default event handlers from exiting the app
     React.useEffect(() => {
         addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'backListener', navigationAllowedRef })
+                prettyLog({ context: 'navigation', action: 'backListener', modal: currentModalRef.current })
             }
-            if (!navigationAllowedRef.current) {
+            if (currentModalRef.current) {
+                // When a modal is shown, prevent default event handlers from exiting the app/page
                 return true
             }
             if (navigationHistoryRef.current.length > 1) {
@@ -236,8 +238,7 @@ export function NavigationContextProvider(props) {
         navPush,
         navPop,
         navReset,
-        navigationHistory,
-        setNavigationAllowed
+        navigationHistory
     }
 
     return (

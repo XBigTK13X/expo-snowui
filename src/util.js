@@ -1,5 +1,6 @@
 import { Platform } from 'react-native'
 import * as SecureStore from 'expo-secure-store';
+import uuid from 'react-native-uuid'
 
 export const getCircularReplacer = () => {
     const seen = new WeakMap();
@@ -10,23 +11,16 @@ export const getCircularReplacer = () => {
         }
 
         if (typeof value === 'object' && value !== null) {
-            const parentDepth =
-                typeof this === 'object' && this !== null ? (seen.get(this) || 0) : 0;
-            const currentDepth = parentDepth + 1;
-
             if (seen.has(value)) {
-                const firstDepth = seen.get(value);
-                if (currentDepth > firstDepth + 1) {
-                    return '[circular reference]';
-                }
-            } else {
-                seen.set(value, currentDepth);
+                return '[circular reference]';
             }
+            seen.set(value, true);
         }
 
         return value;
     };
 };
+
 
 export const stringifySafe = (input) => {
     return JSON.stringify({ ...input }, getCircularReplacer(), 4)
@@ -40,7 +34,7 @@ export const prettyLog = (payload) => {
     }
 }
 
-function stateToUrl(route, state) {
+export function stateToUrl(route, state) {
     if (!state || !Object.keys(state).length) {
         return route
     }
@@ -48,7 +42,7 @@ function stateToUrl(route, state) {
     return `${route}?${params}`
 }
 
-function queryToObject(query) {
+export function queryToObject(query) {
     if (!query) {
         return {}
     }
@@ -56,14 +50,14 @@ function queryToObject(query) {
     return Object.fromEntries(params.entries())
 }
 
-function toBase64(input) {
+export function toBase64(input) {
     if (typeof input === 'object') {
         return btoa(JSON.stringify(input))
     }
     return btoa(input)
 }
 
-function fromBase64(input) {
+export function fromBase64(input) {
     let result = atob(input)
     try {
         result = JSON.parse(result)
@@ -71,7 +65,7 @@ function fromBase64(input) {
     return result
 }
 
-const saveData = (key, value) => {
+export const saveData = (key, value) => {
     return new Promise(resolve => {
         if (Platform.OS === 'web') {
             if (value === null) {
@@ -99,7 +93,7 @@ const saveData = (key, value) => {
     })
 }
 
-const loadData = (key) => {
+export const loadData = (key) => {
     let value = null
     if (Platform.OS === 'web') {
         value = localStorage.getItem(key)
@@ -115,14 +109,19 @@ const loadData = (key) => {
     return value
 }
 
-const blankStyle = {
+export const blankStyle = {
     flex: 1,
     backgroundColor: 'black'
+}
+
+export const getUuid = () => {
+    return uuid.v4()
 }
 
 export default {
     blankStyle,
     getCircularReplacer,
+    getUuid,
     prettyLog,
     stringifySafe,
     stateToUrl,
