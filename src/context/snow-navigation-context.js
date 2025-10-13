@@ -45,9 +45,9 @@ export function NavigationContextProvider(props) {
 
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
-    const { currentModal } = useLayerContext()
+    const { modalRender } = useLayerContext()
 
-    const currentModalRef = React.useRef()
+    const modalRenderRef = React.useRef()
 
     const [isReady, setIsReady] = React.useState(false)
 
@@ -71,8 +71,8 @@ export function NavigationContextProvider(props) {
     }, [navigationHistory])
 
     React.useEffect(() => {
-        currentModalRef.current = currentModal
-    }, [currentModal])
+        modalRenderRef.current = modalRender
+    }, [modalRender])
 
     React.useEffect(() => {
         let lookup = {}
@@ -202,9 +202,9 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'backListener', modal: currentModalRef.current })
+                prettyLog({ context: 'navigation', action: 'backListener', modal: modalRenderRef.current })
             }
-            if (currentModalRef.current) {
+            if (modalRenderRef.current) {
                 // When a modal is shown, prevent default event handlers from exiting the app/page
                 return true
             }

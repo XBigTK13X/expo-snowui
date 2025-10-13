@@ -4,6 +4,10 @@ import { SnowApp } from './snow-app'
 
 export { useFocusContext } from './context/snow-focus-context'
 import { useFocusContext } from './context/snow-focus-context'
+export { useInputContext } from './context/snow-input-context'
+import { useInputContext } from './context/snow-input-context'
+export { useLayerContext } from './context/snow-layer-context'
+import { useLayerContext } from './context/snow-layer-context'
 export { useNavigationContext } from './context/snow-navigation-context'
 import { useNavigationContext } from './context/snow-navigation-context'
 export { useSnowContext } from './context/snow-context'
@@ -62,6 +66,8 @@ export * as util from './util'
 export default {
   useFocusLayer,
   useFocusContext,
+  useInputContext,
+  useLayerContext,
   useNavigationContext,
   useSnowContext,
   useStyleContext,

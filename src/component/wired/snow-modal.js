@@ -3,7 +3,6 @@ import { View } from 'react-native'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useInputContext } from '../../context/snow-input-context'
 import { useLayerContext } from '../../context/snow-layer-context'
-import { useNavigationContext } from '../../context/snow-navigation-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
 import SnowFillView from '../snow-fill-view'
@@ -44,15 +43,17 @@ const SnowModalW = (props) => {
     if (props.contentStyle) {
         style.push(props.contentStyle)
     }
-    let modalView = null
+    let modalContent = null
     if (props.wrapper === false) {
-        modalView = (
+        modalContent = (
             <View
                 navigationBarTranslucent
                 statusBarTranslucent
                 transparent={props.transparent}
                 style={style}
-                children={props.children} />
+            >
+                {props.renderer()}
+            </View>
         )
     } else {
         let modalStyle = [
@@ -63,38 +64,32 @@ const SnowModalW = (props) => {
             modalStyle.push(props.modalStyle)
         }
 
-        let modalContent = (
-            <SnowFillView
-                scroll={props.scroll}
-                children={props.children}
-                style={style} />
-        )
-
-        modalView = (
-            <View
-                style={modalStyle}
-                navigationBarTranslucent
-                statusBarTranslucent
-                transparent={props.transparent}
-            >
-                {modalContent}
-            </View>
-        )
+        modalContent =
+            (
+                <View
+                    style={modalStyle}
+                    navigationBarTranslucent
+                    statusBarTranslucent
+                    transparent={props.transparent}
+                >
+                    <SnowFillView
+                        scroll={props.scroll}
+                        style={style}>
+                        {props.renderer()}
+                    </SnowFillView>
+                </View>
+            )
     }
-    if (modalView) {
-        React.useEffect(() => {
-            pushModal(modalView)
-            const backListenerKey = addBackListener(() => {
-                props.onRequestClose()
-                return true
-            })
-            return () => {
-                removeBackListener(backListenerKey)
-                popModal()
-            }
-        }, [])
-    }
-    return null
+    React.useEffect(() => {
+        const backListenerKey = addBackListener(() => {
+            props.onRequestClose()
+            return true
+        })
+        return () => {
+            removeBackListener(backListenerKey)
+        }
+    }, [])
+    return modalContent
 }
 
 SnowModalW.isSnowFocusWired = true

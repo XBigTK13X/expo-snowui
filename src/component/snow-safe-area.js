@@ -4,12 +4,18 @@ import { useStyleContext } from '../context/snow-style-context'
 import { useFocusContext } from '../context/snow-focus-context'
 import { useLayerContext } from '../context/snow-layer-context'
 import util from '../util'
+import { SnowModal } from './wired/snow-modal'
 
 export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
-    const { currentModal, currentOverlay } = useLayerContext()
+    const { modalPayload, overlayPayload } = useLayerContext()
     const { setScrollViewRef } = useFocusContext()
     const scrollViewRef = React.useRef(null)
+
+    let modal = null
+    if (modalPayload) {
+        modal = <SnowModal {...modalPayload.props} renderer={modalPayload.renderer} />
+    }
 
     React.useEffect(() => {
         if (scrollViewRef.current) {
@@ -23,12 +29,12 @@ export function SnowSafeArea(props) {
                 ref={scrollViewRef}
                 style={SnowStyle.component.safeArea}
                 snowStyle={SnowStyle}
-                showsVerticalScrollIndicator={!currentModal}
+                showsVerticalScrollIndicator={!modalPayload}
             >
                 {props.children}
             </ScrollView>
-            {currentModal}
-            {currentOverlay}
+            {modal}
+            {overlayPayload?.()}
         </View>
     )
 }
