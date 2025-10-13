@@ -114,7 +114,7 @@ export function FocusContextProvider(props) {
             focusOn(topLayer.focusStartElementRef, topLayer.focusStartKey)
         }
         setIsReady(true)
-    }, [focusedKey, focusLayers])
+    }, [focusedKey, focusLayers, focusedLayer])
 
     const isFocused = (elementFocusKey) => {
         if (DEBUG === 'verbose') {
@@ -144,7 +144,7 @@ export function FocusContextProvider(props) {
             else {
                 result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
             }
-            if (DEBUG === 'verbose') {
+            if (DEBUG) {
                 prettyLog({ context: 'focus', action: 'pushFocusLayer', layerName, prev, result })
             }
             return result

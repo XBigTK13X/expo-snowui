@@ -21,7 +21,7 @@ export default function ModalPage() {
   const RegularModal = () => {
     return (
       <>
-        <Snow.TextButton focusStart focusKey="tab-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
+        <Snow.TextButton focusStart focusKey="modal-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 1000 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>
@@ -50,6 +50,7 @@ export default function ModalPage() {
     return (
       <Snow.FillView style={{ backgroundColor: 'green' }}>
         <Snow.Text>This should be fullscreen with no border.</Snow.Text>
+        <Snow.Target focusStart focusKey="fullscreen-modal" />
       </Snow.FillView>
     )
   }
@@ -64,7 +65,7 @@ export default function ModalPage() {
           title="Close Modal"
           onPress={toggleInputs}
         />
-        <Snow.Input focusKey="modal-input" value={textInput} onValueChange={setTextInput} />
+        <Snow.Input focusStart focusKey="modal-input" value={textInput} onValueChange={setTextInput} />
       </>
     )
   }
@@ -125,7 +126,7 @@ export default function ModalPage() {
       <Snow.Label>Component: Modal</Snow.Label>
       <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
       <Snow.TextButton focusKey="modal-two" focusDown="modal-three" title="Test Fullscreen" onPress={toggleFullscreen} />
-      <Snow.TextButton focusKey="modal-three" title="Inputs" onPress={toggleInputs} />
+      <Snow.TextButton focusKey="modal-three" focusDown="nested-modal" title="Inputs" onPress={toggleInputs} />
       <Snow.TextButton focusKey="nested-modal" title="Nested Modal" onPress={toggleNested} />
     </>
   )

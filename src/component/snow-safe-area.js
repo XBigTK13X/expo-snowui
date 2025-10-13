@@ -40,7 +40,7 @@ export function SnowSafeArea(props) {
         }
     }, [scrollViewRef])
 
-    if (DEBUG_LAYERS) {
+    if (DEBUG_LAYERS === 'verbose') {
         util.prettyLog({ component: 'safe-area', action: 'render', modalPayloads, overlayPayload })
     }
 
