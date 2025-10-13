@@ -2,7 +2,6 @@ import React from 'react'
 import { View } from 'react-native'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useInputContext } from '../../context/snow-input-context'
-import { useLayerContext } from '../../context/snow-layer-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
 import SnowFillView from '../snow-fill-view'
@@ -12,7 +11,6 @@ const SnowModalW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { addBackListener, removeBackListener } = useInputContext()
     const { pushFocusLayer, popFocusLayer } = useFocusContext(props)
-    const { pushModal, popModal } = useLayerContext(props)
 
     if (!props.onRequestClose) {
         return <SnowText>SnowModal requires an onRequestClose prop</SnowText>
@@ -22,16 +20,26 @@ const SnowModalW = (props) => {
         if (!props.focusLayer) {
             return <SnowText>SnowModal requires a focusLayer prop</SnowText>
         }
-        else {
-            React.useEffect(() => {
-                pushFocusLayer(`snow-modal-${props.focusLayer}`, true)
-                return () => {
-                    popFocusLayer()
-                }
-            }, [])
-        }
     }
 
+    React.useEffect(() => {
+        if (props.assignFocus && props.focusLayer) {
+            pushFocusLayer(`snow-modal-${props.focusLayer}`, true)
+            return () => {
+                popFocusLayer()
+            }
+        }
+    }, [])
+
+    React.useEffect(() => {
+        const backListenerKey = addBackListener(() => {
+            props.onRequestClose()
+            return true
+        })
+        return () => {
+            removeBackListener(backListenerKey)
+        }
+    }, [])
 
     let style = [SnowStyle.component.modal.prompt]
     if (props.transparent) {
@@ -52,7 +60,7 @@ const SnowModalW = (props) => {
                 transparent={props.transparent}
                 style={style}
             >
-                {props.renderer()}
+                {props.render()}
             </View>
         )
     } else {
@@ -75,20 +83,11 @@ const SnowModalW = (props) => {
                     <SnowFillView
                         scroll={props.scroll}
                         style={style}>
-                        {props.renderer()}
+                        {props.render()}
                     </SnowFillView>
                 </View>
             )
     }
-    React.useEffect(() => {
-        const backListenerKey = addBackListener(() => {
-            props.onRequestClose()
-            return true
-        })
-        return () => {
-            removeBackListener(backListenerKey)
-        }
-    }, [])
     return modalContent
 }
 

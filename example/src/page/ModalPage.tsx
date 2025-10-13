@@ -3,10 +3,10 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function ModalPage() {
-  const { pushModal, popModal } = Snow.useLayerContext()
+  const { showModal, hideModal, enableOverlay, disableOverlay } = Snow.useLayerContext()
 
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => { setShowModal(!showModal) }
+  const [showExample, setShowExample] = React.useState(false)
+  const toggleModal = () => { setShowExample(!showExample) }
   const [showFullscreen, setShowFullscreen] = React.useState(false)
   const toggleFullscreen = () => { setShowFullscreen(!showFullscreen) }
   const [showInputs, setShowInputs] = React.useState(false)
@@ -30,46 +30,57 @@ export default function ModalPage() {
   }
 
   const FullscreenModal = () => {
+    React.useEffect(() => {
+      enableOverlay({
+        props: {
+          focusStart: true,
+          focusKey: "fullscreen-overlay",
+          focusLayer: "fullscreen-modal",
+          onPress: toggleFullscreen
+        }
+      })
+      return disableOverlay
+    }, [])
+
     return (
-      <Snow.View>
-        <Snow.FillView style={{ backgroundColor: 'green' }}>
-          <Snow.Text>This should be fullscreen with no border.</Snow.Text>
-        </Snow.FillView>
-        <Snow.Overlay
-          focusStart
-          focusKey="fullscreen-overlay"
-          focusLayer="fullscreen-modal"
-          onPress={toggleFullscreen} />
-      </Snow.View>
+      <Snow.FillView style={{ backgroundColor: 'green' }}>
+        <Snow.Text>This should be fullscreen with no border.</Snow.Text>
+      </Snow.FillView>
     )
   }
 
   const InputsModal = () => {
     return (
       <Snow.View>
-        <Snow.TextButton focusStart focusKey="close-button" focusDown="modal-input" title="Close Modal" onPress={toggleInputs} />
+        <Snow.TextButton
+          focusStart
+          focusKey="close-button"
+          focusDown="modal-input"
+          title="Close Modal"
+          onPress={toggleInputs}
+        />
         <Snow.Input focusKey="modal-input" value={textInput} onValueChange={setTextInput} />
       </Snow.View>
     )
   }
 
   React.useEffect(() => {
-    const hasModal = showModal || showFullscreen || showInputs
-    if (showModal) {
-      pushModal({ renderer: RegularModal, props: { focusLayer: 'example-modal', scroll: true, onRequestClose: toggleModal } })
+    const hasModal = showExample || showFullscreen || showInputs
+    if (showExample) {
+      showModal({ render: RegularModal, props: { focusLayer: 'example-modal', scroll: true, onRequestClose: toggleModal } })
     }
     if (showFullscreen) {
-      pushModal({ renderer: FullscreenModal, props: { assignFocus: false, onRequestClose: toggleFullscreen } })
+      showModal({ render: FullscreenModal, props: { assignFocus: false, onRequestClose: toggleFullscreen } })
     }
     if (showInputs) {
-      pushModal({ renderer: InputsModal, props: { focusLayer: 'inputs-modal', onRequestClose: toggleInputs } })
+      showModal({ render: InputsModal, props: { focusLayer: 'inputs-modal', onRequestClose: toggleInputs } })
     }
     return () => {
       if (hasModal) {
-        popModal()
+        hideModal()
       }
     }
-  }, [showModal, showFullscreen, showInputs, textInput])
+  }, [showExample, showFullscreen, showInputs, textInput])
 
   return (
     <View>

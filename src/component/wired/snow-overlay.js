@@ -4,6 +4,7 @@ import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useLayerContext } from '../../context/snow-layer-context'
 import SnowText from '../snow-text'
+import SnowFillView from '../snow-fill-view'
 
 const SnowOverlayW = (props) => {
     const { SnowStyle } = useStyleContext(props)
@@ -14,9 +15,9 @@ const SnowOverlayW = (props) => {
         pushFocusLayer,
         popFocusLayer,
         focusedLayer,
-        addFocusMap
+        addFocusMap,
+        readFocusProps
     } = useFocusContext()
-    const { pushOverlay, popOverlay } = useLayerContext(props)
 
     if (!props.focusLayer) {
         return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
@@ -51,9 +52,6 @@ const SnowOverlayW = (props) => {
         isReady
     ]);
 
-
-
-
     let style = [SnowStyle.component.overlay.touchable]
     if (props.transparent) {
         style.push(SnowStyle.component.overlay.transparent)
@@ -62,26 +60,18 @@ const SnowOverlayW = (props) => {
         style.push(SnowStyle.component.overlay.black)
     }
 
-    const overlayView = (
+    return (
         <TouchableOpacity
             ref={elementRef}
             {...tvRemoteProps}
+            {...readFocusProps(props)}
             style={style}
             activeOpacity={1} // Without this, the overlay applies a white filter to anything underneath
             onPress={focusPress(elementRef, props.focusKey)}
-            onLongPress={focusLongPress(elementRef, props.focusKey)}
-            children={props.children}
-        />
+            onLongPress={focusLongPress(elementRef, props.focusKey)}>
+            <SnowFillView></SnowFillView>
+        </TouchableOpacity>
     )
-
-    React.useEffect(() => {
-        pushOverlay(overlayView)
-        return () => {
-            popOverlay()
-        }
-    }, [])
-
-    return null
 }
 
 SnowOverlayW.isSnowFocusWired = true

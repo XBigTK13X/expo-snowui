@@ -13,71 +13,51 @@ export function useLayerContext() {
 }
 
 export function LayerContextProvider(props) {
-    const [modal, setModal] = React.useState(null)
-    const [overlays, setOverlays] = React.useState([])
+    const [modalPayload, setModalPayload] = React.useState(null)
+    const [overlayPayload, setOverlayPayload] = React.useState(null)
 
     const DEBUG = props.DEBUG_LAYERS
 
-    const pushOverlay = (overlay) => {
-        setOverlays((prev) => {
-            if (DEBUG) {
-                prettyLog({ context: 'layer', action: 'pushOverlay', prev, overlay })
-            }
-            return [...prev, overlay]
-        })
-    }
-
-    const popOverlay = () => {
-        setOverlays((prev) => {
-            let result = [...prev]
-            if (result.length) {
-                result.pop()
-            }
-            if (DEBUG) {
-                prettyLog({ context: 'layer', action: 'popOverlay', prev, result })
-            }
-            return result
-        })
-    }
-
-    let currentOverlay = null
-    if (overlays.length) {
-        currentOverlay = modals.at(-1)
-    }
-
-    const clearOverlays = () => {
+    const enableOverlay = (payload) => {
         if (DEBUG) {
-            prettyLog({ context: 'layer', action: 'clearOverlays' })
+            prettyLog({ context: 'layer', action: 'enableOverlay', overlayPayload, payload })
         }
-        setOverlays([])
+        setOverlayPayload(payload)
     }
 
-    const pushModal = (modal) => {
-        setModal(modal)
+    const disableOverlay = () => {
+        if (DEBUG) {
+            prettyLog({ context: 'layer', action: 'disableOverlay', overlayPayload })
+        }
+        setOverlayPayload(null)
     }
 
-    const popModal = () => {
-        setModal(null)
+    const showModal = (payload) => {
+        if (DEBUG) {
+            prettyLog({ context: 'layer', action: 'showModal', modalPayload, payload })
+        }
+        setModalPayload(payload)
     }
 
-    const clearModals = () => {
-        setModal(null)
+    const hideModal = () => {
+        if (DEBUG) {
+            prettyLog({ context: 'layer', action: 'hideModal', modalPayload })
+        }
+        setModalPayload(null)
     }
 
     if (DEBUG === 'verbose') {
-        prettyLog({ context: 'layer', action: 'render', modalRender: modals, overlays })
+        prettyLog({ context: 'layer', action: 'render', modalPayload, overlayPayload })
     }
 
     const context = {
         DEBUG_LAYERS: DEBUG,
-        pushOverlay,
-        pushModal,
-        popModal,
-        popOverlay,
-        clearModals,
-        clearOverlays,
-        modalPayload: modal,
-        overlayPayload: overlays?.at(-1)
+        enableOverlay,
+        disableOverlay,
+        overlayPayload,
+        showModal,
+        hideModal,
+        modalPayload,
     }
     return (
         <LayerContext.Provider style={{ flex: 1 }} value={context}>
