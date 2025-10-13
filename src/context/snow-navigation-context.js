@@ -7,6 +7,8 @@ import { useLayerContext } from './snow-layer-context'
 
 import util, { prettyLog } from '../util'
 
+import SnowText from '../component/snow-text'
+
 const NavigationContext = React.createContext({});
 
 export function useNavigationContext() {
@@ -183,7 +185,7 @@ export function NavigationContextProvider(props) {
         const resetPath = props.resetRoutePath ? props.resetRoutePath : props.initialRoutePath
         const func = () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'navReset', prev, result, resetPath, props })
+                prettyLog({ context: 'navigation', action: 'navReset', navigationHistory, resetPath, props })
             }
             setNavigationHistory([{
                 routePath: resetPath,
@@ -217,6 +219,15 @@ export function NavigationContextProvider(props) {
         }
     }, [])
 
+    React.useEffect(() => {
+        if (!pageLookup[navigationHistory?.at(-1)?.routePath]?.page) {
+            if (DEBUG) {
+                prettyLog({ context: 'navigation', action: 'route 404', pageLookup, currentRoute: navigationHistory?.at(-1) })
+            }
+            navReset()
+        }
+    }, [pageLookup, navigationHistory])
+
     if (!isReady) {
         if (DEBUG) {
             prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer, props })
@@ -225,7 +236,7 @@ export function NavigationContextProvider(props) {
     }
 
     const currentRoute = navigationHistory.at(-1)
-    const CurrentPage = pageLookup[currentRoute.routePath].page
+    let CurrentPage = pageLookup[currentRoute?.routePath]?.page
 
     if (DEBUG === 'verbose') {
         prettyLog({ context: 'navigation', action: 'render', currentRoute, CurrentPage })
