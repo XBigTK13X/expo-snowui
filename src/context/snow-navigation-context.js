@@ -140,7 +140,7 @@ export function NavigationContextProvider(props) {
             setNavigationHistory((prev) => {
                 let result = [...prev]
                 if (result.at(-1).routePath === foundPath) {
-                    result.at(-1).params = foundParams
+                    result.at(-1).routeParams = foundParams
                     if (Platform.OS === 'web') {
                         window.history.replaceState(foundParams, '', util.stateToUrl(foundPath, foundParams))
                     }
@@ -235,7 +235,7 @@ export function NavigationContextProvider(props) {
         return <View style={util.blankStyle} />
     }
 
-    const currentRoute = navigationHistory.at(-1)
+    const currentRoute = { ...navigationHistory.at(-1) }
     let CurrentPage = pageLookup[currentRoute?.routePath]?.page
 
     if (DEBUG === 'verbose') {
