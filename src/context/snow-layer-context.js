@@ -18,16 +18,16 @@ export function LayerContextProvider(props) {
 
     const DEBUG = props.DEBUG_LAYERS
 
-    const enableOverlay = (payload) => {
+    const openOverlay = (payload) => {
         if (DEBUG) {
-            prettyLog({ context: 'layer', action: 'enableOverlay', overlayPayload, payload })
+            prettyLog({ context: 'layer', action: 'openOverlay', overlayPayload, payload })
         }
         setOverlayPayload(payload)
     }
 
-    const disableOverlay = () => {
+    const closeOverlay = () => {
         if (DEBUG) {
-            prettyLog({ context: 'layer', action: 'disableOverlay', overlayPayload })
+            prettyLog({ context: 'layer', action: 'closeOverlay', overlayPayload })
         }
         setOverlayPayload(null)
     }
@@ -62,8 +62,8 @@ export function LayerContextProvider(props) {
 
     const context = {
         DEBUG_LAYERS: DEBUG,
-        enableOverlay,
-        disableOverlay,
+        openOverlay,
+        closeOverlay,
         overlayPayload,
         pushModal,
         popModal,
