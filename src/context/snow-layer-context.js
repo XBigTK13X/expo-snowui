@@ -34,7 +34,7 @@ export function LayerContextProvider(props) {
 
     const pushModal = (payload) => {
         if (DEBUG) {
-            prettyLog({ context: 'layer', action: 'showModal', modalPayloads, payload })
+            prettyLog({ context: 'layer', action: 'pushModal', modalPayloads, payload })
         }
         setModalPayloads((prev) => { return [...prev, payload] })
     }
@@ -45,7 +45,7 @@ export function LayerContextProvider(props) {
 
     const popModal = () => {
         if (DEBUG) {
-            prettyLog({ context: 'layer', action: 'hideModal', modalPayloads })
+            prettyLog({ context: 'layer', action: 'popModal', modalPayloads })
         }
         setModalPayloads((prev) => {
             let result = [...prev]

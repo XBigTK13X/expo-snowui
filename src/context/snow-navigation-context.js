@@ -202,7 +202,7 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'backListener', modal: modalsVisibleRef.current })
+                prettyLog({ context: 'navigation', action: 'backListener', modalShowing: modalsVisibleRef.current })
             }
             if (modalsVisibleRef.current) {
                 // When a modal is shown, prevent default event handlers from exiting the app/page
