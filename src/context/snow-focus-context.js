@@ -83,7 +83,7 @@ export function FocusContextProvider(props) {
     const DEBUG = props.DEBUG_FOCUS
     let SCROLL_OFFSET = 200
     if (props.focusVerticalOffset) {
-        SCROLL_OFFSET = props.focusVersionOffset
+        SCROLL_OFFSET = props.focusVerticalOffset
     }
 
     React.useEffect(() => {

@@ -20,7 +20,9 @@ export function SnowApp(props) {
                     DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
 
                     <FocusContextProvider
-                        DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW} >
+                        DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
+                        focusVerticalOffset={props.focusVerticalOffset}
+                    >
 
                         <NavigationContextProvider
                             routePaths={props.routePaths}
