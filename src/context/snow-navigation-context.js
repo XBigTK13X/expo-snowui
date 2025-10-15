@@ -125,7 +125,7 @@ export function NavigationContextProvider(props) {
 
         if (foundParams === undefined) {
             if (typeof foundPath === 'object') {
-                foundParams = { ...foundParams }
+                foundParams = { ...foundPath }
                 foundPath = navigationHistoryRef.current.at(-1).routePath
             }
         }
