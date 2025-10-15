@@ -220,7 +220,7 @@ export function NavigationContextProvider(props) {
     }, [])
 
     React.useEffect(() => {
-        if (!pageLookup[navigationHistory?.at(-1)?.routePath]?.page) {
+        if (navigationHistory?.at(-1) && !pageLookup[navigationHistory?.at(-1)?.routePath]?.page) {
             if (DEBUG) {
                 prettyLog({ context: 'navigation', action: 'route 404', pageLookup, currentRoute: navigationHistory?.at(-1) })
             }

@@ -3,7 +3,7 @@ import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
 export default function ModalPage() {
-  const { pushModal, popModal, clearModals, enableOverlay, disableOverlay } = Snow.useLayerContext()
+  const { pushModal, popModal, clearModals, openOverylay, closeOverlay } = Snow.useLayerContext()
 
   const [showExample, setShowExample] = React.useState(false)
   const toggleModal = () => { setShowExample(!showExample) }
@@ -36,7 +36,7 @@ export default function ModalPage() {
 
   const FullscreenModal = () => {
     React.useEffect(() => {
-      enableOverlay({
+      openOverylay({
         props: {
           focusStart: true,
           focusKey: "fullscreen-overlay",
@@ -44,7 +44,7 @@ export default function ModalPage() {
           onPress: toggleFullscreen
         }
       })
-      return disableOverlay
+      return closeOverlay
     }, [])
 
     return (

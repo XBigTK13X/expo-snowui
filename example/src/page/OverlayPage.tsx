@@ -2,14 +2,14 @@ import React from 'react'
 import Snow from 'expo-snowui'
 
 export default function OverlayPage() {
-  const { showModal, hideModal, enableOverlay, disableOverlay } = Snow.useLayerContext()
+  const { pushModal, popModal, openOverlay, closeOverlay } = Snow.useLayerContext()
 
   const [hasOverlay, setHasOverlay] = React.useState(false)
   const [showFullscreen, setShowFullscreen] = React.useState(false)
 
   React.useEffect(() => {
     if (hasOverlay) {
-      enableOverlay({
+      openOverlay({
         props: {
           focusStart: true,
           focusKey: "overlay",
@@ -24,7 +24,7 @@ export default function OverlayPage() {
 
   React.useEffect(() => {
     if (showFullscreen) {
-      showModal({
+      pushModal({
         props: {
           assignFocus: false,
           onRequestClose: () => { setShowFullscreen(false) }
@@ -38,7 +38,7 @@ export default function OverlayPage() {
           )
         }
       })
-      enableOverlay({
+      openOverlay({
         props: {
           focusLayer: "hidden-overlay",
           focusStart: true,
@@ -54,8 +54,8 @@ export default function OverlayPage() {
 
   React.useEffect(() => {
     if (!showFullscreen && !hasOverlay) {
-      disableOverlay()
-      hideModal()
+      closeOverlay()
+      popModal()
     }
   }, [showFullscreen, hasOverlay])
 
