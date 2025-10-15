@@ -353,7 +353,7 @@ export function FocusContextProvider(props) {
 
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
-        if (Keyboard.isVisible()) {
+        if (Platform.isTV && Keyboard.isVisible()) {
             if (DEBUG) {
                 prettyLog({ context: 'focus', action: 'moveFocus FAIL Keyboard is visible' })
             }
@@ -449,7 +449,7 @@ export function FocusContextProvider(props) {
             focusKey = focusedKeyRef.current
         }
         const focusMap = focusLayersRef.current.at(-1)
-        const shouldNotPress = Keyboard.isVisible() || !(focusMap?.refs?.[focusKey]?.[action])
+        const shouldNotPress = (Platform.isTV && Keyboard.isVisible()) || !(focusMap?.refs?.[focusKey]?.[action])
         if (DEBUG) {
             prettyLog({
                 context: 'focus',
@@ -458,7 +458,8 @@ export function FocusContextProvider(props) {
                 focusKey,
                 shouldNotPress,
                 focusMap,
-                keyboardVisible: Keyboard.isVisible(), [action]: focusMap?.refs?.[focusKey]?.[action]
+                keyboardVisible: (Platform.isTV && Keyboard.isVisible()),
+                [action]: focusMap?.refs?.[focusKey]?.[action]
             })
         }
         if (shouldNotPress) {
