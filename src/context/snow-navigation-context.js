@@ -119,23 +119,32 @@ export function NavigationContextProvider(props) {
     }, [props.initialRoutePath, props.routePaths, props.routePages])
 
     const navPush = (routePath, routeParams, isFunc) => {
-        let foundParams = {}
+        let foundParams = routeParams
         let foundPath = routePath
         let foundFunc = isFunc
-        if (typeof routePath === 'object') {
-            foundParams = { ...routePath }
-            foundPath = navigationHistoryRef.current.at(-1).routePath
+
+        if (foundParams === undefined) {
+            if (typeof foundPath === 'object') {
+                foundParams = { ...foundParams }
+                foundPath = navigationHistoryRef.current.at(-1).routePath
+            }
         }
-        if (routeParams === true) {
-            foundFunc = true
+        if (isFunc === undefined) {
+            if (foundParams === true) {
+                foundFunc = true
+                foundParams = {}
+            }
+        }
+
+        if (!foundParams) {
             foundParams = {}
         }
-        if (!routeParams) {
-            foundParams = {}
+        else {
+            if (typeof foundParams === 'object') {
+                foundParams = { ...foundParams }
+            }
         }
-        if (typeof routeParams === 'object') {
-            foundParams = { ...routeParams }
-        }
+
         const func = () => {
             setNavigationHistory((prev) => {
                 let result = [...prev]
