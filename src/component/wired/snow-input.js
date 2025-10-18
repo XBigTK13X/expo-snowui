@@ -34,9 +34,12 @@ const SnowInputW = (props) => {
                 onDebounce(val)
             }
         }}
-        onSubmitEditing={() => {
+        onSubmitEditing={(val) => {
             if (props.onSubmit) {
-                props.onSubmit()
+                props.onSubmit(val)
+            }
+            if (!props.onSubmit && onDebounce) {
+                onDebounce(val)
             }
         }}
         value={props.value}
