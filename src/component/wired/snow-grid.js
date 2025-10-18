@@ -30,7 +30,7 @@ const SnowGridW = (props) => {
         // Without this, if a ternary `{x?x:null}` nullable component will leave a gap in the grid
         items = React.Children.toArray(props.children)
     }
-    items = items.filter(child => child !== null)
+    items = items?.filter(child => child !== null)
     if (!items || !items.length) {
         return null
     }
