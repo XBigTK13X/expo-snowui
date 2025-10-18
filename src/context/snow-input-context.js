@@ -189,6 +189,9 @@ export function InputContextProvider(props) {
                                 listener?.onLongLeftEnd?.()
                             }
                             break
+                        case 'select':
+                            listener.onPress?.()
+                            break
                         default:
                             break
                     }
