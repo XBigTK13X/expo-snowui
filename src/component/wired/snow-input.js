@@ -20,6 +20,14 @@ const SnowInputW = (props) => {
     if (props.onDebounce) {
         onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
     }
+    const onSubmit = (evt) => {
+        if (props.onSubmit) {
+            props.onSubmit(evt.nativeEvent.text)
+        }
+        if (!props.onSubmit && onDebounce) {
+            onDebounce(evt.nativeEvent.text)
+        }
+    }
     return <TextInput
         ref={elementRef}
         {...tvRemoteProps(props)}
@@ -34,14 +42,8 @@ const SnowInputW = (props) => {
                 onDebounce(val)
             }
         }}
-        onSubmitEditing={(val) => {
-            if (props.onSubmit) {
-                props.onSubmit(val)
-            }
-            if (!props.onSubmit && onDebounce) {
-                onDebounce(val)
-            }
-        }}
+        onSubmitEditing={onSubmit}
+        onEndEditing={onSubmit}
         value={props.value}
     />
 }
