@@ -222,6 +222,7 @@ const SnowGridW = (props) => {
         < View style={gridStyle} >
             {pageControls('top')}
             <FlatList
+                key={props.focusKey + '-flat'}
                 scrollEnabled={props.scroll === true}
                 disableVirtualization={true}
                 initialNumToRender={itemsPerPage}
