@@ -118,10 +118,11 @@ export function NavigationContextProvider(props) {
         setIsReady(true)
     }, [props.initialRoutePath, props.routePaths, props.routePages])
 
-    const navPush = (routePath, routeParams, isFunc) => {
+    const navPush = (routePath, routeParams, isFunc, shouldReplace) => {
         let foundParams = routeParams
         let foundPath = routePath
         let foundFunc = isFunc
+        let foundReplace = shouldReplace
 
         if (foundParams === undefined) {
             if (typeof foundPath === 'object') {
@@ -145,10 +146,14 @@ export function NavigationContextProvider(props) {
             }
         }
 
+        if (foundReplace === undefined) {
+            foundReplace = true
+        }
+
         const func = () => {
             setNavigationHistory((prev) => {
                 let result = [...prev]
-                if (result.at(-1).routePath === foundPath) {
+                if (result.at(-1).routePath === foundPath && foundReplace) {
                     result.at(-1).routeParams = foundParams
                     if (Platform.OS === 'web') {
                         window.history.replaceState(foundParams, '', util.stateToUrl(foundPath, foundParams))
