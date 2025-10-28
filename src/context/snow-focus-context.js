@@ -104,6 +104,9 @@ export function FocusContextProvider(props) {
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'useEffect([focusedKey,focusLayers])', topLayer, focusedKey })
         }
+        if (!topLayer) {
+            return
+        }
         const shouldFocus = !focusedKey || (!!focusedKey && !topLayer.directions.hasOwnProperty(focusedKey))
         if (shouldFocus && topLayer.focusStartKey && topLayer.focusStartElementRef) {
             setFocusLayers((prev) => {
@@ -125,9 +128,9 @@ export function FocusContextProvider(props) {
 
     const isFocusedLayer = (layerName) => {
         if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'isFocusedLayer', layerName, focusLayers })
+            prettyLog({ context: 'focus', action: 'isFocusedLayer', layerName, focusLayersRef })
         }
-        return layerName && focusLayers.at(-1).layerName === layerName
+        return layerName && (focusLayersRef?.current?.at(-1)?.layerName === layerName)
     }
 
     const pushFocusLayer = (layerName, layerIsUncloned) => {
@@ -158,9 +161,11 @@ export function FocusContextProvider(props) {
     const popFocusLayer = () => {
         setFocusLayers((prev) => {
             let result = [...prev]
-            result.pop()
-            setFocusedLayer(result.at(-1).layerName)
-            setFocusedKey(result.at(-1).focusedKey)
+            if (result?.length > 1) {
+                result.pop()
+                setFocusedLayer(result.at(-1).layerName)
+                setFocusedKey(result.at(-1).focusedKey)
+            }
             if (DEBUG) {
                 prettyLog({ context: 'focus', action: 'popFocusLayer', prev, result })
             }
@@ -202,7 +207,7 @@ export function FocusContextProvider(props) {
 
     const clearFocusLayers = () => {
         if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'clearfocusLayers' })
+            prettyLog({ context: 'focus', action: 'clearFocusLayers' })
         }
         setFocusLayers(emptyLayers())
         setFocusedKey(null)
@@ -284,6 +289,9 @@ export function FocusContextProvider(props) {
     const focusOn = (elementRef, focusKey) => {
         const element = elementRef?.current;
         if (!element) {
+            if (DEBUG === 'verbose') {
+                prettyLog({ context: 'focus', action: 'focusOn', message: 'No element to focus', elementRef, focusKey });
+            }
             return
         }
         if (DEBUG === 'verbose') {
