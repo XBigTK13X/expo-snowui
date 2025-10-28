@@ -118,32 +118,27 @@ export function NavigationContextProvider(props) {
         setIsReady(true)
     }, [props.initialRoutePath, props.routePaths, props.routePages])
 
-    const navPush = (routePath, routeParams, isFunc, shouldReplace) => {
-        let foundParams = routeParams
-        let foundPath = routePath
-        let foundFunc = isFunc
-        let foundReplace = shouldReplace
+    const navPush = (payload) => {
+        if (typeof payload !== 'object') {
+            throw new Error('navPush must be called with an object of the form {path,params,func,replace}')
+        }
+        let foundPath = payload.path
+        let foundParams = payload.params
+        let foundFunc = payload.func
+        let foundReplace = payload.replace
+
+        if (foundPath === undefined) {
+            foundPath = navigationHistoryRef.current.at(-1).routePath
+        }
 
         if (foundParams === undefined) {
-            if (typeof foundPath === 'object') {
-                foundParams = { ...foundPath }
-                foundPath = navigationHistoryRef.current.at(-1).routePath
-            }
-        }
-        if (isFunc === undefined) {
-            if (foundParams === true) {
-                foundFunc = true
-                foundParams = {}
-            }
+            foundParams = {}
+        } else {
+            foundParams = { ...foundParams }
         }
 
-        if (!foundParams) {
-            foundParams = {}
-        }
-        else {
-            if (typeof foundParams === 'object') {
-                foundParams = { ...foundParams }
-            }
+        if (foundFunc === undefined) {
+            foundFunc = true
         }
 
         if (foundReplace === undefined) {

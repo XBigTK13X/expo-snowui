@@ -36,7 +36,7 @@ function AppPage() {
           itemsPerRow={1}
           items={components}
           renderItem={(item: any) => {
-            return <Snow.TextButton title={item[0]} onPress={navPush(item[1], true)} />
+            return <Snow.TextButton title={item[0]} onPress={navPush({ path: item[1] })} />
           }} />
         <Snow.Label>App Level entities</Snow.Label>
         <Snow.Text>App, FillView, SafeArea, useSnowContext.</Snow.Text>

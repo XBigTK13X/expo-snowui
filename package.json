@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.5.19",
+  "version": "1.5.20",
   "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
