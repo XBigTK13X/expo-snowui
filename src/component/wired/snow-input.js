@@ -20,12 +20,22 @@ const SnowInputW = (props) => {
     if (props.onDebounce) {
         onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
     }
+
+    const onChangeText = (val) => {
+        if (props.onValueChange) {
+            props.onValueChange(val)
+        }
+        if (onDebounce) {
+            onDebounce(val)
+        }
+    }
+
     const onSubmit = (evt) => {
         if (props.onSubmit) {
             props.onSubmit(evt.nativeEvent.text)
         }
-        if (!props.onSubmit && onDebounce) {
-            onDebounce(evt.nativeEvent.text)
+        if (onDebounce) {
+            onDebounce.cancel()
         }
     }
     return <TextInput
@@ -34,14 +44,7 @@ const SnowInputW = (props) => {
         secureTextEntry={props.secureTextEntry}
         style={textStyle}
         editable={true}
-        onChangeText={(val) => {
-            if (props.onValueChange) {
-                props.onValueChange(val)
-            }
-            if (onDebounce) {
-                onDebounce(val)
-            }
-        }}
+        onChangeText={onChangeText}
         onSubmitEditing={onSubmit}
         onEndEditing={onSubmit}
         value={props.value}

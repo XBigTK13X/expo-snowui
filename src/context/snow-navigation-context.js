@@ -160,7 +160,7 @@ export function NavigationContextProvider(props) {
                     }
                 }
                 if (DEBUG) {
-                    prettyLog({ context: 'navigation', action: 'navPush', routePath, routeParams, foundPath, foundParams, foundFunc, isFunc, prev, result })
+                    prettyLog({ context: 'navigation', action: 'navPush', payload, foundPath, foundParams, foundFunc, prev, result })
                 }
                 return result
             })

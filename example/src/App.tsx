@@ -62,7 +62,6 @@ export default function App() {
   return (
     <Snow.App
       DEBUG_SNOW={false}
-      DEBUG_NAVIGATION='verbose'
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}
