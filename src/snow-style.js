@@ -10,6 +10,10 @@ let scaleMultiplier = 0.75
 
 if (isTV) {
     scaleMultiplier = 0.5
+} else {
+    if (isAndroid) {
+        scaleMultiplier = 0.45
+    }
 }
 
 const scaled = (input) => {
