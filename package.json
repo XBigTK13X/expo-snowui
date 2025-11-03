@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.5.27",
+  "version": "1.5.28",
   "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -153,8 +153,8 @@
     "version": "0.54.3"
   },
   "dependencies": {
-    "expo": "^54.0.13",
-    "expo-image": "^3.0.9",
+    "expo": "54.0.21",
+    "expo-image": "^3.0.10",
     "expo-secure-store": "^15.0.7",
     "lodash": "^4.17.21",
     "react": "19.1.0",
