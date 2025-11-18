@@ -49,8 +49,10 @@ const SnowImageButtonW = (props) => {
     if (props.imageUrl) {
         imageSource = { uri: props.imageUrl }
     }
-    if (props.imageSource) {
-        imageSource = props.imageSource
+    else {
+        if (props.imageSource) {
+            imageSource = props.imageSource
+        }
     }
 
     return (

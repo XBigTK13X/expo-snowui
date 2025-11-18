@@ -13,13 +13,25 @@ const SnowImageGridW = (props) => {
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
     const renderItem = (item, itemIndex) => {
-        let imageUrl = null
+        let sourceProps = {}
         if (props.getItemImageUrl) {
-            imageUrl = props.getItemImageUrl(item)
+            const imageUrl = props.getItemImageUrl(item)
+            if (imageUrl) {
+                sourceProps.imageUrl = imageUrl
+            }
         }
-        let imageSource = null
         if (props.getItemImageSource) {
-            imageSource = props.getItemImageSource(item)
+            if (!sourceProps?.imageUrl) {
+                const imageSource = props.getItemImageSource(item)
+                if (imageSource) {
+                    sourceProps.imageSource = imageSource
+                }
+            }
+        }
+        if (props.getItemImageFallback) {
+            if (!sourceProps?.imageUrl && !sourceProps?.imageSource) {
+                sourceProps.imageSource = props.getItemImageFallback(item)
+            }
         }
         const itemName = props.getItemName(item)
 
@@ -33,12 +45,11 @@ const SnowImageGridW = (props) => {
         }
 
         return <SnowImageButton
+            {...sourceProps}
             snowStyle={props.snowStyle}
             wide={props.wideImage}
             square={props.squareImage}
             dull={isDull}
-            imageUrl={imageUrl}
-            imageSource={imageSource}
             onPress={() => { if (props.onPress) { props.onPress(item) } }}
             onLongPress={() => {
                 if (props.onLongPress) {
