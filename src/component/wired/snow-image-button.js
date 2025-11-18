@@ -7,7 +7,7 @@ import SnowText from '../snow-text'
 
 const SnowImageButtonW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, useFocusWiring, focusPress, focusLongPress, tvRemoteProps } = useFocusContext()
+    const { focusEnabled, isFocused, useFocusWiring, focusPress, focusLongPress, tvRemoteProps } = useFocusContext()
     const elementRef = useFocusWiring(props)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
@@ -55,14 +55,21 @@ const SnowImageButtonW = (props) => {
         }
     }
 
+    let onPress = props.onPress
+    let onLongPress = props.onLongPress
+    if (focusEnabled) {
+        onPress = focusPress(elementRef, props.focusKey)
+        onLongPress = focusLongPress(elementRef, props.focusKey)
+    }
+
     return (
         <>
             <Pressable
                 ref={elementRef}
                 {...tvRemoteProps(props)}
                 style={wrapperStyle}
-                onPress={focusPress(elementRef, props.focusKey)}
-                onLongPress={focusLongPress(elementRef, props.focusKey)}
+                onPress={onPress}
+                onLongPress={onLongPress}
             >
                 <Image
                     style={imageStyle}

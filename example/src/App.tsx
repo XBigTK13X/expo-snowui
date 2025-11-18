@@ -62,6 +62,7 @@ export default function App() {
   return (
     <Snow.App
       DEBUG_SNOW={false}
+      ENABLE_FOCUS={false}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}

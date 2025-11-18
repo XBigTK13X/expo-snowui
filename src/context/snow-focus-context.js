@@ -85,6 +85,7 @@ export function FocusContextProvider(props) {
     if (props.focusVerticalOffset) {
         SCROLL_OFFSET = props.focusVerticalOffset
     }
+    const ENABLED = props.ENABLE_FOCUS !== false
 
     React.useEffect(() => {
         focusedKeyRef.current = focusedKey
@@ -120,6 +121,9 @@ export function FocusContextProvider(props) {
     }, [focusedKey, focusLayers, focusedLayer])
 
     const isFocused = (elementFocusKey) => {
+        if (!ENABLED) {
+            return false
+        }
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'isFocused', elementFocusKey, focusedKey })
         }
@@ -215,6 +219,9 @@ export function FocusContextProvider(props) {
     }
 
     const addFocusMap = (elementRef, elementProps) => {
+        if (!ENABLED) {
+            return false
+        }
         const focusKey = elementProps.focusKey
         const refs = {
             [focusKey]: {
@@ -287,6 +294,9 @@ export function FocusContextProvider(props) {
     }
 
     const focusOn = (elementRef, focusKey) => {
+        if (!ENABLED) {
+            return false
+        }
         const element = elementRef?.current;
         if (!element) {
             if (DEBUG === 'verbose') {
@@ -361,6 +371,9 @@ export function FocusContextProvider(props) {
 
     // returning false cancels the requested movement
     const moveFocus = (direction) => {
+        if (!ENABLED) {
+            return false
+        }
         if (Platform.isTV && Keyboard.isVisible()) {
             if (DEBUG) {
                 prettyLog({ context: 'focus', action: 'moveFocus FAIL Keyboard is visible' })
@@ -529,6 +542,7 @@ export function FocusContextProvider(props) {
 
     const focusContext = {
         DEBUG,
+        focusEnabled: ENABLED,
         focusedKey,
         focusedLayer,
         isFocused,
@@ -547,7 +561,7 @@ export function FocusContextProvider(props) {
         setScrollViewRef
     }
 
-    if (!isReady) {
+    if (!isReady && ENABLED) {
         if (DEBUG) {
             prettyLog({ context: 'focus', action: 'render short circuit', focusedLayer, props })
         }
