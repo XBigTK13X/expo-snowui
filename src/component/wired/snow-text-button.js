@@ -8,7 +8,10 @@ const SnowTextButtonW = (props) => {
     const { focusEnabled, isFocused, focusPress, focusLongPress, useFocusWiring, tvRemoteProps } = useFocusContext()
     const elementRef = useFocusWiring(props)
 
-    const wrapperStyle = [SnowStyle.component.textButton.wrapper]
+    let wrapperStyle = [SnowStyle.component.textButton.wrapper]
+    if (props.short) {
+        wrapperStyle = [SnowStyle.component.textButton.shortWrapper]
+    }
     if (props.disabled) {
         wrapperStyle.push(SnowStyle.component.textButton.disabled)
     }
@@ -42,13 +45,12 @@ const SnowTextButtonW = (props) => {
         title = title.substring(0, 120) + '...'
     }
 
-    if (props.fade) {
-        textStyle.push(SnowStyle.component.textButton.fadeText)
+    if (props.short) {
+        textStyle.push(SnowStyle.component.textButton.shortText)
     }
 
-    if (props.short) {
-        wrapperStyle.push(SnowStyle.component.textButton.shortWrapper)
-        textStyle.push(SnowStyle.component.textButton.smallText)
+    if (props.fade) {
+        textStyle.push(SnowStyle.component.textButton.fadeText)
     }
 
     let onPress = props.onPress
