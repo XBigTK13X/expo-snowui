@@ -10,7 +10,7 @@ const imageItems = [
   },
   {
     imageUrl: wideImageUrl,
-    title: 'Rainbow'
+    title: 'This rainbow is very long. Like the title has way too much text. So much. Can it all fit? Will it overflow? Will it show some ellipsis?'
   },
   {
     imageSource: { uri: tallImageUrl },

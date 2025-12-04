@@ -12,12 +12,12 @@ const SnowImageButtonW = (props) => {
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
-    if (title && title.length > 20) {
+    if (title && title.length > 60) {
         fontStyle.push(SnowStyle.component.imageButton.smallText)
     }
 
-    if (title && title.length > 40) {
-        title = title.substring(0, 40) + '...'
+    if (title && title.length > 120) {
+        title = title.substring(0, 120) + '...'
     }
 
     const wrapperStyle = [SnowStyle.component.imageButton.wrapper]

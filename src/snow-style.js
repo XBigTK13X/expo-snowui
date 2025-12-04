@@ -64,15 +64,15 @@ export function createStyle(overrides) {
         imageButton: {
             wrapper: {
                 normal: {
-                    height: scaled(isTV ? 450 : 400),
+                    height: scaled(isTV ? 500 : 450),
                     width: scaled(310)
                 },
                 wide: {
-                    height: scaled(isTV ? 300 : 250),
+                    height: scaled(isTV ? 350 : 300),
                     width: scaled(310)
                 },
                 square: {
-                    height: scaled(isTV ? 380 : 340),
+                    height: scaled(isTV ? 430 : 390),
                     width: scaled(isTV ? 380 : 340)
                 }
             },
@@ -101,7 +101,7 @@ export function createStyle(overrides) {
         textButton: {
             wrapper: {
                 normal: {
-                    height: 35
+                    height: 60
                 }
             },
             fontSize: {
@@ -210,23 +210,25 @@ export function createStyle(overrides) {
                 width: AppStyle.imageButton.image.square.width,
             },
             text: {
-                height: 25,
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.imageButton.fontSize.normal,
+                lineHeight: AppStyle.imageButton.fontSize.normal,
                 fontWeight: 'bold',
                 padding: 0,
                 margin: 0,
-                textAlign: 'center'
+                textAlign: 'center',
+                padding: 5
             },
             smallText: {
-                fontSize: AppStyle.imageButton.fontSize.small
+                fontSize: AppStyle.imageButton.fontSize.small,
+                lineHeight: AppStyle.imageButton.fontSize.small
             },
             textWrapper: {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 marginTop: 5,
                 width: '100%',
-                height: 41,
+                height: 80,
                 backgroundColor: AppStyle.color.core,
                 borderColor: AppStyle.color.core,
                 borderRadius: AppStyle.button.borderRadius,
@@ -413,10 +415,8 @@ export function createStyle(overrides) {
             text: {
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.normal,
-                padding: 0,
-                margin: 0,
-                textAlign: 'center',
-                height: AppStyle.textButton.textBox.height
+                padding: 5,
+                textAlign: 'center'
             },
             smallText: {
                 fontSize: AppStyle.textButton.fontSize.small

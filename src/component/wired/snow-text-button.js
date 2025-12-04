@@ -34,7 +34,7 @@ const SnowTextButtonW = (props) => {
     }
 
     let textStyle = [SnowStyle.component.textButton.text]
-    if (props.title.length > 18) {
+    if (props.title.length > 40) {
         textStyle.push(SnowStyle.component.textButton.smallText)
     }
 
