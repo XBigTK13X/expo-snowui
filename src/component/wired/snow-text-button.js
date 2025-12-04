@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 import SnowText from '../snow-text'
@@ -34,8 +34,12 @@ const SnowTextButtonW = (props) => {
     }
 
     let textStyle = [SnowStyle.component.textButton.text]
-    if (props.title.length > 40) {
+    let title = props.title
+    if (props.title.length > 60) {
         textStyle.push(SnowStyle.component.textButton.smallText)
+    }
+    if (props.title.length > 120) {
+        title = title.substring(0, 120) + '...'
     }
 
     if (props.fade) {
@@ -64,7 +68,9 @@ const SnowTextButtonW = (props) => {
             disabled={props.disabled}
 
         >
-            <SnowText noSelect style={textStyle}>{props.title}</SnowText>
+            <View style={SnowStyle.component.textButton.textContainer}>
+                <SnowText noSelect style={textStyle}>{title}</SnowText>
+            </View>
         </Pressable >
     )
 }

@@ -101,15 +101,13 @@ export function createStyle(overrides) {
         textButton: {
             wrapper: {
                 normal: {
-                    height: 60
+                    height: scaled(150),
+                    width: scaled(300)
                 }
             },
             fontSize: {
-                normal: 16,
-                small: 12
-            },
-            textBox: {
-                height: isAndroid ? 25 : 15
+                normal: scaled(25),
+                small: scaled(20)
             }
         },
         rangeSlider: {
@@ -377,28 +375,7 @@ export function createStyle(overrides) {
             }
         },
         textButton: {
-            wrapper: {
-                padding: 5,
-                margin: 10,
-                height: AppStyle.textButton.wrapper.normal.height,
-                justifyContent: 'center', // Horizontally center each line
-                alignItems: 'center', // Vertically center each line
-                alignContent: 'center', // Multiline vertical center of parent
-                textAlign: 'center', // Ensure text objects are horizontally centered
-                backgroundColor: AppStyle.color.core,
-                borderWidth: AppStyle.button.borderRadius,
-                borderColor: AppStyle.color.core,
-                borderRadius: AppStyle.button.borderRadius,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
-            },
-            tallWrapper: {
-                height: 80,
-                padding: 0
-            },
-            shortWrapper: {
-                height: 10,
-                margin: 1
+            fadeText: {
             },
             selected: {
                 borderColor: AppStyle.color.active
@@ -412,18 +389,35 @@ export function createStyle(overrides) {
             fade: {
                 backgroundColor: AppStyle.color.fade
             },
+            wrapper: {
+                margin: 5,
+                width: AppStyle.textButton.wrapper.normal.width,
+                height: AppStyle.textButton.wrapper.normal.height,
+                backgroundColor: AppStyle.color.core,
+                borderWidth: AppStyle.button.borderRadius,
+                borderColor: AppStyle.color.core,
+                borderRadius: AppStyle.button.borderRadius,
+                outlineStyle: 'none',
+                outline: 'none',
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+            textContainer: {
+                height: AppStyle.textButton.wrapper.normal.height,
+            },
             text: {
+                paddingTop: 20,
+                textAlign: 'center',
+                height: AppStyle.textButton.wrapper.normal.height,
+                width: AppStyle.textButton.wrapper.normal.width,
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.normal,
-                textAlign: 'center',
-                padding: 2,
-                height: AppStyle.textButton.wrapper.normal.height
+                lineHeight: AppStyle.textButton.fontSize.normal,
             },
             smallText: {
-                fontSize: AppStyle.textButton.fontSize.small
-            },
-            fadeText: {
-
+                paddingTop: -5,
+                fontSize: AppStyle.textButton.fontSize.small,
+                lineHeight: AppStyle.textButton.fontSize.small
             }
         },
         text: {
