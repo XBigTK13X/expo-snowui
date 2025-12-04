@@ -158,6 +158,7 @@ const SnowGridW = (props) => {
                         focusUp={nextPageKey}
                         focusDown={nextPageKey}
                         title="<<<"
+                        short
                         onPress={firstPage}
                     />
 
@@ -168,6 +169,7 @@ const SnowGridW = (props) => {
                         focusUp={nextPageKey}
                         focusDown={nextPageKey}
                         title="<<"
+                        short
                         onPress={previousHalf}
                     />
 
@@ -178,6 +180,7 @@ const SnowGridW = (props) => {
                         focusUp={nextPageKey}
                         focusDown={nextPageKey}
                         title="<"
+                        short
                         onPress={previousPage}
                     />
 
@@ -189,6 +192,7 @@ const SnowGridW = (props) => {
                         focusLeft={`previous-page-${loc}`}
                         focusRight={`next-half-${loc}`}
                         title=">"
+                        short
                         onPress={nextPage}
                     />
 
@@ -199,6 +203,7 @@ const SnowGridW = (props) => {
                         focusUp={nextPageKey}
                         focusDown={nextPageKey}
                         title=">>"
+                        short
                         onPress={nextHalf}
                     />
 
@@ -209,6 +214,7 @@ const SnowGridW = (props) => {
                         focusUp={nextPageKey}
                         focusDown={nextPageKey}
                         title=">>>"
+                        short
                         onPress={lastPage}
                     />
                 </View>

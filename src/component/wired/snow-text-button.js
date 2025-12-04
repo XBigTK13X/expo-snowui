@@ -60,6 +60,11 @@ const SnowTextButtonW = (props) => {
         onLongPress = focusLongPress(elementRef, props.focusKey)
     }
 
+    let containerStyle = [SnowStyle.component.textButton.textContainer]
+    if (props.short) {
+        containerStyle = [SnowStyle.component.textButton.shortContainer]
+    }
+
     return (
         <Pressable
             ref={elementRef}
@@ -70,7 +75,7 @@ const SnowTextButtonW = (props) => {
             disabled={props.disabled}
 
         >
-            <View style={SnowStyle.component.textButton.textContainer}>
+            <View style={containerStyle}>
                 <SnowText noSelect style={textStyle}>{title}</SnowText>
             </View>
         </Pressable >

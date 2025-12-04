@@ -404,7 +404,7 @@ export function createStyle(overrides) {
             },
             shortWrapper: {
                 margin: 5,
-                width: AppStyle.textButton.wrapper.normal.width * .75,
+                width: AppStyle.textButton.wrapper.normal.width * .5,
                 height: AppStyle.textButton.wrapper.normal.height * .5,
                 backgroundColor: AppStyle.color.core,
                 borderWidth: AppStyle.button.borderRadius,
@@ -418,6 +418,9 @@ export function createStyle(overrides) {
             textContainer: {
                 height: AppStyle.textButton.wrapper.normal.height,
             },
+            shortContainer: {
+                height: AppStyle.textButton.wrapper.normal.height * .5,
+            },
             text: {
                 paddingTop: 20,
                 textAlign: 'center',
@@ -428,10 +431,10 @@ export function createStyle(overrides) {
                 lineHeight: AppStyle.textButton.fontSize.normal,
             },
             shortText: {
-                paddingTop: 40,
+                paddingTop: -10,
                 textAlign: 'center',
                 height: AppStyle.textButton.wrapper.normal.height * .5,
-                width: AppStyle.textButton.wrapper.normal.width * .75,
+                width: AppStyle.textButton.wrapper.normal.width * .5,
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.small,
                 lineHeight: AppStyle.textButton.fontSize.small,

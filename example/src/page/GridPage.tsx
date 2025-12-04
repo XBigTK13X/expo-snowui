@@ -24,6 +24,7 @@ export default function GridPage() {
       <Snow.TextButton title="This should never get focus" />
       <Snow.Grid
         itemsPerPage={15}
+        itemsPerRow={4}
         focusKey="paged-grid-test"
         focusUp='child-key-test'
         focusDown='null-select-test'
