@@ -378,8 +378,8 @@ export function createStyle(overrides) {
         },
         textButton: {
             wrapper: {
+                padding: 5,
                 margin: 10,
-                padding: 10,
                 height: AppStyle.textButton.wrapper.normal.height,
                 justifyContent: 'center', // Horizontally center each line
                 alignItems: 'center', // Vertically center each line
@@ -415,8 +415,9 @@ export function createStyle(overrides) {
             text: {
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.normal,
-                padding: 5,
-                textAlign: 'center'
+                textAlign: 'center',
+                padding: 2,
+                height: AppStyle.textButton.wrapper.normal.height
             },
             smallText: {
                 fontSize: AppStyle.textButton.fontSize.small
