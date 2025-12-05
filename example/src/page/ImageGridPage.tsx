@@ -26,7 +26,7 @@ export default function ImageGridPage() {
       <Snow.ImageGrid
         focusKey="tab-entry"
         focusDown="wide-image"
-        items={imageItems}
+        items={[...imageItems, ...imageItems, ...imageItems, ...imageItems, ...imageItems]}
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}

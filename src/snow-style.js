@@ -12,7 +12,7 @@ if (isTV) {
     scaleMultiplier = 0.5
 } else {
     if (isAndroid) {
-        scaleMultiplier = 0.45
+        scaleMultiplier = 0.5
     }
 }
 
@@ -64,16 +64,16 @@ export function createStyle(overrides) {
         imageButton: {
             wrapper: {
                 normal: {
-                    height: scaled(isTV ? 520 : 450),
+                    height: scaled(520),
                     width: scaled(310)
                 },
                 wide: {
-                    height: scaled(isTV ? 370 : 300),
+                    height: scaled(370),
                     width: scaled(450)
                 },
                 square: {
-                    height: scaled(isTV ? 430 : 390),
-                    width: scaled(isTV ? 380 : 340)
+                    height: scaled(430),
+                    width: scaled(380)
                 }
             },
             image: {
@@ -151,7 +151,7 @@ export function createStyle(overrides) {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                width: '100%',
+                width: '100%'
             },
             pager: {
                 flexDirection: 'row',

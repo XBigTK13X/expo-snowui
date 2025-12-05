@@ -66,7 +66,7 @@ export default function App() {
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}
-      initialRoutePath={routes.grid}
+      initialRoutePath={routes.break}
     >
       <AppPage />
     </Snow.App>
