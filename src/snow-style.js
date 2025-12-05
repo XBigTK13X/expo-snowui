@@ -64,12 +64,12 @@ export function createStyle(overrides) {
         imageButton: {
             wrapper: {
                 normal: {
-                    height: scaled(isTV ? 500 : 450),
+                    height: scaled(isTV ? 520 : 450),
                     width: scaled(310)
                 },
                 wide: {
-                    height: scaled(isTV ? 350 : 300),
-                    width: scaled(310)
+                    height: scaled(isTV ? 370 : 300),
+                    width: scaled(450)
                 },
                 square: {
                     height: scaled(isTV ? 430 : 390),
@@ -136,24 +136,28 @@ export function createStyle(overrides) {
         },
         fillView: {
             default: {
-                flex: 1
+                flex: 1,
+                width: '100%'
             },
             flexStart: {
                 justifyContent: 'flex-start'
             }
         },
         grid: {
-            list: {
-                justifyContent: 'space-evenly'
+            grid: {
+
             },
-            short: {
-                padding: 0
+            row: {
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
             },
             pager: {
                 flexDirection: 'row',
                 justifyContent: 'center',
-                alignItems: 'center'
-            }
+                alignItems: 'center',
+            },
         },
         header: {
             fontSize: AppStyle.fontSize.header,

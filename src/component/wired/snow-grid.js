@@ -8,6 +8,7 @@ import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowText from '../snow-text'
 import SnowTextButton from './snow-text-button'
+import SnowView from './snow-view'
 
 // The grid may contain items that aren't wired for focus
 // This tracks only wired items, so that focus hints between them
@@ -54,10 +55,7 @@ const SnowGridW = (props) => {
 
     const maxPage = Math.ceil(items.length / itemsPerPage)
 
-    let itemStyle = [
-        { flexBasis: `${100 / itemsPerRow}%` }
-    ]
-    let gridStyle = []
+    let gridStyle = [SnowStyle.component.grid.grid]
     if (props.gridStyle) {
         gridStyle.push(props.gridStyle)
     }
@@ -65,17 +63,13 @@ const SnowGridW = (props) => {
     if (props.short) {
         gridStyle.push(SnowStyle.component.grid.short)
     }
+    let rowStyle = SnowStyle.component.grid.row
 
-    let renderItem = (item, itemIndex) => {
+    let renderItem = (item) => {
         return item
     }
     if (props.renderItem) {
         renderItem = props.renderItem
-    }
-    let columnStyle = null
-    if (itemsPerRow > 1) {
-        // If you try to style the column when 1 item per row, flat list throws an error
-        columnStyle = SnowStyle.component.grid.list
     }
 
     const hasPageControls = items.length > itemsPerPage
@@ -224,140 +218,158 @@ const SnowGridW = (props) => {
 
     wiredGridRef.current = emptyWiredGrid()
 
-    return (
-        < View style={gridStyle} >
-            {pageControls('top')}
-            <FlatList
-                key={props.focusKey + '-flat'}
-                scrollEnabled={props.scroll === true}
-                disableVirtualization={true}
-                initialNumToRender={itemsPerPage}
-                numColumns={itemsPerRow}
-                contentContainerStyle={SnowStyle.component.grid.list}
-                columnWrapperStyle={columnStyle}
-                data={items}
-                renderItem={({ item, index, separators }) => {
-                    let child = renderItem(item, index)
+    const renderKey = `${props.focusKey ?? ''}-grid-${itemsPerRow}-cols`
 
-                    if (child.type.isSnowFocusWired && props.assignFocus !== false) {
-                        let wired = wiredGridRef.current
-                        let row = wired.row
-                        let column = wired.column
-                        let focus = {}
-                        if (child.props.focusKey) {
-                            focus.focusKey = child.props.focusKey
-                        }
-                        else {
-                            if (wired.index === 0 && !hasPageControls) {
-                                focus.focusKey = props.focusKey
-                            }
-                            else {
-                                focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
-                                if (focus.focusKey === lastCellFullKey) {
-                                    focus.focusKey = lastCellKey
-                                }
-                            }
-                        }
-                        // Only allow auto focusing before the pager is used
-                        if (!pagerPressed) {
-                            if (child.props.focusStart) {
-                                focus.focusStart = child.props.focusStart
-                            } else {
-                                if (wired.index === 0 && props.focusStart) {
-                                    focus.focusStart = true
-                                }
-                            }
-                        }
+    const renderCell = (item, itemIndex) => {
+        let child = renderItem(item, itemIndex)
 
-                        if (row === 0) {
-                            if (hasPageControls) {
-                                focus.focusUp = props.focusKey
-                            }
-                            else {
-                                if (props.focusUp) {
-                                    focus.focusUp = props.focusUp
-                                }
-                            }
-                        } else {
-                            if (row - 1 === 0 && column === 0 && !hasPageControls) {
-                                focus.focusUp = props.focusKey
-                            } else {
-                                focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
-                            }
-                        }
-
-                        if (row === maxRow - 1) {
-                            if (hasPageControls) {
-                                focus.focusDown = 'next-page-bottom'
-                            } else {
-                                if (props.focusDown) {
-                                    focus.focusDown = props.focusDown
-                                }
-                            }
-
-                        } else {
-                            if (row === maxRow - 2 && column >= lastElementColumn - 1) {
-                                focus.focusDown = lastCellKey
-                            } else {
-                                focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
-                            }
-                        }
-
-                        if (column === 0) {
-                            if (props.focusLeft) {
-                                focus.focusLeft = props.focusLeft
-                            }
-                        } else {
-                            if (column - 1 === 0 && row === 0) {
-                                focus.focusLeft = props.focusKey
-                            } else {
-                                focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
-                            }
-                        }
-
-                        if (column === maxColumn - 1) {
-                            if (props.focusRight) {
-                                focus.focusRight = props.focusRight
-                            }
-                        } else {
-                            focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
-                            if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
-                                focus.focusRight = lastCellKey
-                            }
-                        }
-                        let debugFocus = {}
-                        if (DEBUG_FOCUS) {
-                            debugFocus = {
-                                maxRow,
-                                maxColumn,
-                                lastElementColumn,
-                                row,
-                                column,
-                                lastCellKey,
-                                lastCellFullKey
-                            }
-                        }
-                        row = Math.floor((index + 1) / itemsPerRow)
-                        if (row > wired.lastGridRow) {
-                            wired.row += 1
-                            wired.column = 0
-                            wired.lastGridRow = row
-                        }
-                        else {
-                            wired.column += 1
-                        }
-                        wired.index += 1
-                        wiredGridRef.current = wired
-                        child = React.cloneElement(child, { ...focus, ...debugFocus })
+        if (child.type.isSnowFocusWired && props.assignFocus !== false) {
+            let wired = wiredGridRef.current
+            let row = wired.row
+            let column = wired.column
+            let focus = {}
+            if (child.props.focusKey) {
+                focus.focusKey = child.props.focusKey
+            }
+            else {
+                if (wired.index === 0 && !hasPageControls) {
+                    focus.focusKey = props.focusKey
+                }
+                else {
+                    focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
+                    if (focus.focusKey === lastCellFullKey) {
+                        focus.focusKey = lastCellKey
                     }
+                }
+            }
+            // Only allow auto focusing before the pager is used
+            if (!pagerPressed) {
+                if (child.props.focusStart) {
+                    focus.focusStart = child.props.focusStart
+                } else {
+                    if (wired.index === 0 && props.focusStart) {
+                        focus.focusStart = true
+                    }
+                }
+            }
 
-                    return (
-                        <View style={itemStyle}>
-                            {child}
-                        </View>
-                    )
-                }}
-            />
+            if (row === 0) {
+                if (hasPageControls) {
+                    focus.focusUp = props.focusKey
+                }
+                else {
+                    if (props.focusUp) {
+                        focus.focusUp = props.focusUp
+                    }
+                }
+            } else {
+                if (row - 1 === 0 && column === 0 && !hasPageControls) {
+                    focus.focusUp = props.focusKey
+                } else {
+                    focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
+                }
+            }
+
+            if (row === maxRow - 1) {
+                if (hasPageControls) {
+                    focus.focusDown = 'next-page-bottom'
+                } else {
+                    if (props.focusDown) {
+                        focus.focusDown = props.focusDown
+                    }
+                }
+
+            } else {
+                if (row === maxRow - 2 && column >= lastElementColumn - 1) {
+                    focus.focusDown = lastCellKey
+                } else {
+                    focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
+                }
+            }
+
+            if (column === 0) {
+                if (props.focusLeft) {
+                    focus.focusLeft = props.focusLeft
+                }
+            } else {
+                if (column - 1 === 0 && row === 0) {
+                    focus.focusLeft = props.focusKey
+                } else {
+                    focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
+                }
+            }
+
+            if (column === maxColumn - 1) {
+                if (props.focusRight) {
+                    focus.focusRight = props.focusRight
+                }
+            } else {
+                focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
+                if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
+                    focus.focusRight = lastCellKey
+                }
+            }
+            let debugFocus = {}
+            if (DEBUG_FOCUS) {
+                debugFocus = {
+                    maxRow,
+                    maxColumn,
+                    lastElementColumn,
+                    row,
+                    column,
+                    lastCellKey,
+                    lastCellFullKey
+                }
+            }
+            row = Math.floor((itemIndex + 1) / itemsPerRow)
+            if (row > wired.lastGridRow) {
+                wired.row += 1
+                wired.column = 0
+                wired.lastGridRow = row
+            }
+            else {
+                wired.column += 1
+            }
+            wired.index += 1
+            wiredGridRef.current = wired
+            child = React.cloneElement(child, { ...focus, ...debugFocus })
+        }
+
+        return (
+            <View key={`cell-${itemIndex}`}>
+                {child}
+            </View>
+        )
+    }
+
+    let rows = null
+    let row = null
+    if (items.length) {
+        rows = []
+        row = []
+        for (let ii = 0; ii < items.length; ii++) {
+            row.push(renderCell(items[ii], ii))
+            if (row.length >= itemsPerRow) {
+                rows.push(row)
+                row = []
+            }
+        }
+        if (row?.length) {
+            rows.push(row)
+        }
+    }
+
+
+    return (
+        <View style={gridStyle} key={renderKey}>
+            {pageControls('top')}
+            {rows.map((row, rowIndex) => {
+                return (
+                    <View key={`row-${renderKey}-${rowIndex}`} style={rowStyle}>
+                        {row.map(cell => { return cell })}
+                    </View>
+                )
+            })}
             {pageControls('bottom')}
         </View >
     )

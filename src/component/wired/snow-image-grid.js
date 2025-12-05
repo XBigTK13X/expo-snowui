@@ -1,9 +1,9 @@
 import React from 'react'
-import { View } from 'react-native'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
+import SnowView from './snow-view'
 
 const SnowImageGridW = (props) => {
     if (!props.items || !props.items.length) {
@@ -72,7 +72,9 @@ const SnowImageGridW = (props) => {
             title={itemName}
         />
     }
-    let gridProps = {}
+    let gridProps = {
+        itemsPerRow,
+    }
     if (props.itemsPerRow) {
         gridProps.itemsPerRow = props.itemsPerRow
     }
@@ -91,7 +93,6 @@ const SnowImageGridW = (props) => {
                 {...gridProps}
                 items={props.items}
                 renderItem={renderItem}
-                itemsPerRow={itemsPerRow}
             />
         </>
     )
