@@ -1,7 +1,6 @@
 import React from 'react'
 import {
-    View,
-    FlatList
+    View
 } from 'react-native'
 
 import { useStyleContext } from '../../context/snow-style-context'
