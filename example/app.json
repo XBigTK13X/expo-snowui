@@ -38,6 +38,9 @@
           },
           "ios": {}
         }
+      ],
+      [
+        "expo-navigation-bar"
       ]
     ]
   }
