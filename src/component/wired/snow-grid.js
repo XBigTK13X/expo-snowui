@@ -217,9 +217,9 @@ const SnowGridW = (props) => {
 
     wiredGridRef.current = emptyWiredGrid()
 
-    const renderKey = `${props.focusKey ?? ''}-grid-${itemsPerRow}-cols`
+    const renderKey = `${props.focusKey ?? ''}-grid-${itemsPerRow}-cols-page-${page}`
 
-    const renderCell = (item, itemIndex) => {
+    const renderCell = (item, itemIndex, renderRowIndex) => {
         let child = renderItem(item, itemIndex)
 
         if (child.type.isSnowFocusWired && props.assignFocus !== false) {
@@ -335,7 +335,7 @@ const SnowGridW = (props) => {
         }
 
         return (
-            <View key={`cell-${itemIndex}`}>
+            <View key={`cell-${itemIndex}-${renderRowIndex}`}>
                 {child}
             </View>
         )
@@ -347,7 +347,7 @@ const SnowGridW = (props) => {
         rows = []
         row = []
         for (let ii = 0; ii < items.length; ii++) {
-            row.push(renderCell(items[ii], ii))
+            row.push(renderCell(items[ii], ii, rows.length))
             if (row.length >= itemsPerRow) {
                 rows.push(row)
                 row = []

@@ -1,6 +1,8 @@
+import React from 'react'
 import Snow from 'expo-snowui'
 
 export default function GridPage() {
+  const [clickedNumber, setClickedNumber] = React.useState(0)
   return (
     <>
       <Snow.Label>Component: Grid</Snow.Label>
@@ -22,6 +24,7 @@ export default function GridPage() {
         <Snow.TextButton focusKey='child-key-test' focusDown='paged-grid-test' title={"Button with key"} />
       </Snow.Grid>
       <Snow.TextButton title="This should never get focus" />
+      <Snow.Text>Clicked {clickedNumber}</Snow.Text>
       <Snow.Grid
         itemsPerPage={15}
         itemsPerRow={4}
@@ -30,7 +33,7 @@ export default function GridPage() {
         focusDown='null-select-test'
         items={[...Array(100).keys()].slice(1)}
         renderItem={(item: any) => {
-          return <Snow.TextButton title={item} />
+          return <Snow.TextButton title={item} onPress={() => { setClickedNumber(item) }} />
         }}
       />
       <Snow.Grid focusKey="null-select-test">
