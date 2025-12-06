@@ -20,6 +20,7 @@ export default function InputPage() {
       <Snow.Label>Component: Input</Snow.Label>
       <Snow.Input
         focusKey="tab-entry"
+        focusDown="grid-input"
         value={inputValue}
         onValueChange={updateQuery}
         onSubmit={executeQuery}
@@ -27,6 +28,26 @@ export default function InputPage() {
       />
       <Snow.Text>Query: {query}</Snow.Text>
       <Snow.Text>Result {results}</Snow.Text>
+      <Snow.Grid focusKey="grid-input" itemsPerRow={3}>
+        <Snow.Input
+          value={inputValue}
+          onValueChange={updateQuery}
+          onSubmit={executeQuery}
+          onDebounce={executeQuery}
+        />
+        <Snow.Input
+          value={inputValue}
+          onValueChange={updateQuery}
+          onSubmit={executeQuery}
+          onDebounce={executeQuery}
+        />
+        <Snow.Input
+          value={inputValue}
+          onValueChange={updateQuery}
+          onSubmit={executeQuery}
+          onDebounce={executeQuery}
+        />
+      </Snow.Grid>
     </>
   )
 }

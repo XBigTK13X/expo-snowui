@@ -241,6 +241,7 @@ export function createStyle(overrides) {
         },
         input: {
             text: {
+                width: scaled(350),
                 borderWidth: 2,
                 borderColor: AppStyle.color.coreDark,
                 backgroundColor: AppStyle.color.core,
