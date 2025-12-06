@@ -5,6 +5,7 @@ import {
 
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowPager from './snow-pager'
 
 // The grid may contain items that aren't wired for focus
@@ -34,17 +35,10 @@ const SnowGridW = (props) => {
     }
 
     const { SnowStyle } = useStyleContext(props)
-    const { DEBUG_FOCUS } = useFocusContext()
+    const { currentRoute } = useNavigationContext(props)
+    const { DEBUG_FOCUS } = useFocusContext(props)
 
-    const [page, setPage] = React.useState(0)
-    const [pagerPressed, setPagerPressed] = React.useState(false)
     const wiredGridRef = React.useRef(emptyWiredGrid())
-
-    React.useEffect(() => {
-        if (!pagerPressed && page !== 0) {
-            setPagerPressed(true)
-        }
-    }, [page])
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -75,6 +69,10 @@ const SnowGridW = (props) => {
         renderItem = props.renderItem
     }
 
+    let page = 0
+    if (currentRoute?.routeParams?.gridPage !== undefined) {
+        page = parseInt(currentRoute?.routeParams?.gridPage, 10)
+    }
     const hasPageControls = items.length > itemsPerPage
     if (hasPageControls) {
         items = items.slice(page * itemsPerPage, page * itemsPerPage + itemsPerPage)
@@ -96,8 +94,6 @@ const SnowGridW = (props) => {
             <SnowPager
                 maxPage={maxPage}
                 page={page}
-                onPagerPressed={setPagerPressed}
-                onPageChange={setPage}
                 focusDown={gridFocusKey}
                 focusKey={props.focusKey}
             />
@@ -131,7 +127,7 @@ const SnowGridW = (props) => {
                 }
             }
             // Only allow auto focusing before the pager is used
-            if (!pagerPressed) {
+            if (currentRoute.routeParams.page === undefined) {
                 if (child.props.focusStart) {
                     focus.focusStart = child.props.focusStart
                 } else {
