@@ -23,6 +23,7 @@ const SnowPagerW = (props) => {
         }
         navPush({
             params: params,
+            replace: true,
             func: false
         })
     }
