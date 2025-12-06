@@ -5,9 +5,7 @@ import {
 
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
-import SnowText from '../snow-text'
-import SnowTextButton from './snow-text-button'
-import SnowView from './snow-view'
+import SnowPager from './snow-pager'
 
 // The grid may contain items that aren't wired for focus
 // This tracks only wired items, so that focus hints between them
@@ -41,6 +39,12 @@ const SnowGridW = (props) => {
     const [page, setPage] = React.useState(0)
     const [pagerPressed, setPagerPressed] = React.useState(false)
     const wiredGridRef = React.useRef(emptyWiredGrid())
+
+    React.useEffect(() => {
+        if (!pagerPressed && page !== 0) {
+            setPagerPressed(true)
+        }
+    }, [page])
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -81,138 +85,23 @@ const SnowGridW = (props) => {
     if (lastElementColumn === 0) {
         lastElementColumn = itemsPerRow
     }
-    let pageControls = () => { return null }
-    let firstCellKey = `${props.focusKey}-row-0-column-0`
+
+    let gridFocusKey = `${props.focusKey}-row-0-column-0`
     let lastCellKey = `${props.focusKey}-grid-end`
     let lastCellFullKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
+
+    let pageControls = null
     if (hasPageControls) {
-        const firstPage = () => {
-            setPagerPressed(true)
-            setPage(0)
-
-        }
-        const lastPage = () => {
-            setPagerPressed(true)
-            setPage(maxPage - 1)
-        }
-        const previousPage = () => {
-            setPagerPressed(true)
-            setPage((prev) => {
-                if (prev > 0) {
-                    return prev - 1
-                }
-                return maxPage - 1
-            })
-        }
-        const nextPage = () => {
-            setPagerPressed(true)
-            setPage((prev) => {
-                if (prev < maxPage - 1) {
-                    return prev + 1
-                }
-                return 0
-            })
-        }
-        const previousHalf = () => {
-            setPagerPressed(true)
-            setPage((prev) => {
-                return Math.floor(prev / 2)
-            })
-        }
-        const nextHalf = () => {
-            setPagerPressed(true)
-            setPage((prev) => {
-                return Math.floor((prev + maxPage) / 2)
-            })
-        }
-        pageControls = (loc) => {
-            let nextPageKey = props.focusKey
-            let nextPageFocus = {}
-            nextPageFocus.focusDown = firstCellKey
-            if (loc === 'bottom') {
-                nextPageKey = 'next-page-bottom'
-                if (props.focusDown) {
-                    nextPageFocus.focusDown = props.focusDown
-                } else {
-                    nextPageFocus.focusDown = 'previous-page-bottom'
-                }
-                nextPageFocus.focusUp = lastCellKey
-            } else {
-                if (props.focusUp) {
-                    nextPageFocus.focusUp = props.focusUp
-                }
-            }
-            return (
-                <View style={SnowStyle.component.grid.pager}>
-                    <SnowTextButton
-                        focusKey={`first-page-${loc}`}
-                        focusLeft={`last-page-${loc}`}
-                        focusRight={`previous-half-${loc}`}
-                        focusUp={nextPageKey}
-                        focusDown={nextPageKey}
-                        title="<<<"
-                        short
-                        onPress={firstPage}
-                    />
-
-                    <SnowTextButton
-                        focusKey={`previous-half-${loc}`}
-                        focusLeft={`first-page-${loc}`}
-                        focusRight={`previous-page-${loc}`}
-                        focusUp={nextPageKey}
-                        focusDown={nextPageKey}
-                        title="<<"
-                        short
-                        onPress={previousHalf}
-                    />
-
-                    <SnowTextButton
-                        focusKey={`previous-page-${loc}`}
-                        focusLeft={`previous-half-${loc}`}
-                        focusRight={nextPageKey}
-                        focusUp={nextPageKey}
-                        focusDown={nextPageKey}
-                        title="<"
-                        short
-                        onPress={previousPage}
-                    />
-
-                    <SnowText noSelect>{page + 1} / {maxPage}</SnowText>
-
-                    <SnowTextButton
-                        {...nextPageFocus}
-                        focusKey={nextPageKey}
-                        focusLeft={`previous-page-${loc}`}
-                        focusRight={`next-half-${loc}`}
-                        title=">"
-                        short
-                        onPress={nextPage}
-                    />
-
-                    <SnowTextButton
-                        focusKey={`next-half-${loc}`}
-                        focusLeft={nextPageKey}
-                        focusRight={`last-page-${loc}`}
-                        focusUp={nextPageKey}
-                        focusDown={nextPageKey}
-                        title=">>"
-                        short
-                        onPress={nextHalf}
-                    />
-
-                    <SnowTextButton
-                        focusKey={`last-page-${loc}`}
-                        focusLeft={`next-half-${loc}`}
-                        focusRight={`first-page-${loc}`}
-                        focusUp={nextPageKey}
-                        focusDown={nextPageKey}
-                        title=">>>"
-                        short
-                        onPress={lastPage}
-                    />
-                </View>
-            )
-        }
+        pageControls = (
+            <SnowPager
+                maxPage={maxPage}
+                page={page}
+                onPagerPressed={setPagerPressed}
+                onPageChange={setPage}
+                focusDown={gridFocusKey}
+                focusKey={props.focusKey}
+            />
+        )
     }
 
     wiredGridRef.current = emptyWiredGrid()
@@ -270,12 +159,8 @@ const SnowGridW = (props) => {
             }
 
             if (row === maxRow - 1) {
-                if (hasPageControls) {
-                    focus.focusDown = 'next-page-bottom'
-                } else {
-                    if (props.focusDown) {
-                        focus.focusDown = props.focusDown
-                    }
+                if (props.focusDown) {
+                    focus.focusDown = props.focusDown
                 }
 
             } else {
@@ -361,7 +246,7 @@ const SnowGridW = (props) => {
 
     return (
         <View style={gridStyle} key={renderKey}>
-            {pageControls('top')}
+            {pageControls}
             {rows.map((row, rowIndex) => {
                 return (
                     <View key={`row-${renderKey}-${rowIndex}`} style={rowStyle}>
@@ -369,7 +254,6 @@ const SnowGridW = (props) => {
                     </View>
                 )
             })}
-            {pageControls('bottom')}
         </View >
     )
 }
