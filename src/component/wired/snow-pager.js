@@ -10,11 +10,19 @@ const SnowPagerW = (props) => {
     const { navPush, currentRoute } = useNavigationContext(props)
 
     const gotoPage = (page, trigger) => {
-        navPush({
-            params: {
+        let params = {
+            gridPage: page,
+            pageTrigger: trigger
+        }
+        if (currentRoute?.routeParams) {
+            params = {
+                ...currentRoute.routeParams,
                 gridPage: page,
                 pageTrigger: trigger
-            },
+            }
+        }
+        navPush({
+            params: params,
             func: false
         })
     }
