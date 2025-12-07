@@ -1,6 +1,5 @@
 import React from 'react'
-import { Platform } from 'react-native'
-import { StatusBar } from 'expo-status-bar';
+import { Platform, StatusBar } from 'react-native'
 import * as NavigationBar from 'expo-navigation-bar';
 
 import { InputContextProvider } from './context/snow-input-context'
@@ -16,23 +15,14 @@ export function SnowApp(props) {
     if (Platform.OS !== 'web' && !Platform.isTV) {
         // Hide the system UI on app load
         React.useEffect(() => {
-            const enableImmersive = async () => {
-                try {
-                    await NavigationBar.setVisibilityAsync('hidden');
-                } catch { }
-            };
-
-            enableImmersive();
+            try {
+                NavigationBar.setVisibilityAsync('hidden');
+                StatusBar.setHidden(true, 'none');
+            } catch { }
         }, []);
-
-        // Hide the system UI after a user returns to the app
-        React.useEffect(() => {
-            NavigationBar.setVisibilityAsync('hidden');
-        });
     }
 
     return (<>
-        <StatusBar hidden />
         <StyleContextProvider
             snowStyle={props.snowStyle}
             snowConfig={props.snowConfig} >

@@ -1,14 +1,10 @@
 import React from 'react'
 
-import { Platform, useTVEventHandler } from 'react-native'
-
 import { useStyleContext } from './snow-style-context'
 import { useFocusContext } from './snow-focus-context'
 import { useInputContext } from './snow-input-context'
 import { useNavigationContext } from './snow-navigation-context'
 import { useLayerContext } from './snow-layer-context'
-
-import util from '../util'
 
 const SnowContext = React.createContext({});
 

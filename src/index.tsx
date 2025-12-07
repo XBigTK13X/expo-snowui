@@ -63,6 +63,17 @@ export const useFocusLayer = useFocusLayerFunc
 import util from './util'
 export * as util from './util'
 
+import { StatusBar } from 'react-native'
+import * as NavigationBar from 'expo-navigation-bar';
+
+export const hideSystemUi = () => {
+  try {
+    NavigationBar.setVisibilityAsync('hidden');
+    StatusBar.setHidden(true, 'none');
+  }
+  catch (swallow) { }
+}
+
 export default {
   useFocusLayer,
   useFocusContext,
@@ -72,6 +83,7 @@ export default {
   useSnowContext,
   useStyleContext,
   ...util,
+  hideSystemUi,
   App: SnowApp,
   Break: SnowBreak,
   Dropdown: SnowDropdown,
