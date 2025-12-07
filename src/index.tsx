@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { Platform } from 'react-native'
+
 export { SnowApp } from './snow-app'
 import { SnowApp } from './snow-app'
 
@@ -66,12 +68,16 @@ export * as util from './util'
 import { StatusBar } from 'react-native'
 import * as NavigationBar from 'expo-navigation-bar';
 
-export const hideSystemUi = () => {
+let hideSystemUi = () => {
   try {
     NavigationBar.setVisibilityAsync('hidden');
     StatusBar.setHidden(true, 'none');
   }
   catch (swallow) { }
+}
+
+if (Platform.isTV || Platform.OS === 'web') {
+  hideSystemUi = () => { }
 }
 
 export default {
