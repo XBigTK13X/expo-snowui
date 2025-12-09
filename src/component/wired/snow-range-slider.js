@@ -63,17 +63,16 @@ const SnowRangeSliderW = (props) => {
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
 
-            onPanResponderGrant: (event) => {
+            onPanResponderGrant: () => {
                 isDraggingRef.current = true
-                dragStartXRef.current = event.nativeEvent.pageX
                 dragStartPercentRef.current = percentRef.current
             },
 
-            onPanResponderMove: (event) => {
+            onPanResponderMove: (_, gestureState) => {
                 if (!isDraggingRef.current) return
 
-                const deltaX = event.nativeEvent.pageX - dragStartXRef.current
-                let nextPercent = dragStartPercentRef.current + (deltaX / sliderWidth)
+                let nextPercent =
+                    dragStartPercentRef.current + (gestureState.dx / sliderWidth)
 
                 if (nextPercent < 0) nextPercent = 0
                 if (nextPercent > 1) nextPercent = 1
@@ -93,6 +92,7 @@ const SnowRangeSliderW = (props) => {
             }
         })
     )
+
 
 
     React.useEffect(() => {
