@@ -35,11 +35,17 @@ const SnowRangeSliderW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { addActionListener, removeActionListener } = useInputContext()
     const { useFocusWiring, isFocused } = useFocusContext()
+
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(0)
     const percentRef = React.useRef(percent)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
     const applyIntervalRef = React.useRef(applyStepInterval)
+
+    const dragStartXRef = React.useRef(0)
+    const dragStartPercentRef = React.useRef(0)
+
+
     const elementRef = useFocusWiring(props)
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
@@ -47,71 +53,51 @@ const SnowRangeSliderW = (props) => {
         sliderWidth = props.width
     }
 
-    const layoutsRef = React.useRef({
-        slider: sliderWidth,
-        track: 0,
-        thumb: 0,
-        leftTrack: 0,
-        rightTrack: sliderWidth
-    })
-
     let onValueChange = props.onValueChange
     if (props.debounce) {
         onValueChange = useDebouncedCallback(props.onValueChange, SnowConfig.inputDebounceMilliseconds)
-    }
-
-    const thumbPositionToPercent = (positionX) => {
-        let actionPositionX = positionX - layoutsRef.current.track.x - (layoutsRef.current.thumb.width / 2)
-        if (actionPositionX < 0) {
-            actionPositionX = 0
-        }
-        if (actionPositionX > sliderWidth) {
-            actionPositionX = sliderWidth
-        }
-        let newPercent = actionPositionX / sliderWidth
-        if (newPercent < 0) {
-            newPercent = 0
-        }
-        if (newPercent > 1) {
-            newPercent = 1
-        }
-        setPercent(newPercent)
-        percentRef.current = newPercent
     }
 
     const panRef = React.useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
-            onPanResponderEnd: () => {
-                isDraggingRef.current = false
-                onValueChange(percentRef.current)
+
+            onPanResponderGrant: (event) => {
+                isDraggingRef.current = true
+                dragStartXRef.current = event.nativeEvent.pageX
+                dragStartPercentRef.current = percentRef.current
             },
+
+            onPanResponderMove: (event) => {
+                if (!isDraggingRef.current) return
+
+                const deltaX = event.nativeEvent.pageX - dragStartXRef.current
+                let nextPercent = dragStartPercentRef.current + (deltaX / sliderWidth)
+
+                if (nextPercent < 0) nextPercent = 0
+                if (nextPercent > 1) nextPercent = 1
+
+                percentRef.current = nextPercent
+                setPercent(nextPercent)
+            },
+
             onPanResponderRelease: () => {
                 isDraggingRef.current = false
                 onValueChange(percentRef.current)
             },
-            onPanResponderMove: (pressEvent, gestureState) => {
-                isDraggingRef.current = true
-                let positionX = gestureState.moveX
-                if (!positionX) {
-                    positionX = gestureState.x0
-                }
-                thumbPositionToPercent(positionX)
-            },
-            onPanResponderGrant: (pressEvent, gestureState) => {
-                isDraggingRef.current = true
-                let positionX = gestureState.moveX
-                if (!positionX) {
-                    positionX = gestureState.x0
-                }
-                thumbPositionToPercent(positionX)
+
+            onPanResponderEnd: () => {
+                isDraggingRef.current = false
+                onValueChange(percentRef.current)
             }
         })
-    );
+    )
+
 
     React.useEffect(() => {
         if (!isDraggingRef.current) {
+            percentRef.current = props.percent
             setPercent(props.percent)
         }
     }, [props.percent])
@@ -126,25 +112,18 @@ const SnowRangeSliderW = (props) => {
 
     const applyStep = (amount) => {
         let result = percentRef.current + amount
-        if (result < min) {
-            result = min
-        }
-        if (result > max) {
-            result = max
-        }
+        if (result < min) result = min
+        if (result > max) result = max
         percentRef.current = result
         setPercent(result)
         onValueChange(result)
     }
 
     const longPress = (amount) => {
-        if (applyIntervalRef.current) {
-            clearInterval(applyIntervalRef.current)
-        }
+        clearInterval(applyIntervalRef.current)
         applyStep(amount)
-        setApplyStepInterval(setInterval(() => { applyStep(amount) }, 100))
+        setApplyStepInterval(setInterval(() => applyStep(amount), 100))
     }
-
 
     React.useEffect(() => {
         const actionListenerKey = addActionListener({
@@ -156,13 +135,11 @@ const SnowRangeSliderW = (props) => {
             },
             onLongRightStart: () => {
                 if (isFocused(props.focusKey)) {
-                    longPress(step * 2, 'start')
+                    longPress(step * 2)
                 }
             },
             onLongRightEnd: () => {
-                if (isFocused(props.focusKey)) {
-                    clearInterval(applyIntervalRef.current)
-                }
+                clearInterval(applyIntervalRef.current)
             },
             onLeft: () => {
                 if (isFocused(props.focusKey)) {
@@ -172,56 +149,33 @@ const SnowRangeSliderW = (props) => {
             },
             onLongLeftStart: () => {
                 if (isFocused(props.focusKey)) {
-                    longPress(-step * 2, 'start')
+                    longPress(-step * 2)
                 }
             },
             onLongLeftEnd: () => {
-                if (isFocused(props.focusKey)) {
-                    clearInterval(applyIntervalRef.current)
-                }
+                clearInterval(applyIntervalRef.current)
             },
         })
-        return () => {
-            removeActionListener(actionListenerKey)
-        }
+        return () => removeActionListener(actionListenerKey)
     }, [])
 
-    const handleLayout = (kind) => {
-        return (event) => {
-            let widths = { ...layoutsRef.current }
-            widths[kind] = event.nativeEvent.layout
-            layoutsRef.current = widths
-        };
-    }
+    let thumbX = percentRef.current * sliderWidth
 
     const trackWrapperStyle = [
         SnowStyle.component.rangeSlider.trackWrapper,
-        {
-            width: sliderWidth
-        }
+        { width: sliderWidth }
     ]
-
-    let thumbX = 0
-    if (isDraggingRef.current) {
-        thumbX = percent * sliderWidth
-    }
-    else {
-        thumbX = percentRef.current * sliderWidth
-    }
 
     const leftTrackStyle = [
         SnowStyle.component.rangeSlider.leftTrack,
-        {
-            width: thumbX
-        }
+        { width: thumbX }
     ]
 
     let thumbStyle = [
         SnowStyle.component.rangeSlider.thumb,
-        {
-            left: thumbX - SnowStyle.component.rangeSlider.thumb.width / 2
-        }
+        { left: thumbX - SnowStyle.component.rangeSlider.thumb.width / 2 }
     ]
+
     if (isFocused(props.focusKey)) {
         thumbStyle.push({
             backgroundColor: SnowStyle.color.hover,
@@ -230,14 +184,13 @@ const SnowRangeSliderW = (props) => {
     }
 
     return (
-        <View onLayout={handleLayout('slider')} style={SnowStyle.component.rangeSlider.wrapper}>
-            <View {...panRef.current.panHandlers} onLayout={handleLayout('track')} style={trackWrapperStyle}>
-                <View onLayout={handleLayout('leftTrack')} style={leftTrackStyle} />
-                <View onLayout={handleLayout('rightTrack')} style={SnowStyle.component.rangeSlider.rightTrack} />
+        <View style={SnowStyle.component.rangeSlider.wrapper}>
+            <View {...panRef.current.panHandlers} style={trackWrapperStyle}>
+                <View style={leftTrackStyle} />
+                <View style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
                     ref={elementRef}
                     style={thumbStyle}
-                    onLayout={handleLayout('thumb')}
                     focusKey={props.focusKey}
                     focusRight={props.focusKey}
                     focusLeft={props.focusKey}
@@ -246,11 +199,10 @@ const SnowRangeSliderW = (props) => {
                 />
             </View>
         </View>
-    );
+    )
 }
 
 SnowRangeSliderW.isSnowFocusWired = true
 
 export const SnowRangeSlider = SnowRangeSliderW
-
 export default SnowRangeSlider
