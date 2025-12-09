@@ -80,6 +80,8 @@ export function FocusContextProvider(props) {
     const focusedLayerRef = React.useRef(focusedLayer)
     const [scrollViewRef, setScrollViewRef] = React.useState(null)
 
+    const pendingMeasureRef = React.useRef(false)
+
     const DEBUG = props.DEBUG_FOCUS
     let SCROLL_OFFSET = 200
     if (props.focusVerticalOffset) {
@@ -297,6 +299,18 @@ export function FocusContextProvider(props) {
         if (!ENABLED) {
             return false
         }
+
+        if (focusKey && focusedKeyRef.current === focusKey) {
+            if (DEBUG === 'verbose') {
+                prettyLog({
+                    context: 'focus',
+                    action: 'focusOn short-circuit (already focused)',
+                    focusKey
+                })
+            }
+            return true
+        }
+
         const element = elementRef?.current;
         if (!element) {
             if (DEBUG === 'verbose') {
@@ -313,16 +327,27 @@ export function FocusContextProvider(props) {
 
         const scroll = scrollViewRef?.current
 
-        if (Platform.OS === 'web') {
-            if (element && scroll) {
-                const elementBounds = element.getBoundingClientRect();
-                const scrollBounds = scroll.getBoundingClientRect();
+        if (!scroll) {
+            setFocusedKey(focusKey);
+            focusedKeyRef.current = focusKey;
+            return
+        }
 
-                if (elementBounds.top < scrollBounds.top + SCROLL_OFFSET) {
-                    scroll.scrollTop += elementBounds.top - scrollBounds.top - SCROLL_OFFSET;
-                } else if (elementBounds.bottom > scrollBounds.bottom) {
-                    scroll.scrollTop += elementBounds.bottom - scrollBounds.bottom + SCROLL_OFFSET;
-                }
+        if (Platform.OS === 'web') {
+            if (element && scroll && !pendingMeasureRef.current) {
+                pendingMeasureRef.current = true
+                requestAnimationFrame(() => {
+                    pendingMeasureRef.current = false
+
+                    const elementBounds = element.getBoundingClientRect();
+                    const scrollBounds = scroll.getBoundingClientRect();
+
+                    if (elementBounds.top < scrollBounds.top + SCROLL_OFFSET) {
+                        scroll.scrollTop += elementBounds.top - scrollBounds.top - SCROLL_OFFSET;
+                    } else if (elementBounds.bottom > scrollBounds.bottom) {
+                        scroll.scrollTop += elementBounds.bottom - scrollBounds.bottom + SCROLL_OFFSET;
+                    }
+                })
             }
         } else {
             const node = findNodeHandle(element);
@@ -333,16 +358,20 @@ export function FocusContextProvider(props) {
                         ? findNodeHandle(scroll.getNativeScrollRef())
                         : findNodeHandle(scroll);
 
-                if (scrollHandle) {
+                if (scrollHandle && !pendingMeasureRef.current) {
+                    pendingMeasureRef.current = true
                     UIManager.measureLayout(
                         node,
                         scrollHandle,
                         (err) => {
+                            pendingMeasureRef.current = false
                             if (DEBUG === 'verbose') {
                                 prettyLog({ context: 'focus', action: 'focusOn', error: 'Measurement error', err });
                             }
                         },
                         (x, y, width, height) => {
+                            pendingMeasureRef.current = false
+
                             const viewportHeight = Dimensions.get('window').height;
 
                             const currentOffsetY = scroll?.scrollProperties?.offset || 0;
