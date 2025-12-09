@@ -8,11 +8,18 @@ import _ from 'lodash'
 
 let scaleMultiplier = 0.75
 
+let isTablet = false
+
 if (isTV) {
     scaleMultiplier = 0.5
 } else {
     if (isAndroid) {
         scaleMultiplier = 0.5
+        const { width, height } = Dimensions.get('window');
+        if (Math.min(width, height) >= 600) {
+            isTablet = true
+            scaleMultiplier = 0.75
+        }
     }
 }
 
@@ -497,6 +504,7 @@ export function createStyle(overrides) {
     AppStyle.isWeb = isWeb
     AppStyle.isAndroid = isAndroid
     AppStyle.isPortrait = isPortrait
+    AppStyle.isTablet = isTablet
 
     if (overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)
