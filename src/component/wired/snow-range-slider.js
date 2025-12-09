@@ -37,12 +37,11 @@ const SnowRangeSliderW = (props) => {
     const { useFocusWiring, isFocused } = useFocusContext()
 
     const isDraggingRef = React.useRef(false)
-    const [percent, setPercent] = React.useState(0)
-    const percentRef = React.useRef(percent)
+    const [percent, setPercent] = React.useState(() => typeof props.percent === 'number' ? props.percent : 0)
+    const percentRef = React.useRef(typeof props.percent === 'number' ? props.percent : 0)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
     const applyIntervalRef = React.useRef(applyStepInterval)
 
-    const dragStartXRef = React.useRef(0)
     const dragStartPercentRef = React.useRef(0)
 
 
