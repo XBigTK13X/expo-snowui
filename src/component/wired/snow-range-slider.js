@@ -42,8 +42,8 @@ const SnowRangeSliderW = (props) => {
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
     const applyIntervalRef = React.useRef(applyStepInterval)
 
-    const dragStartPercentRef = React.useRef(0)
-
+    const trackRef = React.useRef(null)
+    const trackXRef = React.useRef(0)
 
     const elementRef = useFocusWiring(props)
 
@@ -57,27 +57,30 @@ const SnowRangeSliderW = (props) => {
         onValueChange = useDebouncedCallback(props.onValueChange, SnowConfig.inputDebounceMilliseconds)
     }
 
+    const clamp = (v) => Math.min(max, Math.max(min, v))
+
+    const updateFromPageX = (pageX) => {
+        let x = pageX - trackXRef.current
+        if (x < 0) x = 0
+        if (x > sliderWidth) x = sliderWidth
+        const next = clamp(x / sliderWidth)
+        percentRef.current = next
+        setPercent(next)
+    }
+
     const panRef = React.useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
 
-            onPanResponderGrant: () => {
+            onPanResponderGrant: (event) => {
                 isDraggingRef.current = true
-                dragStartPercentRef.current = percentRef.current
+                updateFromPageX(event.nativeEvent.pageX)
             },
 
-            onPanResponderMove: (_, gestureState) => {
+            onPanResponderMove: (event) => {
                 if (!isDraggingRef.current) return
-
-                let nextPercent =
-                    dragStartPercentRef.current + (gestureState.dx / sliderWidth)
-
-                if (nextPercent < 0) nextPercent = 0
-                if (nextPercent > 1) nextPercent = 1
-
-                percentRef.current = nextPercent
-                setPercent(nextPercent)
+                updateFromPageX(event.nativeEvent.pageX)
             },
 
             onPanResponderRelease: () => {
@@ -91,8 +94,6 @@ const SnowRangeSliderW = (props) => {
             }
         })
     )
-
-
 
     React.useEffect(() => {
         if (!isDraggingRef.current) {
@@ -184,7 +185,16 @@ const SnowRangeSliderW = (props) => {
 
     return (
         <View style={SnowStyle.component.rangeSlider.wrapper}>
-            <View {...panRef.current.panHandlers} style={trackWrapperStyle}>
+            <View
+                ref={trackRef}
+                onLayout={() => {
+                    trackRef.current?.measureInWindow((x) => {
+                        trackXRef.current = x
+                    })
+                }}
+                {...panRef.current.panHandlers}
+                style={trackWrapperStyle}
+            >
                 <View style={leftTrackStyle} />
                 <View style={SnowStyle.component.rangeSlider.rightTrack} />
                 <Pressable
