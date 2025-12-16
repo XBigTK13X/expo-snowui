@@ -60,7 +60,11 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
         if (navigationHistory?.at(-1)?.routePath) {
-            const layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey + navigationHistory?.at(-1).routeParams?.gridPage
+            let layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey
+            const gridPage = navigationHistory?.at(-1).routeParams?.gridPage
+            if (gridPage) {
+                layerName = layerName + '-' + gridPage
+            }
             if (!isFocusedLayer(layerName)) {
                 pushFocusLayer(layerName)
                 return () => {
