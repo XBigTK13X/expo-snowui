@@ -1,3 +1,4 @@
+import pkg from "../package.json";
 import Snow from 'expo-snowui';
 import { routes, pages } from './routing'
 
@@ -58,9 +59,16 @@ const styleOverrides = {
   }
 }
 
+const SnowApp = Snow.createSnowApp({
+  enableSentry: true,
+  sentryUrl: "https://0ffd8d6684624aa69608f167ff478bdc@bugsink.9914.us/4",
+  appName: 'snowui-example',
+  appVersion: pkg.version
+})
+
 export default function App() {
   return (
-    <Snow.App
+    <SnowApp
       DEBUG_SNOW={false}
       ENABLE_FOCUS={true}
       snowStyle={styleOverrides}
@@ -69,7 +77,7 @@ export default function App() {
       initialRoutePath={routes.break}
     >
       <AppPage />
-    </Snow.App>
+    </SnowApp>
   );
 }
 

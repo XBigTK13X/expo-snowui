@@ -23,7 +23,10 @@ export function SnowSafeArea(props) {
             <>
                 {modalPayloads.map((modalPayload, modalIndex) => {
                     return <SnowModal
-                        key={modalIndex} {...modalPayload.props} render={modalPayload.render} />
+                        key={modalIndex}
+                        depth={modalIndex + 1}
+                        {...modalPayload.props}
+                        render={modalPayload.render} />
                 })}
             </>
         )

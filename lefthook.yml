@@ -3,4 +3,4 @@ pre-commit:
   commands:
     types:
       glob: "*.{js,ts, jsx, tsx}"
-      run: npx tsc
+      run: npx tsc -p tsconfig.build.json --noEmit

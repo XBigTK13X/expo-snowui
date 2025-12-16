@@ -42,15 +42,18 @@ const SnowModalW = (props) => {
     }, [])
 
     let style = [SnowStyle.component.modal.default]
+    let depth = SnowStyle.depth.modal + props.depth
+    style.push({
+        elevation: depth,
+        zIndex: depth
+    })
     if (props.obscure) {
         style.push(SnowStyle.component.modal.obscure)
     }
-    else if (props.transparent) {
-
-    }
-    else {
+    else if (props.transparent !== true) {
         style.push(SnowStyle.component.modal.black)
     }
+
     if (props.center) {
         style.push(SnowStyle.component.modal.center)
     }

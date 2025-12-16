@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.6.25",
+  "version": "1.6.26",
   "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -58,6 +58,21 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "dependencies": {
+    "@sentry/react-native": "^7.2.0",
+    "expo": "54.0.29",
+    "expo-constants": "^18.0.12",
+    "expo-image": "^3.0.10",
+    "expo-navigation-bar": "^5.0.9",
+    "expo-secure-store": "^15.0.7",
+    "expo-status-bar": "^3.0.8",
+    "expo-toast": "^1.0.3",
+    "lodash": "^4.17.21",
+    "react": "19.1.0",
+    "react-native": "npm:react-native-tvos@0.81.5-1",
+    "react-native-uuid": "^2.0.3",
+    "use-debounce": "^10.0.6"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.4",
     "@commitlint/config-conventional": "^19.8.1",
@@ -70,7 +85,7 @@
     "@react-native/eslint-config": "^0.81.1",
     "@release-it/conventional-changelog": "^10.0.1",
     "@types/jest": "^29.5.14",
-    "@types/react": "^19.1.12",
+    "@types/react": "19.1.10",
     "babel-preset-expo": "^54.0.2",
     "commitlint": "^19.8.1",
     "del-cli": "^6.0.0",
@@ -151,17 +166,5 @@
     "languages": "js",
     "type": "library",
     "version": "0.54.3"
-  },
-  "dependencies": {
-    "expo": "54.0.21",
-    "expo-image": "^3.0.10",
-    "expo-navigation-bar": "^5.0.9",
-    "expo-secure-store": "^15.0.7",
-    "expo-status-bar": "^3.0.8",
-    "lodash": "^4.17.21",
-    "react": "19.1.0",
-    "react-native": "npm:react-native-tvos@0.81.4-0",
-    "react-native-uuid": "^2.0.3",
-    "use-debounce": "^10.0.6"
   }
 }

@@ -1,8 +1,14 @@
 // @ts-nocheck
 import { Platform } from 'react-native'
 
-export { SnowApp } from './snow-app'
-import { SnowApp } from './snow-app'
+import { Image } from 'expo-image'
+export { Image } from 'expo-image'
+
+import { useToast } from 'expo-toast'
+export { useToast } from 'expo-toast'
+
+export { createSnowApp } from './snow-app'
+import { createSnowApp } from './snow-app'
 
 export { useFocusContext } from './context/snow-focus-context'
 import { useFocusContext } from './context/snow-focus-context'
@@ -81,6 +87,7 @@ if (Platform.isTV || Platform.OS === 'web') {
 }
 
 export default {
+  createSnowApp,
   useFocusLayer,
   useFocusContext,
   useInputContext,
@@ -88,14 +95,15 @@ export default {
   useNavigationContext,
   useSnowContext,
   useStyleContext,
+  useToast,
   ...util,
   hideSystemUi,
-  App: SnowApp,
   Break: SnowBreak,
   Dropdown: SnowDropdown,
   FillView: SnowFillView,
   Grid: SnowGrid,
   Header: SnowHeader,
+  Image,
   ImageButton: SnowImageButton,
   ImageGrid: SnowImageGrid,
   Input: SnowInput,

@@ -2,6 +2,12 @@ import React from 'react'
 import { Platform, StatusBar } from 'react-native'
 import * as NavigationBar from 'expo-navigation-bar';
 
+import Constants from "expo-constants";
+
+import * as Sentry from "@sentry/react-native";
+
+import { ToastProvider } from 'expo-toast'
+
 import { InputContextProvider } from './context/snow-input-context'
 import { StyleContextProvider } from './context/snow-style-context'
 import { FocusContextProvider } from './context/snow-focus-context'
@@ -11,7 +17,24 @@ import { SnowContextProvider } from './context/snow-context'
 
 import { SnowSafeArea } from './component/snow-safe-area'
 
-export function SnowApp(props) {
+function CrashScreen(props) {
+    return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 60, backgroundColor: 'black', color: 'white' }}>
+            <Text style={{ textAlign: 'center', fontSize: 40, margin: 20, color: 'white' }}>{props.appName ?? 'App'} crashed due to an unhandled error.</Text>
+            <Text style={{ fontSize: 40, margin: 20, color: 'white' }}>The problem has been logged.</Text>
+            <View style={{ width: 400, margin: 20 }}>
+                <Button title="Reload" onPress={props.reloadApp} />
+            </View>
+        </View>
+    )
+}
+
+function SnowApp(props) {
+    const [appKey, setAppKey] = React.useState(1)
+    const reloadApp = () => {
+        setAppKey(prev => { return prev + 1 })
+    }
+
     if (Platform.OS !== 'web' && !Platform.isTV) {
         // Hide the system UI on app load
         React.useEffect(() => {
@@ -22,46 +45,85 @@ export function SnowApp(props) {
         }, []);
     }
 
-    return (<>
-        <StyleContextProvider
-            snowStyle={props.snowStyle}
-            snowConfig={props.snowConfig} >
+    return (
+        <Sentry.ErrorBoundary
+            fallback={<CrashScreen reloadApp={reloadApp} appName={props.appName} />}
+            onError={(error, componentStack) => {
+                console.error('Unhandled error:', error)
+                if (componentStack) {
+                    console.error('Component stack:', componentStack)
+                }
+                Sentry.captureException(error)
+            }}>
 
-            <InputContextProvider
-                DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
+            <StyleContextProvider
+                snowStyle={props.snowStyle}
+                snowConfig={props.snowConfig} >
 
-                <LayerContextProvider
-                    DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
+                <InputContextProvider
+                    DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
-                    <FocusContextProvider
-                        DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
-                        ENABLE_FOCUS={props?.ENABLE_FOCUS}
-                        focusVerticalOffset={props.focusVerticalOffset}
-                    >
+                    <LayerContextProvider
+                        DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
 
-                        <NavigationContextProvider
-                            routePaths={props.routePaths}
-                            routePages={props.routePages}
-                            initialRoutePath={props.initialRoutePath}
-                            resetRoutePath={props.resetRoutePath}
-                            DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+                        <FocusContextProvider
+                            DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
+                            ENABLE_FOCUS={props?.ENABLE_FOCUS}
+                            focusVerticalOffset={props.focusVerticalOffset}
+                        >
 
+                            <NavigationContextProvider
+                                routePaths={props.routePaths}
+                                routePages={props.routePages}
+                                initialRoutePath={props.initialRoutePath}
+                                resetRoutePath={props.resetRoutePath}
+                                DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+                                <ToastProvider>
 
+                                    <SnowContextProvider >
 
-                            <SnowContextProvider >
-                                <SnowSafeArea >
-                                    {props.children}
-                                </SnowSafeArea>
-                            </SnowContextProvider>
+                                        <SnowSafeArea key={appKey}>
+                                            {props.children}
+                                        </SnowSafeArea>
 
-
-                        </NavigationContextProvider>
-                    </FocusContextProvider>
-                </LayerContextProvider>
-            </InputContextProvider>
-        </StyleContextProvider >
-    </>
+                                    </SnowContextProvider>
+                                </ToastProvider>
+                            </NavigationContextProvider>
+                        </FocusContextProvider>
+                    </LayerContextProvider>
+                </InputContextProvider>
+            </StyleContextProvider >
+        </Sentry.ErrorBoundary>
     )
 }
 
-export default SnowApp
+export function createSnowApp({
+    enableSentry,
+    sentryUrl,
+    appName,
+    appVersion,
+}) {
+    function SnowAppConfigured(props) {
+        React.useEffect(() => {
+            if (!enableSentry || !sentryUrl) return
+
+            Sentry.init({
+                dsn: sentryUrl,
+                release: `${appName}@${appVersion}`,
+                dist: `${Constants.manifest?.android?.versionCode ?? 1}`,
+                sendDefaultPii: true,
+            })
+        }, [])
+
+        return <SnowApp {...props} />
+    }
+
+    if (!enableSentry) {
+        return SnowAppConfigured
+    }
+
+    return Sentry.wrap(SnowAppConfigured)
+}
+
+
+export default createSnowApp

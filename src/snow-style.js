@@ -121,6 +121,11 @@ export function createStyle(overrides) {
             borderRadius: 16,
             thumbSize: 60,
             trackSize: 30
+        },
+        depth: {
+            app: 10000,
+            modal: 20000,
+            overlay: 30000
         }
     }
     if (overrides) {
@@ -306,6 +311,8 @@ export function createStyle(overrides) {
                 justifyContent: 'center',
                 outlineStyle: 'none', // Disable web default white outline on focused element
                 outline: 'none', // Disable web default white outline on focused element
+                zIndex: AppStyle.depth.overlay,
+                elevation: AppStyle.depth.overlay
             },
             black: {
                 backgroundColor: 'black' // Without this color, letterbox will be white by default
@@ -357,6 +364,8 @@ export function createStyle(overrides) {
             padding: 30,
             backgroundColor: AppStyle.color.background,
             flex: 1,
+            zIndex: AppStyle.depth.app,
+            elevation: AppStyle.depth.app
         },
         tabs: {
             panel: {

@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { useToast } from 'expo-toast'
+
 import { useStyleContext } from './snow-style-context'
 import { useFocusContext } from './snow-focus-context'
 import { useInputContext } from './snow-input-context'
@@ -22,19 +24,22 @@ export function SnowContextProvider(props) {
     const FocusContext = useFocusContext(props)
     const NavigationContext = useNavigationContext(props)
     const LayerContext = useLayerContext(props)
+    const toast = useToast()
 
     const context = React.useMemo(() => ({
         ...StyleContext,
         ...InputContext,
         ...FocusContext,
         ...NavigationContext,
-        ...LayerContext
+        ...LayerContext,
+        toast: { ...toast }
     }), [
         StyleContext,
         InputContext,
         FocusContext,
         NavigationContext,
-        LayerContext
+        LayerContext,
+        toast
     ]);
 
     return (
