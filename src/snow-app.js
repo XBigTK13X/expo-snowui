@@ -98,29 +98,24 @@ function SnowApp(props) {
 }
 
 export function createSnowApp({
-    enableSentry,
     sentryUrl,
     appName,
     appVersion,
 }) {
     function SnowAppConfigured(props) {
-        React.useEffect(() => {
-            if (!enableSentry || !sentryUrl) return
-
-            Sentry.init({
-                dsn: sentryUrl,
-                release: `${appName}@${appVersion}`,
-                dist: `${Constants.manifest?.android?.versionCode ?? 1}`,
-                sendDefaultPii: true,
-            })
-        }, [])
-
         return <SnowApp {...props} />
     }
 
-    if (!enableSentry) {
+    if (!sentryUrl) {
         return SnowAppConfigured
     }
+
+    Sentry.init({
+        dsn: sentryUrl,
+        release: `${appName}@${appVersion}`,
+        dist: `${Constants.manifest?.android?.versionCode ?? 1}`,
+        sendDefaultPii: true,
+    })
 
     return Sentry.wrap(SnowAppConfigured)
 }
