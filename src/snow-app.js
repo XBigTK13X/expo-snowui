@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, StatusBar } from 'react-native'
+import { View, Text, Button, Platform, StatusBar } from 'react-native'
 import * as NavigationBar from 'expo-navigation-bar';
 
 import Constants from "expo-constants";
