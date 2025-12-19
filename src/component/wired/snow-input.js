@@ -1,4 +1,5 @@
-import { TextInput } from 'react-native'
+import React from 'react'
+import { TextInput, Pressable } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
@@ -6,7 +7,8 @@ import { useFocusContext } from '../../context/snow-focus-context'
 const SnowInputW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { isFocused, useFocusWiring, tvRemoteProps } = useFocusContext()
-    const elementRef = useFocusWiring(props)
+    const containerRef = useFocusWiring(props)
+    const inputRef = React.useRef(null)
 
     let textStyle = [SnowStyle.component.input.text]
     if (props.short) {
@@ -37,18 +39,39 @@ const SnowInputW = (props) => {
         if (onDebounce) {
             onDebounce.cancel()
         }
+        inputRef.current?.blur()
     }
-    return <TextInput
-        ref={elementRef}
-        {...tvRemoteProps(props)}
-        secureTextEntry={props.secureTextEntry}
-        style={textStyle}
-        editable={true}
-        onChangeText={onChangeText}
-        onSubmitEditing={onSubmit}
-        onEndEditing={onSubmit}
-        value={props.value}
-    />
+
+    const onContainerPress = () => {
+        inputRef.current?.focus()
+    }
+
+    return (
+        <Pressable
+            ref={containerRef}
+            {...tvRemoteProps(props)}
+            onPress={onContainerPress}
+            style={textStyle} >
+            <TextInput
+                ref={inputRef}
+                secureTextEntry={props.secureTextEntry}
+                style={[textStyle, {
+                    flex: 1,
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    borderWidth: 0,
+                    margin: 0,
+                    padding: 0
+                }]}
+                editable={true}
+                focusable={false}
+                onChangeText={onChangeText}
+                onSubmitEditing={onSubmit}
+                onEndEditing={onSubmit}
+                value={props.value}
+            />
+        </Pressable>
+    )
 }
 
 SnowInputW.isSnowFocusWired = true
