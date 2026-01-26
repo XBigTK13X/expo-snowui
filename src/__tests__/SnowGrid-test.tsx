@@ -7,13 +7,13 @@ describe('<SnowGrid />', () => {
     const Component = () => {
       return (
         <SnowGrid itemsPerRow={1}>
-          <SnowTextButton title="Single Cell" />
+          <SnowTextButton testID="button-1" title="Single Cell" />
         </SnowGrid>
       )
     }
 
-    const { getByText } = render(<Component />, {});
+    const { getByTestId } = render(<Component />, {});
 
-    getByText('Single Cell');
+    getByTestId('button-1');
   });
 });

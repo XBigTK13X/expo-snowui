@@ -2,9 +2,12 @@
   "extends": "./tsconfig",
   "exclude": [
     "example",
-    "lib"
+    "lib",
+    "src/__tests__",
+    "**/*.test.tsx",
+    "**/*.spec.tsx"
   ],
   "compilerOptions": {
     "verbatimModuleSyntax": false
-  }
+  },
 }

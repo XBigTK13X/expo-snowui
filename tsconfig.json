@@ -32,5 +32,10 @@
     "strict": true,
     "target": "ESNext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "exclude": [
+    "src/__tests__",
+    "**/*.test.tsx",
+    "**/*.spec.tsx"
+  ]
 }

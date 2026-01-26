@@ -69,6 +69,7 @@ const SnowTextButtonW = (props) => {
         <Pressable
             ref={elementRef}
             {...tvRemoteProps(props)}
+            testID={props.testID}
             style={wrapperStyle}
             onPress={onPress}
             onLongPress={onLongPress}
