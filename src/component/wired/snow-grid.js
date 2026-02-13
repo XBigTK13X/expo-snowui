@@ -107,7 +107,7 @@ const SnowGridW = (props) => {
     const renderCell = (item, itemIndex, renderRowIndex) => {
         let child = renderItem(item, itemIndex)
 
-        if (child.type.isSnowFocusWired && props.assignFocus !== false) {
+        if (child?.type?.isSnowFocusWired && props?.assignFocus !== false) {
             let wired = wiredGridRef.current
             let row = wired.row
             let column = wired.column
