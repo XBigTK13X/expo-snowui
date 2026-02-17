@@ -296,9 +296,16 @@ export function FocusContextProvider(props) {
     }
 
     const focusOn = (elementRef, focusKey) => {
-        if (!ENABLED) {
-            return false
-        }
+        if (!ENABLED) return false;
+
+        const element = elementRef?.current;
+        if (!element) return false;
+
+        element.requestTVFocus?.();
+        element.focus?.();
+
+        focusedKeyRef.current = focusKey;
+        setFocusedKey(focusKey);
 
         if (focusKey && focusedKeyRef.current === focusKey) {
             if (DEBUG === 'verbose') {
@@ -311,26 +318,21 @@ export function FocusContextProvider(props) {
             return true
         }
 
-        const element = elementRef?.current;
         if (!element) {
             if (DEBUG === 'verbose') {
                 prettyLog({ context: 'focus', action: 'focusOn', message: 'No element to focus', elementRef, focusKey });
             }
-            return
+            return false
         }
+
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'focusOn', elementRef, focusKey });
         }
 
-        element.requestTVFocus?.();
-        element.focus?.();
-
         const scroll = scrollViewRef?.current
 
         if (!scroll) {
-            setFocusedKey(focusKey);
-            focusedKeyRef.current = focusKey;
-            return
+            return true
         }
 
         if (Platform.OS === 'web') {
@@ -393,9 +395,6 @@ export function FocusContextProvider(props) {
                 }
             }
         }
-
-        setFocusedKey(focusKey);
-        focusedKeyRef.current = focusKey;
     };
 
     // returning false cancels the requested movement
@@ -571,23 +570,28 @@ export function FocusContextProvider(props) {
 
     const focusContext = {
         DEBUG,
-        focusEnabled: ENABLED,
         focusedKey,
         focusedLayer,
-        isFocused,
-        isFocusedLayer,
-        tvRemoteProps,
-        useFocusWiring,
+        focusLayers,
+        focusEnabled: ENABLED,
         addFocusMap,
-        useFocusLayer,
-        popFocusLayer,
-        pushFocusLayer,
         clearFocusLayers,
-        readFocusProps,
         focusLongPress,
         focusOn,
         focusPress,
-        setScrollViewRef
+        isFocused,
+        isFocusedLayer,
+        moveFocusDown,
+        moveFocusLeft,
+        moveFocusRight,
+        moveFocusUp,
+        popFocusLayer,
+        pushFocusLayer,
+        readFocusProps,
+        setScrollViewRef,
+        tvRemoteProps,
+        useFocusLayer,
+        useFocusWiring,
     }
 
     if (!isReady && ENABLED) {

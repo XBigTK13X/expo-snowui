@@ -1,51 +1,101 @@
 import { StyleSheet } from 'react-native';
 
-import { render } from './test-utils';
-import { fireEvent } from '@testing-library/react-native';
+import {
+  act,
+  render,
+  AppStyle,
+  getFocusEngine
+} from './test-utils';
 
-import SnowStyle from '../snow-style'
 import SnowGrid from '../component/wired/snow-grid'
 import SnowTextButton from '../component/wired/snow-text-button'
 
-const AppStyle = SnowStyle.createStyle()
-
-const OneColumnGrid = () => {
+const OneByThreeGrid = () => {
   return (
-    <SnowGrid testID="grid-container" focusStart focusKey="test-1" itemsPerRow={1}>
-      <SnowTextButton testID="button-1" title="Single Cell 1" />
-      <SnowTextButton testID="button-2" title="Single Cell 2" />
-      <SnowTextButton testID="button-3" title="Single Cell 3" />
+    <SnowGrid
+      focusStart
+      focusKey="grid-cell"
+      itemsPerRow={1}>
+      <SnowTextButton title="Single Cell 0.1" />
+      <SnowTextButton title="Single Cell 1.1" />
+      <SnowTextButton title="Single Cell 2.1" />
     </SnowGrid>
   )
 }
 
-describe('<SnowGrid />', () => {
-  test('Single column grid highlights the first cell and not the second', () => {
-    const { getByTestId, } = render(<OneColumnGrid />, {});
+const TwoByTwoGrid = () => {
+  return (
+    <SnowGrid
+      focusStart
+      focusKey="grid-cell"
+      itemsPerRow={2}>
+      <SnowTextButton title="Single Cell 0.0" />
+      <SnowTextButton title="Single Cell 0.1" />
+      <SnowTextButton title="Single Cell 1.0" />
+      <SnowTextButton title="Single Cell 1.1" />
+    </SnowGrid>
+  )
+}
 
-    const firstStyle = StyleSheet.flatten(getByTestId('button-1').props.style)
+describe('SnowGrid', () => {
+  describe('Single Column', () => {
+    test('Cell grid-cell is focused on first render', async () => {
+      const { getByTestId } = render(<OneByThreeGrid />, {});
 
-    const secondStyle = StyleSheet.flatten(getByTestId('button-2').props.style)
+      const focus = getFocusEngine()
 
-    expect(firstStyle.borderColor).toBe(AppStyle.component.textButton.focused)
-    expect(secondStyle.borderColor).not.toBe(AppStyle.component.textButton.focused)
-  });
+      const firstStyle = StyleSheet.flatten(getByTestId('grid-cell').props.style)
+      const secondStyle = StyleSheet.flatten(getByTestId('grid-cell-row-1-column-0').props.style)
 
-  test('Single column grid highlights the second cell after hitting down arrow', () => {
-    const { getByTestId, } = render(<OneColumnGrid />, {});
-
-    fireEvent(getByTestId('grid-container'), 'keyDown', {
-      key: 'ArrowDown',
-      keyCode: 40,
-      which: 40,
+      expect(focus.focusedKey).toBe('grid-cell');
+      expect(firstStyle.borderColor).toBe(AppStyle.component.textButton.focused.borderColor)
+      expect(secondStyle.borderColor).not.toBe(AppStyle.component.textButton.focused.borderColor)
     });
 
-    const firstStyle = StyleSheet.flatten(getByTestId('button-1').props.style)
-    const secondStyle = StyleSheet.flatten(getByTestId('button-2').props.style)
+    test('Cell 1.0 is focused after moving down', async () => {
+      const { getByTestId } = render(<OneByThreeGrid />, {});
 
-    expect(secondStyle.borderColor).toBe(AppStyle.component.textButton.focused)
-    expect(firstStyle.borderColor).not.toBe(AppStyle.component.textButton.focused)
-  });
+      act(() => {
+        getFocusEngine().moveFocusDown()
+      })
+
+      const firstStyle = StyleSheet.flatten(getByTestId('grid-cell').props.style)
+      const secondStyle = StyleSheet.flatten(getByTestId('grid-cell-row-1-column-0').props.style)
+
+      expect(getFocusEngine().focusedKey).toBe('grid-cell-row-1-column-0');
+      expect(firstStyle.borderColor).not.toBe(AppStyle.component.textButton.focused.borderColor)
+      expect(secondStyle.borderColor).toBe(AppStyle.component.textButton.focused.borderColor)
+    });
+  })
+
+  describe('2x2 Grid', () => {
+    test('Cell 1.2 is focused after moving right', async () => {
+      const { getByTestId } = render(<TwoByTwoGrid />, {});
+
+      act(() => {
+        getFocusEngine().moveFocusRight()
+      })
+
+      const targetKey = 'grid-cell-row-0-column-1'
+      const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
+
+      expect(getFocusEngine().focusedKey).toBe(targetKey);
+      expect(targetStyle.borderColor).toBe(AppStyle.component.textButton.focused.borderColor)
+    });
+    test('Cell 2.1 is focused after moving down', async () => {
+      const { getByTestId } = render(<TwoByTwoGrid />, {});
+
+      act(() => {
+        getFocusEngine().moveFocusDown()
+      })
+
+      const targetKey = 'grid-cell-row-1-column-0'
+      const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
+
+      expect(getFocusEngine().focusedKey).toBe(targetKey);
+      expect(targetStyle.borderColor).toBe(AppStyle.component.textButton.focused.borderColor)
+    });
+  })
 });
 
 

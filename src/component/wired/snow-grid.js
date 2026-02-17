@@ -107,11 +107,13 @@ const SnowGridW = (props) => {
     const renderCell = (item, itemIndex, renderRowIndex) => {
         let child = renderItem(item, itemIndex)
 
+        let focus = {}
+
         if (child?.type?.isSnowFocusWired && props?.assignFocus !== false) {
             let wired = wiredGridRef.current
             let row = wired.row
             let column = wired.column
-            let focus = {}
+
             if (child.props.focusKey) {
                 focus.focusKey = child.props.focusKey
             }
@@ -212,7 +214,7 @@ const SnowGridW = (props) => {
             }
             wired.index += 1
             wiredGridRef.current = wired
-            child = React.cloneElement(child, { ...focus, ...debugFocus })
+            child = React.cloneElement(child, { ...focus, ...debugFocus, testID: focus.focusKey })
         }
 
         return (

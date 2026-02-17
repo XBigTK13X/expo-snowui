@@ -50,7 +50,7 @@ function AppPage() {
   )
 }
 
-const styleOverrides = {
+export const styleOverrides = {
   color: {
     hover: 'rgba(44, 219, 175, 1)',
     hoverDark: 'rgba(23, 116, 92, 1)',
