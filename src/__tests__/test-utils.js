@@ -30,7 +30,7 @@ const pages = {
     [routes.testPage]: TestPage
 }
 
-const TestApp = () => {
+const TestApp = (props) => {
     return (
         <SnowApp
             DEBUG_SNOW={false}
@@ -39,11 +39,13 @@ const TestApp = () => {
             routePaths={routes}
             routePages={pages}
             initialRoutePath={routes.testPage}
-        />
+        >
+            <TestPage children={props.children} />
+        </SnowApp>
     )
 }
 
-const customRender = (ui: any, options: any) =>
+const customRender = (ui, options) =>
     render(ui, { wrapper: TestApp, ...options });
 
 export * from '@testing-library/react-native';

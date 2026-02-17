@@ -1,4 +1,3 @@
-import React from 'react'
 import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
@@ -9,15 +8,17 @@ const SnowPagerW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { navPush, currentRoute } = useNavigationContext(props)
 
+    const pageKey = `gridPage-${props.focusKey}`
+
     const gotoPage = (page, trigger) => {
         let params = {
-            gridPage: page,
+            pageKey: page,
             pageTrigger: trigger
         }
         if (currentRoute?.routeParams) {
             params = {
                 ...currentRoute.routeParams,
-                gridPage: page,
+                pageKey: page,
                 pageTrigger: trigger
             }
         }
@@ -68,7 +69,8 @@ const SnowPagerW = (props) => {
         focusEscapeProps.focusUp = props.focusUp
     }
 
-    const renderKey = `${props.focusKey ?? ''}-pager-${props.page}`
+    const renderKey = `${props.focusKey ?? ''
+        }-pager - ${props.page} `
 
     let buttonFocusStart = null
     if (currentRoute?.routeParams?.pageTrigger !== undefined) {
@@ -78,10 +80,10 @@ const SnowPagerW = (props) => {
     return (
         <View style={SnowStyle.component.grid.pager} key={renderKey}>
             <SnowTextButton
-                focusKey={`first-page`}
+                focusKey={`first - page`}
                 focusStart={buttonFocusStart === 'first-page'}
-                focusLeft={`last-page`}
-                focusRight={`previous-half`}
+                focusLeft={`last - page`}
+                focusRight={`previous - half`}
                 focusUp={nextPageKey}
                 focusDown={nextPageKey}
                 title="<<<"
@@ -90,10 +92,10 @@ const SnowPagerW = (props) => {
             />
 
             <SnowTextButton
-                focusKey={`previous-half`}
+                focusKey={`previous - half`}
                 focusStart={buttonFocusStart === 'previous-half'}
-                focusLeft={`first-page`}
-                focusRight={`previous-page`}
+                focusLeft={`first - page`}
+                focusRight={`previous - page`}
                 focusUp={nextPageKey}
                 focusDown={nextPageKey}
                 title="<<"
@@ -102,9 +104,9 @@ const SnowPagerW = (props) => {
             />
 
             <SnowTextButton
-                focusKey={`previous-page`}
+                focusKey={`previous - page`}
                 focusStart={buttonFocusStart === 'previous-page'}
-                focusLeft={`previous-half`}
+                focusLeft={`previous - half`}
                 focusRight={nextPageKey}
                 focusUp={nextPageKey}
                 focusDown={nextPageKey}
@@ -119,18 +121,18 @@ const SnowPagerW = (props) => {
                 {...focusEscapeProps}
                 focusKey={nextPageKey}
                 focusStart={buttonFocusStart === 'next-page'}
-                focusLeft={`previous-page`}
-                focusRight={`next-half`}
+                focusLeft={`previous - page`}
+                focusRight={`next - half`}
                 title=">"
                 short
                 onPress={nextPage}
             />
 
             <SnowTextButton
-                focusKey={`next-half`}
+                focusKey={`next - half`}
                 focusStart={buttonFocusStart === 'next-half'}
                 focusLeft={nextPageKey}
-                focusRight={`last-page`}
+                focusRight={`last - page`}
                 focusUp={nextPageKey}
                 focusDown={nextPageKey}
                 title=">>"
@@ -139,10 +141,10 @@ const SnowPagerW = (props) => {
             />
 
             <SnowTextButton
-                focusKey={`last-page`}
+                focusKey={`last - page`}
                 focusStart={buttonFocusStart === 'last-page'}
-                focusLeft={`next-half`}
-                focusRight={`first-page`}
+                focusLeft={`next - half`}
+                focusRight={`first - page`}
                 focusUp={nextPageKey}
                 focusDown={nextPageKey}
                 title=">>>"

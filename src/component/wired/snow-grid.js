@@ -241,7 +241,7 @@ const SnowGridW = (props) => {
 
 
     return (
-        <View style={gridStyle} key={renderKey}>
+        <View testID={props.testID} style={gridStyle} key={renderKey}>
             {pageControls}
             {rows.map((row, rowIndex) => {
                 return (

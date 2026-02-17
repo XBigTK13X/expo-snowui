@@ -521,3 +521,9 @@ export function createStyle(overrides) {
 
     return AppStyle
 }
+
+export default {
+    createStyle,
+    getWindowHeight,
+    getWindowWidth
+}

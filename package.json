@@ -111,9 +111,16 @@
   "packageManager": "yarn@3.6.1",
   "jest": {
     "preset": "jest-expo",
+    "silent": false,
+    "detectOpenHandles": false,
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
+      "<rootDir>/lib/",
+      "test-utils.js",
+      "jest.setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/__tests__/jest.setup.js"
     ]
   },
   "commitlint": {
