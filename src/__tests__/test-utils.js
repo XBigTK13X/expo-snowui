@@ -20,6 +20,8 @@ const styleOverrides = {
 
 export const AppStyle = SnowStyle.createStyle(styleOverrides);
 
+export const focusedColor = AppStyle.component.textButton.focused.borderColor
+
 let capturedFocusMethods = null;
 
 const FocusSpy = () => {
@@ -33,6 +35,14 @@ export const getFocusEngine = () => {
     }
     return capturedFocusMethods;
 };
+
+export const debugFocus = () => {
+    const focus = getFocusEngine()
+    console.log({
+        directions: focus.focusLayers.at(-1).directions,
+        focusedKey: focus.focusedKey
+    })
+}
 
 const TestPage = (props) => {
     return props.children;

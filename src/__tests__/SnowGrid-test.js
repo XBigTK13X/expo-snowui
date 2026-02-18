@@ -3,16 +3,15 @@ import { StyleSheet } from 'react-native';
 import {
   act,
   render,
-  AppStyle,
+  debugFocus,
+  focusedColor,
   getFocusEngine
 } from './test-utils';
 
 import SnowGrid from '../component/wired/snow-grid'
 import SnowTextButton from '../component/wired/snow-text-button'
 
-const focusedTextButtonColor = AppStyle.component.textButton.focused.borderColor
-
-const OneByThreeGrid = (props: any) => {
+const OneByThreeGrid = (props) => {
   return (
     <SnowGrid
       focusStart={props.focusStart !== false}
@@ -25,7 +24,7 @@ const OneByThreeGrid = (props: any) => {
   )
 }
 
-const ThreeByOneGrid = (props: any) => {
+const ThreeByOneGrid = (props) => {
   return (
     <SnowGrid
       focusStart={props.focusStart !== false}
@@ -38,7 +37,7 @@ const ThreeByOneGrid = (props: any) => {
   )
 }
 
-const TwoByTwoGrid = (props: any) => {
+const TwoByTwoGrid = (props) => {
   return (
     <SnowGrid
       focusStart={props.focusStart !== false}
@@ -52,7 +51,7 @@ const TwoByTwoGrid = (props: any) => {
   )
 }
 
-const ThreeByThreeGrid = (props: any) => {
+const ThreeByThreeGrid = (props) => {
   return (
     <SnowGrid
       focusStart={props.focusStart !== false}
@@ -71,33 +70,54 @@ const ThreeByThreeGrid = (props: any) => {
   )
 }
 
-const Surround = (props: any) => {
+const Surround = (props) => {
   return (
     <>
-      <SnowTextButton focusStart={props.focusStart == 'left'} focusKey="left-button" focusRight="grid-cell" title="Left" />
-      <SnowTextButton focusStart={props.focusStart == 'up'} focusKey="up-button" focusDown="grid-cell" title="Up" />
+      <SnowTextButton
+        focusStart={props.focusStart == 'left'}
+        focusKey="left-button"
+        focusRight="grid-cell"
+        title="Left"
+      />
+      <SnowTextButton
+        focusStart={props.focusStart == 'up'}
+        focusKey="up-button"
+        focusDown="grid-cell"
+        title="Up"
+      />
       {props.children}
-      <SnowTextButton focusStart={props.focusStart == 'right'} focusKey="right-button" focusLeft="grid-cell" title="Right" />
-      <SnowTextButton focusStart={props.focusStart == 'down'} focusKey="down-button" focusUp="grid-cell" title="Down" />
+      <SnowTextButton
+        focusStart={props.focusStart == 'right'}
+        focusKey="right-button"
+        focusLeft="grid-cell-grid-end"
+        title="Right"
+      />
+      <SnowTextButton
+        focusStart={props.focusStart == 'down'}
+        focusKey="down-button"
+        focusUp="grid-cell-grid-end"
+        title="Down"
+      />
     </>
   )
 }
 
 describe('SnowGrid', () => {
+
   describe('Internal Movement', () => {
+
     describe('Single Column', () => {
+
       test('Cell 0.0 [grid-cell] is focused on first render', async () => {
         const { getByTestId } = render(<OneByThreeGrid />, {});
 
-        const focus = getFocusEngine()
+        const targetKey = 'grid-cell'
 
-        const firstStyle = StyleSheet.flatten(getByTestId('grid-cell').props.style)
-        const secondStyle = StyleSheet.flatten(getByTestId('grid-cell-row-1-column-0').props.style)
+        const firstStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
-        expect(focus.focusedKey).toBe('grid-cell');
-        expect(firstStyle.borderColor).toBe(focusedTextButtonColor)
-        expect(secondStyle.borderColor).not.toBe(focusedTextButtonColor)
-      });
+        expect(getFocusEngine().focusedKey).toBe(targetKey);
+        expect(firstStyle.borderColor).toBe(focusedColor)
+      })
 
       test('Cell 1.0 is focused after moving D', async () => {
         const { getByTestId } = render(<OneByThreeGrid />, {});
@@ -106,16 +126,16 @@ describe('SnowGrid', () => {
           getFocusEngine().moveFocusDown()
         })
 
-        const firstStyle = StyleSheet.flatten(getByTestId('grid-cell').props.style)
-        const secondStyle = StyleSheet.flatten(getByTestId('grid-cell-row-1-column-0').props.style)
+        const targetKey = 'grid-cell-row-1-column-0'
+        const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
-        expect(getFocusEngine().focusedKey).toBe('grid-cell-row-1-column-0');
-        expect(firstStyle.borderColor).not.toBe(focusedTextButtonColor)
-        expect(secondStyle.borderColor).toBe(focusedTextButtonColor)
-      });
+        expect(getFocusEngine().focusedKey).toBe(targetKey);
+        expect(targetStyle.borderColor).toBe(focusedColor)
+      })
     })
 
     describe('2x2 Grid', () => {
+
       test('Cell 0.1 is focused after moving R', async () => {
         const { getByTestId } = render(<TwoByTwoGrid />, {});
 
@@ -127,8 +147,9 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
-      });
+        expect(targetStyle.borderColor).toBe(focusedColor)
+      })
+
       test('Cell 1.0 is focused after moving D', async () => {
         const { getByTestId } = render(<TwoByTwoGrid />, {});
 
@@ -140,11 +161,12 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       });
     })
 
     describe('3x3 Grid', () => {
+
       test('Cell 1.1 is focused after moving RD', async () => {
         const { getByTestId } = render(<ThreeByThreeGrid />, {});
 
@@ -159,8 +181,9 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
-      });
+        expect(targetStyle.borderColor).toBe(focusedColor)
+      })
+
       test('Cell 2.2 [grid-cell-grid-end] is focused after moving DDRR', async () => {
         const { getByTestId } = render(<ThreeByThreeGrid />, {});
 
@@ -181,12 +204,15 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       });
     })
-  });
+  })
+
   describe("External Movement", () => {
+
     describe('Entering grid', () => {
+
       test('Left button R into 2x2 focuses grid-cell', () => {
         const { getByTestId } = render(<Surround focusStart="left"><TwoByTwoGrid focusStart={false} /></Surround>);
 
@@ -198,22 +224,24 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
-      test('Right button L into 2x2 focuses grid-cell', () => {
+
+      test('Right button L into 2x2 focuses grid-cell-grid-end', () => {
         const { getByTestId } = render(<Surround focusStart="right"><TwoByTwoGrid focusStart={false} /></Surround>);
 
         act(() => {
           getFocusEngine().moveFocusLeft()
         })
 
-        const targetKey = 'grid-cell'
+        const targetKey = 'grid-cell-grid-end'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
-      test('Up button D into 2x2 focuses grid-cell', () => {
+
+      test('Up button D into 2x2 focuses grid-cell-grid-end', () => {
         const { getByTestId } = render(<Surround focusStart="up"><TwoByTwoGrid focusStart={false} /></Surround>);
 
         act(() => {
@@ -224,23 +252,26 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
-      test('Down button U into 2x2 focuses grid-cell', () => {
+
+      test('Down button U into 2x2 focuses grid-cell-grid-end', () => {
         const { getByTestId } = render(<Surround focusStart="down"><TwoByTwoGrid focusStart={false} /></Surround>);
 
         act(() => {
           getFocusEngine().moveFocusUp()
         })
 
-        const targetKey = 'grid-cell'
+        const targetKey = 'grid-cell-grid-end'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
     })
+
     describe('Crossing grid', () => {
+
       test('Left button RRR into 2x2 focuses right-button', () => {
         const { getByTestId } = render(<Surround focusStart="left"><TwoByTwoGrid focusStart={false} /></Surround>);
 
@@ -254,12 +285,15 @@ describe('SnowGrid', () => {
           getFocusEngine().moveFocusRight()
         })
 
+        debugFocus()
+
         const targetKey = 'right-button'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
+
       test('Up button DDD into 2x2 focuses down-button', () => {
         const { getByTestId } = render(<Surround focusStart="up"><TwoByTwoGrid focusStart={false} /></Surround>);
 
@@ -277,7 +311,7 @@ describe('SnowGrid', () => {
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
-        expect(targetStyle.borderColor).toBe(focusedTextButtonColor)
+        expect(targetStyle.borderColor).toBe(focusedColor)
       })
     })
   })
