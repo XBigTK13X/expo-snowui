@@ -3,7 +3,9 @@ import Snow from 'expo-snowui';
 import { routes, pages } from './routing'
 
 function AppPage() {
-  const { CurrentPage, navPush } = Snow.useSnowContext()
+  const { CurrentPage, navPush, currentRoute } = Snow.useSnowContext()
+
+  const renderKey = Snow.stringifySafe(currentRoute.routeParams)
 
   let components = [
     ['Break', routes.break],
@@ -44,7 +46,7 @@ function AppPage() {
       </Snow.View>
       <Snow.Break style={{ width: "5%" }} vertical />
       <Snow.View style={{ width: "70%" }}>
-        <CurrentPage />
+        <CurrentPage key={renderKey} />
       </Snow.View>
     </Snow.View>
   )

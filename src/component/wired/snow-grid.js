@@ -70,8 +70,8 @@ const SnowGridW = (props) => {
     }
 
     let page = 0
-    if (currentRoute?.routeParams?.gridPage !== undefined) {
-        page = parseInt(currentRoute?.routeParams?.gridPage, 10)
+    if (currentRoute?.routeParams?.hasOwnProperty(`gridPage-${props.focusKey}`)) {
+        page = parseInt(currentRoute?.routeParams?.[`gridPage-${props.focusKey}`], 10)
     }
     const hasPageControls = items.length > itemsPerPage
     if (hasPageControls) {

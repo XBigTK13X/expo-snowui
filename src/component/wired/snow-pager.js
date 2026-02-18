@@ -12,13 +12,13 @@ const SnowPagerW = (props) => {
 
     const gotoPage = (page, trigger) => {
         let params = {
-            pageKey: page,
+            [pageKey]: page,
             pageTrigger: trigger
         }
         if (currentRoute?.routeParams) {
             params = {
                 ...currentRoute.routeParams,
-                pageKey: page,
+                [pageKey]: page,
                 pageTrigger: trigger
             }
         }
