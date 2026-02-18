@@ -9,17 +9,18 @@ const SnowPagerW = (props) => {
     const { navPush, currentRoute } = useNavigationContext(props)
 
     const pageKey = `gridPage-${props.focusKey}`
+    const pageTrigger = `pageTrigger-${props.focusKey}`
 
     const gotoPage = (page, trigger) => {
         let params = {
             [pageKey]: page,
-            pageTrigger: trigger
+            [pageTrigger]: trigger
         }
         if (currentRoute?.routeParams) {
             params = {
                 ...currentRoute.routeParams,
                 [pageKey]: page,
-                pageTrigger: trigger
+                [pageTrigger]: trigger
             }
         }
         navPush({
@@ -73,8 +74,8 @@ const SnowPagerW = (props) => {
         }-pager-${props.page} `
 
     let buttonFocusStart = null
-    if (currentRoute?.routeParams?.pageTrigger !== undefined) {
-        buttonFocusStart = currentRoute?.routeParams?.pageTrigger
+    if (currentRoute?.routeParams?.hasOwnProperty(pageTrigger)) {
+        buttonFocusStart = currentRoute?.routeParams?.[pageTrigger]
     }
 
     return (
