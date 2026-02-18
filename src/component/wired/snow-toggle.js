@@ -6,7 +6,7 @@ import { SnowLabel } from '../snow-label'
 const SnowToggleW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { useFocusWiring, isFocused, tvRemoteProps } = useFocusContext()
-    const elementRef = useFocusWiring(props)
+    const { elementRef } = useFocusWiring(props)
 
     const toggleValue = () => {
         props.onValueChange(!props.value)

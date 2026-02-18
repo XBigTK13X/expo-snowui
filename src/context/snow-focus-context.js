@@ -74,6 +74,7 @@ export function FocusContextProvider(props) {
 
     const [focusedKey, setFocusedKey] = React.useState(null)
     const focusedKeyRef = React.useRef(focusedKey)
+    const lastFocusedElementRef = React.useRef(null)
     const [focusLayers, setFocusLayers] = React.useState(emptyLayers())
     const focusLayersRef = React.useRef(focusLayers)
     const [focusedLayer, setFocusedLayer] = React.useState('app')
@@ -190,12 +191,12 @@ export function FocusContextProvider(props) {
 
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
-        const { addFocusMap, focusedLayer } = useFocusContext();
-        const elementRef = React.useRef(null);
+        const { addFocusMap, focusedLayer, focusedKey } = useFocusContext()
+        const elementRef = React.useRef(null)
 
         React.useEffect(() => {
             if (elementRef.current) {
-                addFocusMap(elementRef, elementProps);
+                addFocusMap(elementRef, elementProps)
             }
         }, [
             elementProps.focusStart,
@@ -206,9 +207,9 @@ export function FocusContextProvider(props) {
             elementProps.focusLeft,
             focusedLayer,
             elementRef
-        ]);
+        ])
 
-        return elementRef;
+        return { elementRef, focusedKey }
     }
 
     const clearFocusLayers = () => {
@@ -296,16 +297,15 @@ export function FocusContextProvider(props) {
     }
 
     const focusOn = (elementRef, focusKey) => {
-        if (!ENABLED) return false;
+        if (!ENABLED) return false
 
-        const element = elementRef?.current;
-        if (!element) return false;
-
-        element.requestTVFocus?.();
-        element.focus?.();
-
-        focusedKeyRef.current = focusKey;
-        setFocusedKey(focusKey);
+        const element = elementRef?.current
+        if (!element) {
+            if (DEBUG === 'verbose') {
+                prettyLog({ context: 'focus', action: 'focusOn', message: 'No element to focus', elementRef, focusKey });
+            }
+            return false
+        }
 
         if (focusKey && focusedKeyRef.current === focusKey) {
             if (DEBUG === 'verbose') {
@@ -318,12 +318,12 @@ export function FocusContextProvider(props) {
             return true
         }
 
-        if (!element) {
-            if (DEBUG === 'verbose') {
-                prettyLog({ context: 'focus', action: 'focusOn', message: 'No element to focus', elementRef, focusKey });
-            }
-            return false
-        }
+        lastFocusedElementRef.current?.blur?.()
+        element.requestTVFocus?.()
+        element.focus?.()
+        lastFocusedElementRef.current = element
+        focusedKeyRef.current = focusKey
+        setFocusedKey(focusKey)
 
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'focusOn', elementRef, focusKey });

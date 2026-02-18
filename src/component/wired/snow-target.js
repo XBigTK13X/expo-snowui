@@ -5,7 +5,7 @@ import { useStyleContext } from '../../context/snow-style-context'
 const SnowTargetW = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { isFocused, useFocusWiring } = useFocusContext()
-    const elementRef = useFocusWiring(props)
+    const { elementRef } = useFocusWiring(props)
 
     let outerStyle = [SnowStyle.component.target.outer]
 

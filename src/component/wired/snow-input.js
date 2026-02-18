@@ -7,7 +7,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 const SnowInputW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { isFocused, useFocusWiring, tvRemoteProps } = useFocusContext()
-    const containerRef = useFocusWiring(props)
+    const { elementRef } = useFocusWiring(props)
     const inputRef = React.useRef(null)
 
     let textStyle = [SnowStyle.component.input.text]
@@ -48,7 +48,7 @@ const SnowInputW = (props) => {
 
     return (
         <Pressable
-            ref={containerRef}
+            ref={elementRef}
             {...tvRemoteProps(props)}
             onPress={onContainerPress}
             style={textStyle} >

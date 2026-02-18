@@ -45,7 +45,7 @@ const SnowRangeSliderW = (props) => {
     const trackRef = React.useRef(null)
     const trackXRef = React.useRef(0)
 
-    const elementRef = useFocusWiring(props)
+    const { elementRef } = useFocusWiring(props)
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
     if (props.width) {
