@@ -285,8 +285,6 @@ describe('SnowGrid', () => {
           getFocusEngine().moveFocusRight()
         })
 
-        debugFocus()
-
         const targetKey = 'right-button'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 

@@ -397,7 +397,13 @@ export function FocusContextProvider(props) {
         }
     };
 
-    // returning false cancels the requested movement
+
+    // moveFocus is a complex handler
+    // Returning false means the move failed
+    // First it tries to use a direct mapping of source to destination
+    // If there isn't a direct route, then check if focus is on a grid
+    // If moving down or right, then see if the gridId-grid-end can be used as a proxy move target
+    // If moving up or left, then see if the gridId can be used as a proxy move target
     const moveFocus = (direction) => {
         if (!ENABLED) {
             return false
@@ -417,40 +423,41 @@ export function FocusContextProvider(props) {
             }
             return false
         }
-        let sourceKey = focusedKeyRef.current
-        let destinationKey = null
+
+        const sourceKey = focusedKeyRef.current
         const focusLayer = focusLayersRef.current.at(-1)
 
-        const request = focusLayer.directions?.[sourceKey]?.[direction];
-        const normalDestination = request && focusLayer.directions.hasOwnProperty(request)
-        let isGridCell = false
-        if (!normalDestination) {
-            isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) || (sourceKey.indexOf('-grid-end') !== -1)
+        let destinationKey = focusLayer.directions?.[sourceKey]?.[direction]
+        if (!destinationKey || !focusLayer.refs[destinationKey]) {
+            const isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) ||
+                (sourceKey.indexOf('-grid-end') !== -1)
+
             if (isGridCell) {
-                sourceKey = sourceKey.split('-row-')[0]
-                // Only ever replace one -grid-end at a time
-                // Otherwise, a nested grid will have focus escape a map too early
-                sourceKey = sourceKey.replace('-grid-end', '')
-                let target = focusLayer.directions?.[sourceKey]?.[direction]
-                // The target is defined and isn't a cell in the grid
-                if (target && target.indexOf(sourceKey) === -1) {
-                    destinationKey = target
-                    if (DEBUG) {
-                        prettyLog({ context: 'focus', action: 'moveFocus->gridAdjustment', sourceKey, destinationKey, focusLayer })
+                const gridId = sourceKey.split('-row-')[0].replace('-grid-end', '')
+                const hubTarget = focusLayer.directions?.[gridId]?.[direction]
+                if (hubTarget && hubTarget.indexOf(gridId) === -1) {
+                    destinationKey = hubTarget
+                }
+                if (!destinationKey) {
+                    let proxyKey = null
+                    if (direction === 'right' || direction === 'down') {
+                        proxyKey = `${gridId}-grid-end`
+                    }
+                    else if (direction === 'left' || direction === 'up') {
+                        proxyKey = `${gridId}-row-0-column-0`
+                    }
+                    if (proxyKey && proxyKey !== sourceKey) {
+                        const proxyTarget = focusLayer.directions?.[proxyKey]?.[direction]
+                        if (proxyTarget && proxyTarget.indexOf(gridId) === -1) {
+                            destinationKey = proxyTarget
+                            if (DEBUG) {
+                                prettyLog({ context: 'focus', action: 'moveFocus->proxyEscape', sourceKey, proxyKey, destinationKey })
+                            }
+                        }
                     }
                 }
             }
         }
-
-        // If the destination wasn't found using edge cases above
-        // Use a normal lookup
-        if (!destinationKey && !isGridCell && focusLayer.directions[sourceKey]) {
-            destinationKey = focusLayer.directions[sourceKey][direction]
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'moveFocus->normalDestination', sourceKey, destinationKey, focusLayer })
-            }
-        }
-
 
         if (!destinationKey || !focusLayer.refs[destinationKey]) {
             if (DEBUG) {
