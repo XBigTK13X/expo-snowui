@@ -4,7 +4,8 @@ import {
   act,
   render,
   focusedColor,
-  getFocusEngine
+  getFocusEngine,
+  runActions
 } from './test-utils';
 
 import SnowTabs from '../component/wired/snow-tabs'
@@ -52,11 +53,23 @@ describe('SnowTabs', () => {
       test('Second tab is focused after moving R', async () => {
         const { getByTestId } = render(<TwoGrids />, {});
 
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
+        await runActions(act, ['R'])
 
         const targetKey = 'grid-tabs-grid-end'
+
+        const firstStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
+
+        expect(getFocusEngine().focusedKey).toBe(targetKey);
+        expect(firstStyle.borderColor).toBe(focusedColor)
+      })
+    })
+    describe('Grid Pager', () => {
+      test("Second tab pager doesn't change first tab grid", async () => {
+        const { getByTestId } = render(<TwoGrids />, {});
+
+        await runActions(act, ['R', 'P', 'D', 'P', 'P', 'U', 'L', 'P'])
+
+        const targetKey = 'grid-tabs'
 
         const firstStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
 

@@ -524,6 +524,14 @@ export function FocusContextProvider(props) {
         return focusMap.refs[focusKey][action]()
     }
 
+    const pressFocused = () => {
+        return focusedElementAction(null, 'onPress')
+    }
+
+    const longPressFocused = () => {
+        return focusedElementAction(null, 'onLongPress')
+    }
+
     const focusAction = (elementRef, focusKey, action) => {
         return () => {
             focusOn(elementRef, focusKey)
@@ -588,10 +596,12 @@ export function FocusContextProvider(props) {
         focusPress,
         isFocused,
         isFocusedLayer,
+        longPressFocused,
         moveFocusDown,
         moveFocusLeft,
         moveFocusRight,
         moveFocusUp,
+        pressFocused,
         popFocusLayer,
         pushFocusLayer,
         readFocusProps,

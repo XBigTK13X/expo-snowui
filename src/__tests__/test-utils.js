@@ -73,6 +73,31 @@ const TestApp = (props) => {
     );
 };
 
+export const runActions = async (runner, actions) => {
+    return new Promise(async resolve => {
+        for (let action of actions) {
+            await runner(() => {
+                if (action == 'R') {
+                    getFocusEngine().moveFocusRight()
+                }
+                if (action == 'L') {
+                    getFocusEngine().moveFocusLeft()
+                }
+                if (action == 'U') {
+                    getFocusEngine().moveFocusUp()
+                }
+                if (action == 'D') {
+                    getFocusEngine().moveFocusDown()
+                }
+                if (action == 'P') {
+                    getFocusEngine().pressFocused()
+                }
+            })
+        }
+        resolve(true)
+    })
+}
+
 const customRender = (ui, options) =>
     render(ui, { wrapper: TestApp, ...options });
 

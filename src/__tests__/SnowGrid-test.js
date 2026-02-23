@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import {
   act,
   render,
-  debugFocus,
+  runActions,
   focusedColor,
   getFocusEngine
 } from './test-utils';
@@ -102,13 +102,21 @@ const Surround = (props) => {
   )
 }
 
+const surrounded = (start) => {
+  return (
+    <Surround focusStart={start}>
+      <TwoByTwoGrid focusStart={false} />
+    </Surround>
+  )
+}
+
 describe('SnowGrid', () => {
 
   describe('Internal Movement', () => {
 
     describe('Single Column', () => {
 
-      test('Cell 0.0 [grid-cell] is focused on first render', async () => {
+      test('1.1) Cell 0.0 [grid-cell] is focused on first render', async () => {
         const { getByTestId } = render(<OneByThreeGrid />, {});
 
         const targetKey = 'grid-cell'
@@ -119,12 +127,10 @@ describe('SnowGrid', () => {
         expect(firstStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Cell 1.0 is focused after moving D', async () => {
+      test('1.2) Cell 1.0 is focused after moving D', async () => {
         const { getByTestId } = render(<OneByThreeGrid />, {});
 
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
+        await runActions(act, ['D'])
 
         const targetKey = 'grid-cell-row-1-column-0'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -136,12 +142,10 @@ describe('SnowGrid', () => {
 
     describe('2x2 Grid', () => {
 
-      test('Cell 0.1 is focused after moving R', async () => {
+      test('2.1) Cell 0.1 is focused after moving R', async () => {
         const { getByTestId } = render(<TwoByTwoGrid />, {});
 
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
+        await runActions(act, ['R'])
 
         const targetKey = 'grid-cell-row-0-column-1'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -150,7 +154,7 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Cell 1.0 is focused after moving D', async () => {
+      test('2.2) Cell 1.0 is focused after moving D', async () => {
         const { getByTestId } = render(<TwoByTwoGrid />, {});
 
         act(() => {
@@ -167,15 +171,10 @@ describe('SnowGrid', () => {
 
     describe('3x3 Grid', () => {
 
-      test('Cell 1.1 is focused after moving RD', async () => {
+      test('3.1) Cell 1.1 is focused after moving RD', async () => {
         const { getByTestId } = render(<ThreeByThreeGrid />, {});
 
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
+        await runActions(act, ['R', 'D'])
 
         const targetKey = 'grid-cell-row-1-column-1'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -184,21 +183,10 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Cell 2.2 [grid-cell-grid-end] is focused after moving DDRR', async () => {
+      test('3.2) Cell 2.2 [grid-cell-grid-end] is focused after moving DDRR', async () => {
         const { getByTestId } = render(<ThreeByThreeGrid />, {});
 
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
+        await runActions(act, ['D', 'D', 'R', 'R'])
 
         const targetKey = 'grid-cell-grid-end'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -213,12 +201,10 @@ describe('SnowGrid', () => {
 
     describe('Entering grid', () => {
 
-      test('Left button R into 2x2 focuses grid-cell', () => {
-        const { getByTestId } = render(<Surround focusStart="left"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('4.1) left-button R into 2x2 focuses grid-cell', async () => {
+        const { getByTestId } = render(surrounded('left'));
 
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
+        await runActions(act, ['R'])
 
         const targetKey = 'grid-cell'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -227,12 +213,10 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Right button L into 2x2 focuses grid-cell-grid-end', () => {
-        const { getByTestId } = render(<Surround focusStart="right"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('4.2) right-button L into 2x2 focuses grid-cell-grid-end', async () => {
+        const { getByTestId } = render(surrounded('right'));
 
-        act(() => {
-          getFocusEngine().moveFocusLeft()
-        })
+        await runActions(act, ['L'])
 
         const targetKey = 'grid-cell-grid-end'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -241,12 +225,10 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Up button D into 2x2 focuses grid-cell-grid-end', () => {
-        const { getByTestId } = render(<Surround focusStart="up"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('4.3) up-button D into 2x2 focuses grid-cell', async () => {
+        const { getByTestId } = render(surrounded('up'));
 
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
+        await runActions(act, ['D'])
 
         const targetKey = 'grid-cell'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -255,12 +237,10 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Down button U into 2x2 focuses grid-cell-grid-end', () => {
-        const { getByTestId } = render(<Surround focusStart="down"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('4.4) down-button U into 2x2 focuses grid-cell-grid-end', async () => {
+        const { getByTestId } = render(surrounded('down'));
 
-        act(() => {
-          getFocusEngine().moveFocusUp()
-        })
+        await runActions(act, ['U'])
 
         const targetKey = 'grid-cell-grid-end'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -272,18 +252,10 @@ describe('SnowGrid', () => {
 
     describe('Crossing grid', () => {
 
-      test('Left button RRR into 2x2 focuses right-button', () => {
-        const { getByTestId } = render(<Surround focusStart="left"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('5.1) left-button RRR into 2x2 focuses right-button', async () => {
+        const { getByTestId } = render(surrounded('left'));
 
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
-        act(() => {
-          getFocusEngine().moveFocusRight()
-        })
+        await runActions(act, ['R', 'R', 'R'])
 
         const targetKey = 'right-button'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
@@ -292,18 +264,10 @@ describe('SnowGrid', () => {
         expect(targetStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Up button DDD into 2x2 focuses down-button', () => {
-        const { getByTestId } = render(<Surround focusStart="up"><TwoByTwoGrid focusStart={false} /></Surround>);
+      test('5.2) up-button DDD into 2x2 focuses down-button', async () => {
+        const { getByTestId } = render(surrounded('up'));
 
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
-        act(() => {
-          getFocusEngine().moveFocusDown()
-        })
+        await runActions(act, ['D', 'D', 'D'])
 
         const targetKey = 'down-button'
         const targetStyle = StyleSheet.flatten(getByTestId(targetKey).props.style)
