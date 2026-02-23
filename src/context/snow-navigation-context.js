@@ -61,7 +61,7 @@ export function NavigationContextProvider(props) {
         navigationHistoryRef.current = navigationHistory
         if (navigationHistory?.at(-1)?.routePath) {
             let layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey
-            const gridPage = navigationHistory?.at(-1).routeParams?.gridPage
+            const gridPage = navigationHistory?.at(-1).routeParams?.['grid-page']
             if (gridPage) {
                 layerName = layerName + '-' + gridPage
             }
