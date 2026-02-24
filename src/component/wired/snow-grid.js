@@ -1,16 +1,11 @@
 import React from 'react'
-import {
-    View
-} from 'react-native'
+import { View } from 'react-native'
 
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowPager from './snow-pager'
 
-// The grid may contain items that aren't wired for focus
-// This tracks only wired items, so that focus hints between them
-// Can be more easily management
 const emptyWiredGrid = () => {
     return {
         row: 0,
@@ -26,7 +21,6 @@ const SnowGridW = (props) => {
     }
     let items = props.items
     if (!props.items) {
-        // Without this, if a ternary `{x?x:null}` nullable component will leave a gap in the grid
         items = React.Children.toArray(props.children)
     }
     items = items?.filter(child => child !== null)
@@ -70,8 +64,8 @@ const SnowGridW = (props) => {
     }
 
     let page = 0
-    if (currentRoute?.routeParams?.hasOwnProperty(`grid-page-${props.focusKey}`)) {
-        page = parseInt(currentRoute?.routeParams?.[`grid-page-${props.focusKey}`], 10) ?? 0
+    if (currentRoute?.routeParams?.hasOwnProperty(`${props.focusKey}-grid-page`)) {
+        page = parseInt(currentRoute?.routeParams?.[`${props.focusKey}-grid-page`], 10) ?? 0
     }
 
     const hasPageControls = items.length > itemsPerPage
@@ -89,12 +83,17 @@ const SnowGridW = (props) => {
     let lastCellKey = `${props.focusKey}-grid-end`
     let lastCellFullKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
 
+    if (gridFocusKey === lastCellFullKey) {
+        gridFocusKey = lastCellKey
+    }
+
     let pageControls = null
     if (hasPageControls) {
         pageControls = (
             <SnowPager
                 maxPage={maxPage}
                 page={page}
+                focusUp={props.focusUp}
                 focusDown={gridFocusKey}
                 focusKey={props.focusKey}
             />
@@ -129,8 +128,8 @@ const SnowGridW = (props) => {
                     }
                 }
             }
-            // Only allow auto focusing before the pager is used
-            if (currentRoute.routeParams.page === undefined) {
+
+            if (currentRoute?.routeParams?.page === undefined) {
                 if (child.props.focusStart) {
                     focus.focusStart = child.props.focusStart
                 } else {
@@ -142,7 +141,7 @@ const SnowGridW = (props) => {
 
             if (row === 0) {
                 if (hasPageControls) {
-                    focus.focusUp = props.focusKey
+                    focus.focusUp = `${props.focusKey}-next-page`
                 }
                 else {
                     if (props.focusUp) {

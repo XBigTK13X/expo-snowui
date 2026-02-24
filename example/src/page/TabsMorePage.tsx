@@ -18,7 +18,12 @@ const imageItems = [
   }
 ]
 
+
+
 export default function TabsMorePage() {
+  const { logFocusInfo } = Snow.useFocusContext()
+
+  logFocusInfo()
 
   return (
     <>

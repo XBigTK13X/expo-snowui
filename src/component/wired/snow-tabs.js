@@ -1,10 +1,9 @@
 import React from 'react'
-import { View } from 'react-native';
+import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowDropdown from './snow-dropdown'
-
 
 const SnowTabsW = (props) => {
     if (!props.headers) {
@@ -17,8 +16,8 @@ const SnowTabsW = (props) => {
     const { readFocusProps } = useFocusContext()
     const { navPush, currentRoute } = useNavigationContext(props)
 
-    const tabKey = `tab-${props.focusKey}`
-    const tabTrigger = `tab-trigger-${props.focusKey}`
+    const tabKey = `${props.focusKey}-tab`
+    const tabTrigger = `${props.focusKey}-tab-trigger`
 
     let tabIndex = 0
     if (currentRoute?.routeParams?.hasOwnProperty(tabKey)) {
@@ -67,18 +66,19 @@ const SnowTabsW = (props) => {
     const innerFocusKey = `${props.focusKey}-tab`
 
     const outerFocusProps = readFocusProps(props)
-    outerFocusProps.focusDown = innerFocusKey
+    outerFocusProps.focusDown = `${innerFocusKey}-${tabIndex}`
 
     const tabs = React.Children.toArray(props.children).map((child, childIndex) => {
         if (React.isValidElement(child)) {
             return React.cloneElement(child, {
                 snowStyle: tabStyle,
                 focusKey: `${innerFocusKey}-${childIndex}`,
-                focusDown: props.focusDown
-            });
+                focusDown: props.focusDown,
+                focusUp: props.focusKey
+            })
         }
-        return child;
-    }).filter(child => child !== null);
+        return child
+    }).filter(child => child !== null)
 
     return (
         <>

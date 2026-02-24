@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash'
 import {
     Dimensions,
     findNodeHandle,
@@ -191,12 +190,17 @@ export function FocusContextProvider(props) {
 
     // This is only used by low level components to interact with the focus system
     const useFocusWiring = (elementProps) => {
-        const { addFocusMap, focusedLayer, focusedKey } = useFocusContext()
+        const { addFocusMap, removeFocusMap, focusedLayer, focusedKey } = useFocusContext()
         const elementRef = React.useRef(null)
 
         React.useEffect(() => {
             if (elementRef.current) {
                 addFocusMap(elementRef, elementProps)
+            }
+            return () => {
+                if (removeFocusMap && elementProps.focusKey) {
+                    removeFocusMap(elementProps.focusKey)
+                }
             }
         }, [
             elementProps.focusStart,
@@ -226,72 +230,85 @@ export function FocusContextProvider(props) {
             return false
         }
         const focusKey = elementProps.focusKey
-        const refs = {
-            [focusKey]: {
-                element: elementRef,
-                onPress: elementProps.onPress,
-                onLongPress: elementProps.onLongPress
-            }
+        const newRef = {
+            element: elementRef,
+            onPress: elementProps.onPress,
+            onLongPress: elementProps.onLongPress
         }
+
         let focus = {}
-        if (elementProps.focusUp) {
-            focus['up'] = elementProps.focusUp
-        }
-        if (elementProps.focusDown) {
-            focus['down'] = elementProps.focusDown
-        }
-        if (elementProps.focusRight) {
-            focus['right'] = elementProps.focusRight
-        }
-        if (elementProps.focusLeft) {
-            focus['left'] = elementProps.focusLeft
-        }
-        const directions = {
-            [focusKey]: focus
-        }
+        if (elementProps.focusUp) focus['up'] = elementProps.focusUp
+        if (elementProps.focusDown) focus['down'] = elementProps.focusDown
+        if (elementProps.focusRight) focus['right'] = elementProps.focusRight
+        if (elementProps.focusLeft) focus['left'] = elementProps.focusLeft
+
         if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'addFocusMap', elementRef, elementProps, focusKey, refs, directions })
+            prettyLog({ context: 'focus', action: 'addFocusMap', elementRef, elementProps, focusKey, newRef, focus })
         }
+
         setFocusLayers((prev) => {
             let result = [...prev]
-            let focusLayer = result[result.length - 1]
+            let focusLayer = { ...result[result.length - 1] }
+
+            focusLayer.directions = { ...focusLayer.directions }
+            focusLayer.refs = { ...focusLayer.refs }
+
             if (elementProps.focusUp) {
-                if (!focusLayer.directions.hasOwnProperty(elementProps.focusUp)) {
-                    focusLayer.directions[elementProps.focusUp] = {}
-                }
-                if (!focusLayer.directions[elementProps.focusUp]['down']) {
-                    focusLayer.directions[elementProps.focusUp]['down'] = focusKey
+                focusLayer.directions[elementProps.focusUp] = {
+                    ...focusLayer.directions[elementProps.focusUp],
+                    down: focusLayer.directions[elementProps.focusUp]?.down || focusKey
                 }
             }
             if (elementProps.focusDown) {
-                if (!focusLayer.directions.hasOwnProperty(elementProps.focusDown)) {
-                    focusLayer.directions[elementProps.focusDown] = {}
-                }
-                if (!focusLayer.directions[elementProps.focusDown]['up']) {
-                    focusLayer.directions[elementProps.focusDown]['up'] = focusKey
+                focusLayer.directions[elementProps.focusDown] = {
+                    ...focusLayer.directions[elementProps.focusDown],
+                    up: focusLayer.directions[elementProps.focusDown]?.up || focusKey
                 }
             }
             if (elementProps.focusLeft) {
-                if (!focusLayer.directions.hasOwnProperty(elementProps.focusLeft)) {
-                    focusLayer.directions[elementProps.focusLeft] = {}
-                }
-                if (!focusLayer.directions[elementProps.focusLeft]['right']) {
-                    focusLayer.directions[elementProps.focusLeft]['right'] = focusKey
+                focusLayer.directions[elementProps.focusLeft] = {
+                    ...focusLayer.directions[elementProps.focusLeft],
+                    right: focusLayer.directions[elementProps.focusLeft]?.right || focusKey
                 }
             }
             if (elementProps.focusRight) {
-                if (!focusLayer.directions.hasOwnProperty(elementProps.focusRight)) {
-                    focusLayer.directions[elementProps.focusRight] = {}
-                }
-                if (!focusLayer.directions[elementProps.focusRight]['left']) {
-                    focusLayer.directions[elementProps.focusRight]['left'] = focusKey
+                focusLayer.directions[elementProps.focusRight] = {
+                    ...focusLayer.directions[elementProps.focusRight],
+                    left: focusLayer.directions[elementProps.focusRight]?.left || focusKey
                 }
             }
+
             if (elementProps.focusStart) {
                 focusLayer.focusStartElementRef = elementRef
                 focusLayer.focusStartKey = elementProps.focusKey
             }
-            result[result.length - 1] = _.merge({}, { ...focusLayer }, { refs, directions })
+
+            focusLayer.directions[focusKey] = { ...focusLayer.directions[focusKey], ...focus }
+            focusLayer.refs[focusKey] = newRef
+
+            result[result.length - 1] = focusLayer
+            return result
+        })
+    }
+
+    const removeFocusMap = (focusKey) => {
+        if (!ENABLED || !focusKey) return false
+
+        if (DEBUG === 'verbose') {
+            prettyLog({ context: 'focus', action: 'removeFocusMap', focusKey })
+        }
+
+        setFocusLayers((prev) => {
+            let result = [...prev]
+            let focusLayer = { ...result[result.length - 1] }
+
+            focusLayer.directions = { ...focusLayer.directions }
+            focusLayer.refs = { ...focusLayer.refs }
+
+            delete focusLayer.refs[focusKey]
+            delete focusLayer.directions[focusKey]
+
+            result[result.length - 1] = focusLayer
             return result
         })
     }
@@ -418,41 +435,43 @@ export function FocusContextProvider(props) {
         let destinationKey = focusLayer.directions?.[sourceKey]?.[direction]
 
         if (!destinationKey) {
-            const possibleParents = Object.keys(focusLayer.directions)
-                .filter(key => sourceKey.includes(key) && key !== sourceKey)
-                .sort((a, b) => b.length - a.length)
-
-            for (let parentKey of possibleParents) {
+            let parts = sourceKey.split('-')
+            while (parts.length > 1 && !destinationKey) {
+                parts.pop()
+                let parentKey = parts.join('-')
                 if (focusLayer.directions[parentKey]?.[direction]) {
                     destinationKey = focusLayer.directions[parentKey][direction]
-                    break
                 }
             }
         }
 
-        if (destinationKey && !focusLayer.refs[destinationKey]) {
+        const isValidTarget = (key) => focusLayer.refs[key] && focusLayer.refs[key].element?.current
+
+        if (destinationKey && !isValidTarget(destinationKey)) {
             const potentialTargets = Object.keys(focusLayer.refs)
-                .filter(key => key.includes(destinationKey) && focusLayer.refs[key] && key !== destinationKey)
-                .sort((a, b) => a.length - b.length)
+                .filter(key => key.startsWith(destinationKey) && isValidTarget(key) && key !== destinationKey)
+                .sort()
 
-            if (potentialTargets.length > 0 && !sourceKey.includes(destinationKey)) {
-                const activeTrigger = params[`page-trigger-${destinationKey}`] ||
-                    params[`tab-trigger-${destinationKey}`] ||
-                    params[`trigger-${destinationKey}`]
+            if (potentialTargets.length > 0 && !sourceKey.startsWith(destinationKey)) {
+                const activeTrigger = params[`${destinationKey}-page-trigger`] ||
+                    params[`${destinationKey}-tab-trigger`] ||
+                    params[`${destinationKey}-trigger`]
 
-                destinationKey = (activeTrigger && focusLayer.refs[activeTrigger])
+                destinationKey = (activeTrigger && isValidTarget(activeTrigger))
                     ? activeTrigger
-                    : potentialTargets[0]
+                    : (potentialTargets.find(k => k.endsWith('-next-page')) ||
+                        potentialTargets.find(k => k.endsWith('-row-0-column-0')) ||
+                        potentialTargets[0])
             }
         }
 
-        if (!destinationKey || !focusLayer.refs[destinationKey]) {
+        if (!destinationKey || !isValidTarget(destinationKey)) {
             const isGridCell = sourceKey.includes('-row-') || sourceKey.includes('-grid-end')
             if (isGridCell) {
                 const gridId = sourceKey.split('-row-')[0].replace('-grid-end', '')
                 const hubTarget = focusLayer.directions?.[gridId]?.[direction]
 
-                if (hubTarget && !hubTarget.includes(gridId)) {
+                if (hubTarget && !hubTarget.startsWith(gridId)) {
                     destinationKey = hubTarget
                 }
 
@@ -463,7 +482,7 @@ export function FocusContextProvider(props) {
 
                     if (proxyKey !== sourceKey) {
                         const proxyTarget = focusLayer.directions?.[proxyKey]?.[direction]
-                        if (proxyTarget && !proxyTarget.includes(gridId)) {
+                        if (proxyTarget && !proxyTarget.startsWith(gridId)) {
                             destinationKey = proxyTarget
                         }
                     }
@@ -471,7 +490,33 @@ export function FocusContextProvider(props) {
             }
         }
 
-        if (!destinationKey || !focusLayer.refs[destinationKey]) {
+        if (!destinationKey || !isValidTarget(destinationKey)) {
+            let parts = sourceKey.split('-')
+            while (parts.length > 1) {
+                parts.pop()
+                let parentKey = parts.join('-')
+                if (direction === 'up' && parentKey) {
+                    let triggerKey = params[`${parentKey}-page-trigger`] ||
+                        params[`${parentKey}-tab-trigger`] ||
+                        params[`${parentKey}-trigger`]
+
+                    if (triggerKey && isValidTarget(triggerKey)) {
+                        destinationKey = triggerKey
+                        break
+                    }
+
+                    const fallbackTargets = Object.keys(focusLayer.refs).filter(key =>
+                        key.startsWith(parentKey) && isValidTarget(key) && !key.startsWith(`${parentKey}-tab`) && key !== sourceKey
+                    )
+                    if (fallbackTargets.length > 0) {
+                        destinationKey = fallbackTargets[0]
+                        break
+                    }
+                }
+            }
+        }
+
+        if (!destinationKey || !isValidTarget(destinationKey)) {
             return false
         }
 
@@ -576,6 +621,13 @@ export function FocusContextProvider(props) {
         return focusProps
     }
 
+    const logFocusInfo = () => {
+        console.log({
+            directions: focusLayers.at(-1).directions,
+            focusedKey: focusedKey
+        })
+    }
+
     // If these are omitted, then TV remote doesn't work on first launch
     // This is a low level helper for wired components
     // Most things outside snowui will not need it
@@ -607,6 +659,7 @@ export function FocusContextProvider(props) {
         moveFocusLeft,
         moveFocusRight,
         moveFocusUp,
+        logFocusInfo,
         pressFocused,
         popFocusLayer,
         pushFocusLayer,
