@@ -92,6 +92,9 @@ export const runActions = async (runner, actions) => {
                 if (action == 'P') {
                     getFocusEngine().pressFocused()
                 }
+                if (action === 'B') {
+                    debugFocus()
+                }
             })
         }
         resolve(true)

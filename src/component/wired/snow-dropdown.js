@@ -15,7 +15,7 @@ const SnowDropdownW = (props) => {
 
     const choose = (chosenIndex) => {
         if (props.onValueChange) {
-            props.onValueChange(chosenIndex)
+            props.onValueChange(chosenIndex, props.focusKey)
         }
     }
 

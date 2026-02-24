@@ -3,7 +3,6 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
-import SnowView from './snow-view'
 
 const SnowImageGridW = (props) => {
     if (!props.items || !props.items.length) {

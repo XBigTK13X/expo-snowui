@@ -2,20 +2,28 @@ import React from 'react'
 import { View } from 'react-native';
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowDropdown from './snow-dropdown'
 
 
 const SnowTabsW = (props) => {
-    const { SnowStyle } = useStyleContext(props)
     if (!props.headers) {
         return null
     }
     if (!props.children) {
         return null
     }
+    const { SnowStyle } = useStyleContext(props)
     const { readFocusProps } = useFocusContext()
+    const { navPush, currentRoute } = useNavigationContext(props)
 
-    const [tabIndex, setTabIndex] = React.useState(0)
+    const tabKey = `tab-${props.focusKey}`
+    const tabTrigger = `tab-trigger-${props.focusKey}`
+
+    let tabIndex = 0
+    if (currentRoute?.routeParams?.hasOwnProperty(tabKey)) {
+        tabIndex = parseInt(currentRoute?.routeParams?.[tabKey], 10) ?? 0
+    }
     const tabStyle = {
         color: {
             fade: SnowStyle.color.panel
@@ -37,16 +45,35 @@ const SnowTabsW = (props) => {
         }
     }
 
+    const changeTab = (newIndex, trigger) => {
+        let params = {
+            [tabKey]: newIndex,
+            [tabTrigger]: trigger
+        }
+        if (currentRoute?.routeParams) {
+            params = {
+                ...currentRoute.routeParams,
+                [tabKey]: newIndex,
+                [tabTrigger]: trigger
+            }
+        }
+        navPush({
+            params: params,
+            replace: true,
+            func: false
+        })
+    }
+
     const innerFocusKey = `${props.focusKey}-tab`
 
     const outerFocusProps = readFocusProps(props)
     outerFocusProps.focusDown = innerFocusKey
 
-    const tabs = React.Children.toArray(props.children).map(child => {
+    const tabs = React.Children.toArray(props.children).map((child, childIndex) => {
         if (React.isValidElement(child)) {
             return React.cloneElement(child, {
                 snowStyle: tabStyle,
-                focusKey: innerFocusKey,
+                focusKey: `${innerFocusKey}-${childIndex}`,
                 focusDown: props.focusDown
             });
         }
@@ -60,7 +87,7 @@ const SnowTabsW = (props) => {
                 snowStyle={tabStyle}
                 fade
                 options={props.headers}
-                onValueChange={setTabIndex}
+                onValueChange={changeTab}
                 valueIndex={tabIndex}
                 itemsPerRow={props.headers.length} />
             <View style={SnowStyle.component.tabs.panel}>

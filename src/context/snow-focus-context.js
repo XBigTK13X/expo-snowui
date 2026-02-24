@@ -404,55 +404,67 @@ export function FocusContextProvider(props) {
     // If there isn't a direct route, then check if focus is on a grid
     // If moving down or right, then see if the gridId-grid-end can be used as a proxy move target
     // If moving up or left, then see if the gridId can be used as a proxy move target
+    // If there are focus hints in the url, then try to resolve global keys without IDs from local keys that contain
     const moveFocus = (direction) => {
-        if (!ENABLED) {
-            return false
-        }
-        if (Platform.isTV && Keyboard.isVisible()) {
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'moveFocus FAIL Keyboard is visible' })
-            }
-            return false
-        }
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'moveFocus', direction, focusedKey: focusedKeyRef.current, focusLayers: focusLayersRef.current })
-        }
-        if (!focusedKeyRef.current || !focusLayersRef.current.length) {
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'moveFocus FAIL no element currently focused' })
-            }
-            return false
-        }
+        if (!ENABLED) return false
+        if (Platform.isTV && Keyboard.isVisible()) return false
 
         const sourceKey = focusedKeyRef.current
         const focusLayer = focusLayersRef.current.at(-1)
+        const params = props.currentRoute?.routeParams || {}
+
+        if (!sourceKey || !focusLayer) return false
 
         let destinationKey = focusLayer.directions?.[sourceKey]?.[direction]
-        if (!destinationKey || !focusLayer.refs[destinationKey]) {
-            const isGridCell = (sourceKey.indexOf('-row-') !== -1 && sourceKey.indexOf('-column-') !== -1) ||
-                (sourceKey.indexOf('-grid-end') !== -1)
 
+        if (!destinationKey) {
+            const possibleParents = Object.keys(focusLayer.directions)
+                .filter(key => sourceKey.includes(key) && key !== sourceKey)
+                .sort((a, b) => b.length - a.length)
+
+            for (let parentKey of possibleParents) {
+                if (focusLayer.directions[parentKey]?.[direction]) {
+                    destinationKey = focusLayer.directions[parentKey][direction]
+                    break
+                }
+            }
+        }
+
+        if (destinationKey && !focusLayer.refs[destinationKey]) {
+            const potentialTargets = Object.keys(focusLayer.refs)
+                .filter(key => key.includes(destinationKey) && focusLayer.refs[key] && key !== destinationKey)
+                .sort((a, b) => a.length - b.length)
+
+            if (potentialTargets.length > 0 && !sourceKey.includes(destinationKey)) {
+                const activeTrigger = params[`page-trigger-${destinationKey}`] ||
+                    params[`tab-trigger-${destinationKey}`] ||
+                    params[`trigger-${destinationKey}`]
+
+                destinationKey = (activeTrigger && focusLayer.refs[activeTrigger])
+                    ? activeTrigger
+                    : potentialTargets[0]
+            }
+        }
+
+        if (!destinationKey || !focusLayer.refs[destinationKey]) {
+            const isGridCell = sourceKey.includes('-row-') || sourceKey.includes('-grid-end')
             if (isGridCell) {
                 const gridId = sourceKey.split('-row-')[0].replace('-grid-end', '')
                 const hubTarget = focusLayer.directions?.[gridId]?.[direction]
-                if (hubTarget && hubTarget.indexOf(gridId) === -1) {
+
+                if (hubTarget && !hubTarget.includes(gridId)) {
                     destinationKey = hubTarget
                 }
+
                 if (!destinationKey) {
-                    let proxyKey = null
-                    if (direction === 'right' || direction === 'down') {
-                        proxyKey = `${gridId}-grid-end`
-                    }
-                    else if (direction === 'left' || direction === 'up') {
-                        proxyKey = `${gridId}-row-0-column-0`
-                    }
-                    if (proxyKey && proxyKey !== sourceKey) {
+                    let proxyKey = (direction === 'right' || direction === 'down')
+                        ? `${gridId}-grid-end`
+                        : `${gridId}-row-0-column-0`
+
+                    if (proxyKey !== sourceKey) {
                         const proxyTarget = focusLayer.directions?.[proxyKey]?.[direction]
-                        if (proxyTarget && proxyTarget.indexOf(gridId) === -1) {
+                        if (proxyTarget && !proxyTarget.includes(gridId)) {
                             destinationKey = proxyTarget
-                            if (DEBUG) {
-                                prettyLog({ context: 'focus', action: 'moveFocus->proxyEscape', sourceKey, proxyKey, destinationKey })
-                            }
                         }
                     }
                 }
@@ -460,15 +472,9 @@ export function FocusContextProvider(props) {
         }
 
         if (!destinationKey || !focusLayer.refs[destinationKey]) {
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'moveFocus FAIL no destination found', destinationKey })
-            }
             return false
         }
 
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'moveFocus SUCCESS', destinationKey })
-        }
         focusOn(focusLayer.refs[destinationKey].element, destinationKey)
     }
 

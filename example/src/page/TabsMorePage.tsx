@@ -26,18 +26,21 @@ export default function TabsMorePage() {
       <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
         <Snow.ImageGrid
           items={imageItems}
+          itemsPerPage={2}
           getItemImageUrl={(item: any) => { return item.imageUrl }}
           getItemImageSource={(item: any) => { return item.imageSource }}
           getItemName={(item: any) => { return item.title }}
         />
         <Snow.ImageGrid
           items={imageItems}
+          itemsPerPage={2}
           getItemImageUrl={(item: any) => { return item.imageUrl }}
           getItemImageSource={(item: any) => { return item.imageSource }}
           getItemName={(item: any) => { return item.title }}
         />
         <Snow.ImageGrid
           items={imageItems}
+          itemsPerPage={2}
           getItemImageUrl={(item: any) => { return item.imageUrl }}
           getItemImageSource={(item: any) => { return item.imageSource }}
           getItemName={(item: any) => { return item.title }}

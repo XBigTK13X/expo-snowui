@@ -39,7 +39,7 @@ const TwoGrids = (props) => {
 describe('SnowTabs', () => {
   describe('Internal Movement', () => {
     describe('Tabs', () => {
-      test('First tab is focused on first render', async () => {
+      test('1.1) First tab is focused on first render', async () => {
         const { getByTestId } = render(<TwoGrids />, {});
 
         const targetKey = 'grid-tabs'
@@ -50,7 +50,7 @@ describe('SnowTabs', () => {
         expect(firstStyle.borderColor).toBe(focusedColor)
       })
 
-      test('Second tab is focused after moving R', async () => {
+      test('1.2) Second tab is focused after moving R', async () => {
         const { getByTestId } = render(<TwoGrids />, {});
 
         await runActions(act, ['R'])
@@ -63,8 +63,9 @@ describe('SnowTabs', () => {
         expect(firstStyle.borderColor).toBe(focusedColor)
       })
     })
+
     describe('Grid Pager', () => {
-      test("Second tab pager doesn't change first tab grid", async () => {
+      test("2.1) First tab's pager gets focus after using second tab's pager", async () => {
         const { getByTestId } = render(<TwoGrids />, {});
 
         await runActions(act, ['R', 'P', 'D', 'P', 'P', 'U', 'L', 'P'])
@@ -75,6 +76,18 @@ describe('SnowTabs', () => {
 
         expect(getFocusEngine().focusedKey).toBe(targetKey);
         expect(firstStyle.borderColor).toBe(focusedColor)
+      })
+
+      test("2.2) Second tab changed to second page keeps first tab on first page", async () => {
+        const { getByTestId } = render(<TwoGrids />, {});
+
+        await runActions(act, ['R', 'P', 'D', 'P', 'P', 'U', 'L', 'P'])
+
+        const targetKey = 'page-count-grid-tabs-tab-0'
+
+        const pageCountText = parseInt(getByTestId(targetKey).children.join(''), 10)
+
+        expect(pageCountText).toBe(1)
       })
     })
   })

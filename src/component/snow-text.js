@@ -22,6 +22,7 @@ export function SnowText(props) {
         <View
             style={wrapperStyle}>
             <Text
+                testID={props.testID}
                 style={style}
                 selectable={!props.noSelect}
                 children={props.children} />

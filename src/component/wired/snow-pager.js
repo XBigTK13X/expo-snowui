@@ -17,6 +17,7 @@ const SnowPagerW = (props) => {
     const nextPageKey = `${props.focusKey}`
     const nextHalfKey = `next-half-${props.focusKey}`
     const lastPageKey = `last-page-${props.focusKey}`
+    const pageCountTestId = `page-count-${props.focusKey}`
 
     const gotoPage = (page, trigger) => {
         let params = {
@@ -123,7 +124,7 @@ const SnowPagerW = (props) => {
                 onPress={previousPage}
             />
 
-            <SnowText noSelect>{props.page + 1} / {props.maxPage}</SnowText>
+            <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
 
             <SnowTextButton
                 {...focusEscapeProps}
