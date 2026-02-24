@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextInput, Pressable } from 'react-native'
+import { TextInput, Pressable, Keyboard } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
@@ -45,6 +45,21 @@ const SnowInputW = (props) => {
     const onContainerPress = () => {
         inputRef.current?.focus()
     }
+
+    React.useEffect(() => {
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                if (isFocused(props.focusKey)) {
+                    onSubmit({ nativeEvent: { text: props.value } })
+                }
+            }
+        )
+
+        return () => {
+            keyboardDidHideListener.remove()
+        }
+    }, [props, isFocused])
 
     return (
         <Pressable
