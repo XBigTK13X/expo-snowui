@@ -1,693 +1,180 @@
-import React from 'react';
-import {
-    Dimensions,
-    findNodeHandle,
-    Keyboard,
-    Platform,
-    UIManager,
-    View,
-} from 'react-native'
+import React, { createContext, useContext, useMemo, useCallback, useRef } from 'react';
+import { UIManager, findNodeHandle, Platform } from 'react-native';
 
-import { prettyLog } from '../util'
+const SnowFocusContext = createContext(null);
 
-import { useInputContext } from './snow-input-context'
+/**
+Hierarchical spatial focus management\
 
-/*
-TODO
-Focus can get lost if in a tabs element there is only text.
-      Nothing inside the tab should be selectable, but the outer view gets a focusKey
-
-Allow long press directions to continue moving focus
-
-Allow grid to grid movement to maintain the relative positon.
-    Imagine a 1x3 grid and then a 1x3 under it.
-    When highlighting the second element of the first, a down move should send you to the send element of the next.
-    However, grid movement currently always pushes you to the start of the grid
-
-Nested grids generate duplicate keys, breaking navigation.
-    assignFocus={false} is a bandaid, but it would be useful to allow nested grids
-
-Hitting the edge of a paged grid snaps up to the pager.
-    Maybe add a way to totally block focus in one direction?
-    null just means another component can decide to map to you.
+Uses a single App-level provider to manage a global registry of components
+Focus is represented as a pipe-delimited string of segments such as 'root|container:0,0|item:2,5'
+Implements a "bubble-up" movement strategy: local coordinate search occurs first;
+    If a boundary is hit, the event repeats one level up at the parent
+Focus state is stored in the URL to support persistence, rehydration, and back navigation
+Supports focus trapping for modals by restricting bubbling to a designated id
 */
 
-const FocusContext = React.createContext({});
+export function SnowFocusProvider(props) {
+    const registry = useRef(new Map());
+    const scrollRef = useRef(null);
 
-export function useFocusContext() {
-    const value = React.useContext(FocusContext);
-    if (!value) {
-        throw new Error('useFocusContext must be wrapped in a <FocusContextProvider />');
-    }
-    return value;
-}
+    const focusPath = props.valueFromUrl || 'root';
+    const pathParts = useMemo(() => focusPath.split('|'), [focusPath]);
+    const activeLeafId = useMemo(() => {
+        const lastPart = pathParts[pathParts.length - 1];
+        return lastPart.split(':')[0];
+    }, [pathParts]);
 
-const emptyLayers = () => {
-    return [
-        {
-            layerName: 'app',
-            refs: {},
-            directions: {}
-        }
-    ]
-}
+    const [focusRootId, setFocusRootId] = React.useState('root');
 
+    const scrollToElement = useCallback((elementRef) => {
+        if (!scrollRef.current || !elementRef.current) return;
 
-/* Relevant props
-focusKey
-    A unique identifier for the focus context in a given element
+        const nodeHandle = findNodeHandle(elementRef.current);
+        const scrollHandle = findNodeHandle(scrollRef.current);
 
-focusStart
-    The element on the page that begins focused.
-    Passing focusStart to multiple elements will not crash, but doesn't make sense.
-
-focusUp,focusRight,focusDown,focusLeft
-    A per-element optional prop.
-    Setting this to a key tells the provider the relative position of an element.
-    Not setting a specific direction tells the provider to ignore keypresses from that element in that direction.
-*/
-export function FocusContextProvider(props) {
-    const { addActionListener, removeActionListener } = useInputContext()
-
-    const [isReady, setIsReady] = React.useState(false)
-
-    const [focusedKey, setFocusedKey] = React.useState(null)
-    const focusedKeyRef = React.useRef(focusedKey)
-    const lastFocusedElementRef = React.useRef(null)
-    const [focusLayers, setFocusLayers] = React.useState(emptyLayers())
-    const focusLayersRef = React.useRef(focusLayers)
-    const [focusedLayer, setFocusedLayer] = React.useState('app')
-    const focusedLayerRef = React.useRef(focusedLayer)
-    const [scrollViewRef, setScrollViewRef] = React.useState(null)
-
-    const pendingMeasureRef = React.useRef(false)
-
-    const DEBUG = props.DEBUG_FOCUS
-    let SCROLL_OFFSET = 200
-    if (props.focusVerticalOffset) {
-        SCROLL_OFFSET = props.focusVerticalOffset
-    }
-    const ENABLED = props.ENABLE_FOCUS !== false
-
-    React.useEffect(() => {
-        focusedKeyRef.current = focusedKey
-    }, [focusedKey])
-
-    React.useEffect(() => {
-        focusedLayerRef.current = focusedLayer
-    }, [focusedLayer])
-
-    React.useEffect(() => {
-        focusLayersRef.current = focusLayers
-    }, [focusLayers])
-
-    // After focusMaps are added by components, decide at the focus layer level what should have the first focus
-    React.useEffect(() => {
-        let topLayer = focusLayers?.at(-1)
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'useEffect([focusedKey,focusLayers])', topLayer, focusedKey })
-        }
-        if (!topLayer) {
-            return
-        }
-        const shouldFocus = !focusedKey || (!!focusedKey && !topLayer.directions.hasOwnProperty(focusedKey))
-        if (shouldFocus && topLayer.focusStartKey && topLayer.focusStartElementRef) {
-            setFocusLayers((prev) => {
-                let result = [...prev]
-                result.at(-1).hasFocusedStart = true
-                return result
-            })
-            focusOn(topLayer.focusStartElementRef, topLayer.focusStartKey)
-        }
-        setIsReady(true)
-    }, [focusedKey, focusLayers, focusedLayer])
-
-    const isFocused = (elementFocusKey) => {
-        if (!ENABLED) {
-            return false
-        }
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'isFocused', elementFocusKey, focusedKey })
-        }
-        return elementFocusKey && elementFocusKey === focusedKeyRef.current
-    }
-
-    const isFocusedLayer = (layerName) => {
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'isFocusedLayer', layerName, focusLayersRef })
-        }
-        return layerName && (focusLayersRef?.current?.at(-1)?.layerName === layerName)
-    }
-
-    const pushFocusLayer = (layerName, layerIsUncloned) => {
-        // By default, assume that a new layer will want any elements from old layers
-        // This allows a root layout to define the first layer
-        // Then each page gets a single layer, which is popped at unmount
-        // That way, things like header elements can be referenced for focus by a page
-        // If something like a modal is desired, then specify that and do not copy the previous layer
-        setFocusLayers((prev) => {
-            let result = [...prev]
-            if (layerIsUncloned) {
-                result.push({ layerName, refs: {}, directions: {}, isUncloned: true })
-            }
-            else {
-                result.push({ layerName, refs: { ...prev.at(-1).refs }, directions: { ...prev.at(-1).directions }, focusedKey })
-            }
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'pushFocusLayer', layerName, prev, result })
-            }
-            return result
-        })
-        setFocusedLayer(layerName)
-        if (layerIsUncloned) {
-            setFocusedKey(null)
-        }
-    }
-
-    const popFocusLayer = () => {
-        setFocusLayers((prev) => {
-            let result = [...prev]
-            if (result?.length > 1) {
-                result.pop()
-                setFocusedLayer(result.at(-1).layerName)
-                setFocusedKey(result.at(-1).focusedKey)
-            }
-            if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'popFocusLayer', prev, result })
-            }
-            return result
-        })
-    }
-
-    const useFocusLayer = (name, isUncloned) => {
-        React.useLayoutEffect(() => {
-            pushFocusLayer(name, isUncloned)
-            return () => {
-                popFocusLayer()
-            }
-        }, [])
-    }
-
-    // This is only used by low level components to interact with the focus system
-    const useFocusWiring = (elementProps) => {
-        const { addFocusMap, removeFocusMap, focusedLayer, focusedKey } = useFocusContext()
-        const elementRef = React.useRef(null)
-
-        React.useEffect(() => {
-            if (elementRef.current) {
-                addFocusMap(elementRef, elementProps)
-            }
-            return () => {
-                if (removeFocusMap && elementProps.focusKey) {
-                    removeFocusMap(elementProps.focusKey)
+        if (nodeHandle && scrollHandle) {
+            UIManager.measureLayout(
+                nodeHandle,
+                scrollHandle,
+                () => { },
+                (xx, yy, width, height) => {
+                    const offset = props.scrollOffset || 100;
+                    scrollRef.current.scrollTo({
+                        y: Math.max(0, yy - offset),
+                        animated: true
+                    });
                 }
-            }
-        }, [
-            elementProps.focusStart,
-            elementProps.focusKey,
-            elementProps.focusDown,
-            elementProps.focusUp,
-            elementProps.focusRight,
-            elementProps.focusLeft,
-            focusedLayer,
-            elementRef
-        ])
-
-        return { elementRef, focusedKey }
-    }
-
-    const clearFocusLayers = () => {
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'clearFocusLayers' })
+            );
         }
-        setFocusLayers(emptyLayers())
-        setFocusedKey(null)
-        setFocusedLayer('app')
-    }
+    }, [props.scrollOffset]);
 
-    const addFocusMap = (elementRef, elementProps) => {
-        if (!ENABLED) {
-            return false
-        }
-        const focusKey = elementProps.focusKey
-        const newRef = {
-            element: elementRef,
-            onPress: elementProps.onPress,
-            onLongPress: elementProps.onLongPress
+    const register = useCallback((id, parentId, coord, settings) => {
+        if (!registry.current.has(parentId)) {
+            registry.current.set(parentId, { coords: new Map(), isContainer: true });
         }
 
-        let focus = {}
-        if (elementProps.focusUp) focus['up'] = elementProps.focusUp
-        if (elementProps.focusDown) focus['down'] = elementProps.focusDown
-        if (elementProps.focusRight) focus['right'] = elementProps.focusRight
-        if (elementProps.focusLeft) focus['left'] = elementProps.focusLeft
-
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'addFocusMap', elementRef, elementProps, focusKey, newRef, focus })
+        const parentEntry = registry.current.get(parentId);
+        if (coord) {
+            parentEntry.coords.set(coord, id);
         }
 
-        setFocusLayers((prev) => {
-            let result = [...prev]
-            let focusLayer = { ...result[result.length - 1] }
+        registry.current.set(id, {
+            parentId,
+            coords: new Map(),
+            isContainer: settings.isContainer,
+            onPress: settings.onPress,
+            onLongPress: settings.onLongPress,
+            ref: settings.ref
+        });
 
-            focusLayer.directions = { ...focusLayer.directions }
-            focusLayer.refs = { ...focusLayer.refs }
-
-            if (elementProps.focusUp) {
-                focusLayer.directions[elementProps.focusUp] = {
-                    ...focusLayer.directions[elementProps.focusUp],
-                    down: focusLayer.directions[elementProps.focusUp]?.down || focusKey
-                }
-            }
-            if (elementProps.focusDown) {
-                focusLayer.directions[elementProps.focusDown] = {
-                    ...focusLayer.directions[elementProps.focusDown],
-                    up: focusLayer.directions[elementProps.focusDown]?.up || focusKey
-                }
-            }
-            if (elementProps.focusLeft) {
-                focusLayer.directions[elementProps.focusLeft] = {
-                    ...focusLayer.directions[elementProps.focusLeft],
-                    right: focusLayer.directions[elementProps.focusLeft]?.right || focusKey
-                }
-            }
-            if (elementProps.focusRight) {
-                focusLayer.directions[elementProps.focusRight] = {
-                    ...focusLayer.directions[elementProps.focusRight],
-                    left: focusLayer.directions[elementProps.focusRight]?.left || focusKey
-                }
-            }
-
-            if (elementProps.focusStart) {
-                focusLayer.focusStartElementRef = elementRef
-                focusLayer.focusStartKey = elementProps.focusKey
-            }
-
-            focusLayer.directions[focusKey] = { ...focusLayer.directions[focusKey], ...focus }
-            focusLayer.refs[focusKey] = newRef
-
-            result[result.length - 1] = focusLayer
-            return result
-        })
-    }
-
-    const removeFocusMap = (focusKey) => {
-        if (!ENABLED || !focusKey) return false
-
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'removeFocusMap', focusKey })
+        if (id === activeLeafId && settings.ref) {
+            scrollToElement(settings.ref);
         }
 
-        setFocusLayers((prev) => {
-            let result = [...prev]
-            let focusLayer = { ...result[result.length - 1] }
+        return () => {
+            const currentParent = registry.current.get(parentId);
+            if (currentParent) currentParent.coords.delete(coord);
+            registry.current.delete(id);
+        };
+    }, [activeLeafId, scrollToElement]);
 
-            focusLayer.directions = { ...focusLayer.directions }
-            focusLayer.refs = { ...focusLayer.refs }
-
-            delete focusLayer.refs[focusKey]
-            delete focusLayer.directions[focusKey]
-
-            result[result.length - 1] = focusLayer
-            return result
-        })
-    }
-
-    const focusOn = (elementRef, focusKey) => {
-        if (!ENABLED) return false
-
-        const element = elementRef?.current
-        if (!element) {
-            if (DEBUG === 'verbose') {
-                prettyLog({ context: 'focus', action: 'focusOn', message: 'No element to focus', elementRef, focusKey });
-            }
-            return false
+    const dispatchAction = useCallback((actionType) => {
+        const entry = registry.current.get(activeLeafId);
+        if (entry && entry[actionType]) {
+            entry[actionType]();
+            return true;
         }
+        return false;
+    }, [activeLeafId]);
 
-        if (focusKey && focusedKeyRef.current === focusKey) {
-            if (DEBUG === 'verbose') {
-                prettyLog({
-                    context: 'focus',
-                    action: 'focusOn short-circuit (already focused)',
-                    focusKey
-                })
-            }
-            return true
-        }
+    const move = useCallback((direction) => {
+        const rootIndex = pathParts.indexOf(focusRootId);
+        const stopAt = rootIndex !== -1 ? rootIndex : 0;
 
-        lastFocusedElementRef.current?.blur?.()
-        element.requestTVFocus?.()
-        element.focus?.()
-        lastFocusedElementRef.current = element
-        focusedKeyRef.current = focusKey
-        setFocusedKey(focusKey)
+        for (let ii = pathParts.length - 1; ii >= stopAt; ii--) {
+            const segment = pathParts[ii];
+            const [id, currentCoord] = segment.split(':');
+            const entry = registry.current.get(id);
 
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'focusOn', elementRef, focusKey });
-        }
+            if (entry && currentCoord) {
+                let [xx, yy] = currentCoord.split(',').map(Number);
+                if (direction === 'up') yy--;
+                if (direction === 'down') yy++;
+                if (direction === 'left') xx--;
+                if (direction === 'right') xx++;
 
-        const scroll = scrollViewRef?.current
+                const nextCoordKey = `${xx},${yy}`;
+                const neighborId = entry.coords.get(nextCoordKey);
 
-        if (!scroll) {
-            return true
-        }
+                if (neighborId) {
+                    const neighborEntry = registry.current.get(neighborId);
+                    let newSegment = neighborEntry?.isContainer
+                        ? `${neighborId}:0,0`
+                        : `${id}:${nextCoordKey}`;
 
-        if (Platform.OS === 'web') {
-            if (element && scroll && !pendingMeasureRef.current) {
-                pendingMeasureRef.current = true
-                requestAnimationFrame(() => {
-                    pendingMeasureRef.current = false
+                    const newPath = [...pathParts.slice(0, ii), newSegment].join('|');
+                    props.onUrlChange(newPath);
 
-                    const elementBounds = element.getBoundingClientRect();
-                    const scrollBounds = scroll.getBoundingClientRect();
-
-                    if (elementBounds.top < scrollBounds.top + SCROLL_OFFSET) {
-                        scroll.scrollTop += elementBounds.top - scrollBounds.top - SCROLL_OFFSET;
-                    } else if (elementBounds.bottom > scrollBounds.bottom) {
-                        scroll.scrollTop += elementBounds.bottom - scrollBounds.bottom + SCROLL_OFFSET;
+                    if (neighborEntry && !neighborEntry.isContainer && neighborEntry.ref) {
+                        scrollToElement(neighborEntry.ref);
                     }
-                })
-            }
-        } else {
-            const node = findNodeHandle(element);
-
-            if (scroll && node) {
-                const scrollHandle =
-                    typeof scroll.getNativeScrollRef === 'function'
-                        ? findNodeHandle(scroll.getNativeScrollRef())
-                        : findNodeHandle(scroll);
-
-                if (scrollHandle && !pendingMeasureRef.current) {
-                    pendingMeasureRef.current = true
-                    UIManager.measureLayout(
-                        node,
-                        scrollHandle,
-                        (err) => {
-                            pendingMeasureRef.current = false
-                            if (DEBUG === 'verbose') {
-                                prettyLog({ context: 'focus', action: 'focusOn', error: 'Measurement error', err });
-                            }
-                        },
-                        (x, y, width, height) => {
-                            pendingMeasureRef.current = false
-
-                            const viewportHeight = Dimensions.get('window').height;
-
-                            const currentOffsetY = scroll?.scrollProperties?.offset || 0;
-
-                            const top = y;
-                            const bottom = y + height;
-
-                            const viewTop = currentOffsetY;
-                            const viewBottom = currentOffsetY + viewportHeight;
-
-                            if (top - SCROLL_OFFSET < viewTop) {
-                                scroll.scrollTo?.({ y: Math.max(top - SCROLL_OFFSET, 0), animated: false });
-                            } else if (bottom > viewBottom) {
-                                const target = bottom - viewportHeight + SCROLL_OFFSET;
-                                scroll.scrollTo?.({ y: target, animated: false });
-                            }
-                        }
-                    );
+                    return true;
                 }
             }
         }
+        return false;
+    }, [pathParts, focusRootId, props.onUrlChange, scrollToElement]);
+
+    const moveUp = useCallback(() => { move('up') })
+    const moveLeft = useCallback(() => { move('left') })
+    const moveRight = useCallback(() => { move('right') })
+    const moveDown = useCallback(() => { move('down') })
+
+    const contextValue = {
+        focusPath,
+        activeLeafId,
+        register,
+        move,
+        dispatchAction,
+        setFocusRoot: setFocusRootId,
+        setScrollRef: (ref) => { scrollRef.current = ref; }
     };
 
-
-    // moveFocus is a complex handler
-    // Returning false means the move failed
-    // First it tries to use a direct mapping of source to destination
-    // If there isn't a direct route, then check if focus is on a grid
-    // If moving down or right, then see if the gridId-grid-end can be used as a proxy move target
-    // If moving up or left, then see if the gridId can be used as a proxy move target
-    // If there are focus hints in the url, then try to resolve global keys without IDs from local keys that contain
-    const moveFocus = (direction) => {
-        if (!ENABLED) return false
-        if (Platform.isTV && Keyboard.isVisible()) return false
-
-        const sourceKey = focusedKeyRef.current
-        const focusLayer = focusLayersRef.current.at(-1)
-        const params = props.currentRoute?.routeParams || {}
-
-        if (!sourceKey || !focusLayer) return false
-
-        let destinationKey = focusLayer.directions?.[sourceKey]?.[direction]
-
-        if (!destinationKey) {
-            let parts = sourceKey.split('-')
-            while (parts.length > 1 && !destinationKey) {
-                parts.pop()
-                let parentKey = parts.join('-')
-                if (focusLayer.directions[parentKey]?.[direction]) {
-                    destinationKey = focusLayer.directions[parentKey][direction]
-                }
-            }
-        }
-
-        const isValidTarget = (key) => focusLayer.refs[key] && focusLayer.refs[key].element?.current
-
-        if (destinationKey && !isValidTarget(destinationKey)) {
-            const potentialTargets = Object.keys(focusLayer.refs)
-                .filter(key => key.startsWith(destinationKey) && isValidTarget(key) && key !== destinationKey)
-                .sort()
-
-            if (potentialTargets.length > 0 && !sourceKey.startsWith(destinationKey)) {
-                const activeTrigger = params[`${destinationKey}-page-trigger`] ||
-                    params[`${destinationKey}-tab-trigger`] ||
-                    params[`${destinationKey}-trigger`]
-
-                destinationKey = (activeTrigger && isValidTarget(activeTrigger))
-                    ? activeTrigger
-                    : (potentialTargets.find(k => k.endsWith('-next-page')) ||
-                        potentialTargets.find(k => k.endsWith('-row-0-column-0')) ||
-                        potentialTargets[0])
-            }
-        }
-
-        if (!destinationKey || !isValidTarget(destinationKey)) {
-            const isGridCell = sourceKey.includes('-row-') || sourceKey.includes('-grid-end')
-            if (isGridCell) {
-                const gridId = sourceKey.split('-row-')[0].replace('-grid-end', '')
-                const hubTarget = focusLayer.directions?.[gridId]?.[direction]
-
-                if (hubTarget && !hubTarget.startsWith(gridId)) {
-                    destinationKey = hubTarget
-                }
-
-                if (!destinationKey) {
-                    let proxyKey = (direction === 'right' || direction === 'down')
-                        ? `${gridId}-grid-end`
-                        : `${gridId}-row-0-column-0`
-
-                    if (proxyKey !== sourceKey) {
-                        const proxyTarget = focusLayer.directions?.[proxyKey]?.[direction]
-                        if (proxyTarget && !proxyTarget.startsWith(gridId)) {
-                            destinationKey = proxyTarget
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!destinationKey || !isValidTarget(destinationKey)) {
-            let parts = sourceKey.split('-')
-            while (parts.length > 1) {
-                parts.pop()
-                let parentKey = parts.join('-')
-                if (direction === 'up' && parentKey) {
-                    let triggerKey = params[`${parentKey}-page-trigger`] ||
-                        params[`${parentKey}-tab-trigger`] ||
-                        params[`${parentKey}-trigger`]
-
-                    if (triggerKey && isValidTarget(triggerKey)) {
-                        destinationKey = triggerKey
-                        break
-                    }
-
-                    const fallbackTargets = Object.keys(focusLayer.refs).filter(key =>
-                        key.startsWith(parentKey) && isValidTarget(key) && !key.startsWith(`${parentKey}-tab`) && key !== sourceKey
-                    )
-                    if (fallbackTargets.length > 0) {
-                        destinationKey = fallbackTargets[0]
-                        break
-                    }
-                }
-            }
-        }
-
-        if (!destinationKey || !isValidTarget(destinationKey)) {
-            return false
-        }
-
-        focusOn(focusLayer.refs[destinationKey].element, destinationKey)
-    }
-
-    const moveFocusRight = () => {
-        moveFocus('right')
-    }
-
-    const moveFocusLeft = () => {
-        moveFocus('left')
-    }
-
-    const moveFocusUp = () => {
-        moveFocus('up')
-    }
-
-    const moveFocusDown = () => {
-        moveFocus('down')
-    }
-
-    React.useEffect(() => {
-        addActionListener('focus-context', {
-            onUp: moveFocusUp,
-            onDown: moveFocusDown,
-            onRight: moveFocusRight,
-            onLeft: moveFocusLeft
-        })
-        return () => {
-            removeActionListener('focus-context')
-        }
-    }, [])
-
-    const focusedElementAction = (focusKey, action) => {
-        if (!focusKey) {
-            focusKey = focusedKeyRef.current
-        }
-        const focusMap = focusLayersRef.current.at(-1)
-        const shouldNotPress = (Platform.isTV && Keyboard.isVisible()) || !(focusMap?.refs?.[focusKey]?.[action])
-        if (DEBUG) {
-            prettyLog({
-                context: 'focus',
-                action: 'focusedElementAction',
-                kind: action,
-                focusKey,
-                shouldNotPress,
-                focusMap,
-                keyboardVisible: (Platform.isTV && Keyboard.isVisible()),
-                [action]: focusMap?.refs?.[focusKey]?.[action]
-            })
-        }
-        if (shouldNotPress) {
-            return false
-        }
-        return focusMap.refs[focusKey][action]()
-    }
-
-    const pressFocused = () => {
-        return focusedElementAction(null, 'onPress')
-    }
-
-    const longPressFocused = () => {
-        return focusedElementAction(null, 'onLongPress')
-    }
-
-    const focusAction = (elementRef, focusKey, action) => {
-        return () => {
-            focusOn(elementRef, focusKey)
-            focusedElementAction(focusKey, action)
-        }
-    }
-
-    const focusPress = (elementRef, focusKey) => {
-        return focusAction(elementRef, focusKey, 'onPress')
-    }
-
-    const focusLongPress = (elementRef, focusKey) => {
-        return focusAction(elementRef, focusKey, 'onLongPress')
-    }
-
-    const readFocusProps = (elementProps) => {
-        let focusProps = {}
-        if (elementProps.focusStart) {
-            focusProps.focusStart = elementProps.focusStart
-        }
-        if (elementProps.focusKey) {
-            focusProps.focusKey = elementProps.focusKey
-        }
-        if (elementProps.focusUp) {
-            focusProps.focusUp = elementProps.focusUp
-        }
-        if (elementProps.focusDown) {
-            focusProps.focusDown = elementProps.focusDown
-        }
-        if (elementProps.focusLeft) {
-            focusProps.focusLeft = elementProps.focusLeft
-        }
-        if (elementProps.focusRight) {
-            focusProps.focusRight = elementProps.focusRight
-        }
-        return focusProps
-    }
-
-    const logFocusInfo = () => {
-        console.log({
-            directions: focusLayers.at(-1).directions,
-            focusedKey: focusedKey
-        })
-    }
-
-    // If these are omitted, then TV remote doesn't work on first launch
-    // This is a low level helper for wired components
-    // Most things outside snowui will not need it
-    const tvRemoteProps = (elementProps) => {
-        if (!Platform.isTV || !elementProps.focusStart) {
-            return {}
-        }
-        return {
-            focusable: elementProps.focusStart,
-            hasTVPreferredFocus: elementProps.focusStart
-        }
-    }
-
-    const focusContext = {
-        DEBUG,
-        focusedKey,
-        focusedLayer,
-        focusLayers,
-        focusEnabled: ENABLED,
-        addFocusMap,
-        clearFocusLayers,
-        focusLongPress,
-        focusOn,
-        focusPress,
-        isFocused,
-        isFocusedLayer,
-        longPressFocused,
-        moveFocusDown,
-        moveFocusLeft,
-        moveFocusRight,
-        moveFocusUp,
-        logFocusInfo,
-        pressFocused,
-        popFocusLayer,
-        pushFocusLayer,
-        readFocusProps,
-        setScrollViewRef,
-        tvRemoteProps,
-        useFocusLayer,
-        useFocusWiring,
-    }
-
-    if (!isReady && ENABLED) {
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'render short circuit', focusedLayer, props })
-        }
-        return <></>
-    }
-
-    if (DEBUG === 'verbose') {
-        prettyLog({ context: 'focus', action: 'render', focusedKey, focusedLayer })
-    }
-
     return (
-        <FocusContext.Provider
-            style={{ flex: 1 }}
-            value={focusContext}>
+        <SnowFocusContext.Provider value={contextValue}>
             {props.children}
-        </FocusContext.Provider>
+        </SnowFocusContext.Provider>
     );
 }
 
-export default FocusContextProvider
+export function useFocus(id, parentId, focusSettings) {
+    const context = useContext(SnowFocusContext);
+    if (!context) {
+        throw new Error("useFocus must be used within SnowFocusProvider");
+    }
+
+    const coordKey = `${focusSettings.xx},${focusSettings.yy}`;
+
+    const isActive = useMemo(() => {
+        return context.pathParts.some(part => part.startsWith(`${id}:`) || part === id);
+    }, [context.pathParts, id]);
+
+    React.useEffect(() => {
+        const unregisterFunc = context.register(
+            id,
+            parentId,
+            coordKey,
+            focusSettings.isContainer
+        );
+
+        return () => {
+            unregisterFunc();
+        };
+    }, [id, parentId, coordKey, focusSettings.isContainer]);
+
+    return {
+        isActive,
+        move: context.move
+    };
+}
