@@ -1,7 +1,7 @@
 import React from 'react'
 import { ScrollView, View } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
-import { useFocusContext } from '../context/snow-focus-context'
+import { useFocusAppContext } from '../context/snow-focus-context'
 import { useLayerContext } from '../context/snow-layer-context'
 import util from '../util'
 import { SnowModal } from './wired/snow-modal'
@@ -10,7 +10,7 @@ import { SnowOverlay } from './wired/snow-overlay'
 export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
     const { modalPayloads, overlayPayload, DEBUG_LAYERS } = useLayerContext()
-    const { setScrollViewRef } = useFocusContext()
+    const { setScrollViewRef } = useFocusAppContext()
     const scrollViewRef = React.useRef(null)
 
     // This allows modals and overlays to draw on top of the regular app

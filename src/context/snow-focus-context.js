@@ -1,12 +1,46 @@
 import React from 'react'
-import ReactNative from 'react-native'
+import { Platform } from 'react-native'
 
 import { useNavigationContext } from './snow-navigation-context'
 
+import Tree from '../tree'
+
 const FocusContext = React.createContext(null)
 
+/*
+Coordinates orientation
+(0,0)->(X,0)
+  |      |
+  v      v
+(0,Y)->(X,Y)
+*/
+
+const getDistance = (source, destination, direction) => {
+    const dx = destination.xx - source.xx
+    const dy = destination.yy - source.yy
+
+    if (direction === 'up' && dy >= 0) return Infinity
+    if (direction === 'down' && dy <= 0) return Infinity
+    if (direction === 'left' && dx >= 0) return Infinity
+    if (direction === 'right' && dx <= 0) return Infinity
+
+    return Math.sqrt(dx * dx + dy * dy)
+}
+
+
+export const useFocusAppContext = () => {
+    return {
+        ...React.useContext(FocusContext)
+    }
+}
+
 export const useFocusContext = (componentName, props) => {
-    const { FOCUS_ENABLED, register, unregister, focusedPath } = React.useContext(FocusContext)
+    const {
+        FOCUS_ENABLED,
+        registerFocus,
+        unregisterFocus,
+        focusedPath
+    } = React.useContext(FocusContext)
     const focusRef = React.useRef(null)
 
     let {
@@ -28,22 +62,22 @@ export const useFocusContext = (componentName, props) => {
     }
 
     React.useEffect(() => {
-        register({
+        registerFocus({
             focusPath,
             focusRef,
             xx,
             yy,
-            onPress,
-            onLongPress
+            onPress: actionPress,
+            onLongPress: actionLongPress
         })
         return () => {
-            unregister(focusPath)
+            unregisterFocus(focusPath)
         }
     }, [])
 
     const isFocused = focusedPath == focusPath
 
-    const focusWrap = (props) => {
+    const focusWrap = (child) => {
         /*
         If these are omitted, then TV remote doesn't work on first launch
         This is a low level helper for wired components
@@ -51,7 +85,7 @@ export const useFocusContext = (componentName, props) => {
         */
         let actions = {}
         let tvRemoteProps = {}
-        if (ReactNative.Platform.OS.isTV && (onPress || onLongPress)) {
+        if (Platform.OS.isTV && (onPress || onLongPress)) {
             tvRemoteProps = {
                 focusable: isFocused,
                 hasTVPreferredFocus: isFocused
@@ -86,22 +120,75 @@ export const FocusContextProvider = (props) => {
 
     const focusedPath = currentRoute?.routeParams?.focusedPath
 
-    const registry = React.useRef(new Map())
+    const scrollViewRef = React.useRef(null)
 
-    const addFocus = (payload) => {
-        registry.current.set(payload.focusPath, payload)
+    const setScrollViewRef = (ref) => {
+        scrollViewRef.current = ref
     }
 
-    const removeFocus = (focusPath) => {
-        registry.current.delete(focusPath)
+    const registry = React.useRef(new Tree())
+    const adjacency = React.useRef(new Map())
+
+    const registerFocus = (payload) => {
+        registry.current.insert(payload.focusPath, payload)
+        registry.current.debug()
+        // TODO Debounce rebuild of lookup table
+    }
+
+    const unregisterFocus = (focusPath) => {
+        registry.current.prune(focusPath)
+    }
+
+    const updateAdjacencies = React.useCallback(() => {
+
+    })
+
+
+    const getNeighbor = React.useCallback((sourceFocusPath, direction) => {
+
+    })
+
+    const moveFocus = React.useCallback((direction) => {
+        const dest = getNeighbor(focusedPath, direction)
+        if (dest) {
+            navPush({
+                params: {
+                    ...currentRoute.routeParams,
+                    focusedPath: dest.focusPath
+                },
+                func: false,
+                replace: true
+            })
+        }
+    })
+
+    const moveFocusDown = React.useCallback(() => { moveFocus('down') })
+    const moveFocusLeft = React.useCallback(() => { moveFocus('left') })
+    const moveFocusRight = React.useCallback(() => { moveFocus('right') })
+    const moveFocusUp = React.useCallback(() => { moveFocus('up') })
+
+    const pressFocused = () => {
+
+    }
+
+    const longPressFocused = () => {
+
     }
 
     const value = React.useMemo(() => ({
-        addFocus,
-        removeFocus,
+        FOCUS_ENABLED,
         focusedPath,
-        FOCUS_ENABLED
-    }), [focusedPath, moveFocus, interact])
+        longPressFocused,
+        moveFocusDown,
+        moveFocusLeft,
+        moveFocusRight,
+        moveFocusUp,
+        pressFocused,
+        registerFocus,
+        unregisterFocus,
+        setScrollViewRef,
+        scrollViewRef
+    }), [focusedPath, moveFocus])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
 }
@@ -141,18 +228,6 @@ export const useFocusContextWrong = (id, options = {}) => {
         ref: elementRef,
         isFocused: activeId === id
     }
-}
-
-const getDistance = (source, target, direction) => {
-    const dx = target.xx - source.xx
-    const dy = target.yy - source.yy
-
-    if (direction === 'up' && dy >= 0) return Infinity
-    if (direction === 'down' && dy <= 0) return Infinity
-    if (direction === 'left' && dx >= 0) return Infinity
-    if (direction === 'right' && dx <= 0) return Infinity
-
-    return Math.sqrt(dx * dx + dy * dy)
 }
 
 export const FocusContextProviderWrong = (props) => {
