@@ -6,6 +6,7 @@ export class Tree {
             children: new Map(),
             parent: null,
             value: null,
+            segmentName: 'root',
             path: '|'
         };
         this.lookup = new Map();
@@ -75,13 +76,12 @@ export class Tree {
 
     debug(node = this.root, indent = 0) {
         const space = '\t'.repeat(indent);
-        const valueInfo = node.value ? ` [Value: ${util.stringifySafe(node.value)}]` : '';
 
         if (node == this.root) {
             console.log("Showing debug info for tree")
         }
 
-        console.log(`${space}└─ ${node.segmentName}${valueInfo}`);
+        console.log(`${space}└─ ${node.segmentName}`);
 
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1);

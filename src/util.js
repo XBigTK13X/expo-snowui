@@ -6,7 +6,7 @@ export const getCircularReplacer = () => {
     const seen = new WeakMap();
 
     return function replacer(key, value) {
-        if (key.includes('__') || key === '_viewConfig' || key === 'children') {
+        if (key === 'current' || key.includes('__') || key === '_viewConfig' || key === 'children') {
             return '[react node]';
         }
 

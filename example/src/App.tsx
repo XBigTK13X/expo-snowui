@@ -30,12 +30,13 @@ function AppPage() {
   return (
     <Snow.View style={{ flexDirection: 'row', flex: 1 }}>
       <Snow.View style={{ width: "25%" }}>
-        <Snow.TextButton focusKey="test-higher-focus" focusDown="component-picker" title="Focus Test" />
+        <Snow.TextButton
+          yy={0}
+          title="Focus Test"
+        />
         <Snow.Label>Components</Snow.Label>
         <Snow.Grid
-          focusStart
-          focusKey={"component-picker"}
-          focusRight={`tab-entry`}
+          yy={1}
           itemsPerRow={1}
           items={components}
           renderItem={(item: any) => {

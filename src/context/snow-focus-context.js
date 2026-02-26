@@ -43,15 +43,17 @@ export const useFocusContext = (componentName, props) => {
     } = React.useContext(FocusContext)
     const focusRef = React.useRef(null)
 
-    let {
-        focusKey,
-        xx,
-        yy,
-        parentPath
-    } = props
-    let focusPath = `${componentName}-${focusKey}`
+    let xx = props.xx ?? 0
+    let yy = props.yy ?? 0
+    let parentPath = props.parentPath || null
+    let focusKey = props.focusKey || null
+
+    let focusPath = `${componentName}-${xx}x-${yy}y`
+    if (focusKey) {
+        focusPath = `${focusKey}-${focusPath}`
+    }
     if (parentPath) {
-        focusPath = `${parentPath}|${focusKey}`
+        focusPath = `${parentPath}|${focusPath}`
     }
 
     let actionPress = props.onPress
