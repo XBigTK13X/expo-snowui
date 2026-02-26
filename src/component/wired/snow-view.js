@@ -10,11 +10,9 @@ import { useFocusContext } from '../../context/snow-focus-context'
 // Style props goto all children
 
 export const SnowView = (props) => {
+    const { focusWrap, focusPath } = useFocusContext('view', props)
     let styleProps = {}
-    let focusKey = `view-${props.focusKey}|`
-    if (props.snowFocus?.parent) {
-        focusKey = `${props.snowFocus.parent}|${focusKey}`
-    }
+
     if (props.snowStyle) {
         styleProps.snowStyle = props.snowStyle
     }
@@ -25,19 +23,16 @@ export const SnowView = (props) => {
     const children = React.Children.toArray(props.children).map((child, childIndex) => {
         if (React.isValidElement(child)) {
             return React.cloneElement(child, {
-                snowFocus: {
-                    xx: 0,
-                    yy: childIndex,
-                    parent: focusKey
-                },
+                parentPath: focusPath,
+                xx: 0,
+                yy: childIndex,
                 ...styleProps
             })
         }
         return child;
     }).filter(child => child !== null);
 
-    return (<View
-        focusKey={focusKey}
+    return focusWrap(<View
         {...styleProps}
         style={props.style}
         children={children}

@@ -4,11 +4,11 @@ import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
 
-const SnowImageGridW = (props) => {
+export const SnowImageGrid = (props) => {
     if (!props.items || !props.items.length) {
         return null
     }
-    const { readFocusProps } = useFocusContext()
+    const { focusPath } = useFocusContext('image-grid', props)
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
     const renderItem = (item, itemIndex) => {
@@ -88,17 +88,13 @@ const SnowImageGridW = (props) => {
                 </SnowLabel>
                 : null}
             <SnowGrid
-                {...readFocusProps(props)}
                 {...gridProps}
+                parentPath={focusPath}
                 items={props.items}
                 renderItem={renderItem}
             />
         </>
     )
 }
-
-SnowImageGridW.isSnowFocusWired = true
-
-export const SnowImageGrid = SnowImageGridW
 
 export default SnowImageGrid

@@ -1,12 +1,14 @@
 import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
+import { useFocusContext } from '../../context/snow-focus-context'
 import SnowText from '../snow-text'
 import SnowTextButton from './snow-text-button'
 
 export const SnowPager = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { navPush, currentRoute } = useNavigationContext(props)
+    const { focusPath } = useFocusContext('pager', props)
 
     const pageKey = `${props.focusKey}-grid-page`
     const pageTrigger = `${props.focusKey}-page-trigger`
@@ -71,36 +73,30 @@ export const SnowPager = (props) => {
     return (
         <View style={SnowStyle.component.grid.pager} key={pagerFocusKey}>
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'first-page-btn',
-                    parent: pagerFocusKey,
-                    xx: 0,
-                    yy: 0
-                }}
+                focusKey={'first-page-btn'}
+                parentPath={focusPath}
+                xx={0}
+                yy={0}
                 title="<<<"
                 short
                 onPress={firstPage}
             />
 
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'first-half-btn',
-                    parent: pagerFocusKey,
-                    xx: 1,
-                    yy: 0
-                }}
+                focusKey={'first-half-btn'}
+                parentPath={focusPath}
+                xx={1}
+                yy={0}
                 title="<<"
                 short
                 onPress={previousHalf}
             />
 
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'previous-page-btn',
-                    parent: pagerFocusKey,
-                    xx: 2,
-                    yy: 0
-                }}
+                focusKey={'previous-page-btn'}
+                parentPath={focusPath}
+                xx={2}
+                yy={0}
                 title="<"
                 short
                 onPress={previousPage}
@@ -109,36 +105,30 @@ export const SnowPager = (props) => {
             <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
 
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'next-page-btn',
-                    parent: pagerFocusKey,
-                    xx: 3,
-                    yy: 0
-                }}
+                focusKey={'next-page-btn'}
+                parentPath={focusPath}
+                xx={3}
+                yy={0}
                 title=">"
                 short
                 onPress={nextPage}
             />
 
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'next-half-btn',
-                    parent: pagerFocusKey,
-                    xx: 4,
-                    yy: 0
-                }}
+                focusKey={'next-half-btn'}
+                parentPath={focusPath}
+                xx={4}
+                yy={0}
                 title=">>"
                 short
                 onPress={nextHalf}
             />
 
             <SnowTextButton
-                snowFocus={{
-                    focusKey: 'final-page-btn',
-                    parent: pagerFocusKey,
-                    xx: 5,
-                    yy: 0
-                }}
+                focusKey={'final-page-btn'}
+                parentPath={focusPath}
+                xx={5}
+                yy={0}
                 title=">>>"
                 short
                 onPress={finalPage}

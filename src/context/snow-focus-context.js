@@ -1,13 +1,114 @@
-import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from 'react'
-import { findNodeHandle, UIManager } from 'react-native'
+import React from 'react'
+import ReactNative from 'react-native'
 
 import { useNavigationContext } from './snow-navigation-context'
 
-const FocusContext = createContext(null)
+const FocusContext = React.createContext(null)
 
-export const useFocusContext = (id, options = {}) => {
-    const { register, unregister, activeId } = useContext(FocusContext)
-    const elementRef = useRef(null)
+export const useFocusContext = (componentName, props) => {
+    const { FOCUS_ENABLED, register, unregister, focusedPath } = React.useContext(FocusContext)
+    const focusRef = React.useRef(null)
+
+    let {
+        focusKey,
+        xx,
+        yy,
+        parentPath
+    } = props
+    let focusPath = `${componentName}-${focusKey}`
+    if (parentPath) {
+        focusPath = `${parentPath}|${focusKey}`
+    }
+
+    let actionPress = props.onPress
+    let actionLongPress = props.onLongPresss
+    if (FOCUS_ENABLED) {
+        actionPress = () => { }
+        actionLongPress = () => { }
+    }
+
+    React.useEffect(() => {
+        register({
+            focusPath,
+            focusRef,
+            xx,
+            yy,
+            onPress,
+            onLongPress
+        })
+        return () => {
+            unregister(focusPath)
+        }
+    }, [])
+
+    const isFocused = focusedPath == focusPath
+
+    const focusWrap = (props) => {
+        /*
+        If these are omitted, then TV remote doesn't work on first launch
+        This is a low level helper for wired components
+        Most things outside snowui will not need it
+        */
+        let actions = {}
+        let tvRemoteProps = {}
+        if (ReactNative.Platform.OS.isTV && (onPress || onLongPress)) {
+            tvRemoteProps = {
+                focusable: isFocused,
+                hasTVPreferredFocus: isFocused
+            }
+        }
+        if (actionPress) {
+            actions.onPress = actionPress
+        }
+        if (actionLongPress) {
+            actions.onLongPress = actionLongPress
+        }
+        return React.cloneElement(child, {
+            ...tvRemoteProps,
+            ...actions,
+            ref: focusRef,
+            testID: focusPath
+        })
+    }
+
+    return {
+        focusRef,
+        focusPath,
+        focusWrap,
+        isFocused,
+    }
+}
+
+export const FocusContextProvider = (props) => {
+    const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
+
+    const { currentRoute } = useNavigationContext()
+
+    const focusedPath = currentRoute?.routeParams?.focusedPath
+
+    const registry = React.useRef(new Map())
+
+    const addFocus = (payload) => {
+        registry.current.set(payload.focusPath, payload)
+    }
+
+    const removeFocus = (focusPath) => {
+        registry.current.delete(focusPath)
+    }
+
+    const value = React.useMemo(() => ({
+        addFocus,
+        removeFocus,
+        focusedPath,
+        FOCUS_ENABLED
+    }), [focusedPath, moveFocus, interact])
+
+    return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
+}
+
+export const useFocusContextWrong = (id, options = {}) => {
+    const { register, unregister, activeId } = React.useContext(FocusContext)
+    const elementRef = React.useRef(null)
 
     const {
         parentId = null,
@@ -19,9 +120,9 @@ export const useFocusContext = (id, options = {}) => {
         onLongPress
     } = options
 
-    const pos = useMemo(() => fp || focusPosition || { xx: 0, yy: 0 }, [fp, focusPosition])
+    const pos = React.useMemo(() => fp || focusPosition || { xx: 0, yy: 0 }, [fp, focusPosition])
 
-    useEffect(() => {
+    React.useEffect(() => {
         register(id, {
             id,
             ref: elementRef,
@@ -54,15 +155,15 @@ const getDistance = (source, target, direction) => {
     return Math.sqrt(dx * dx + dy * dy)
 }
 
-export const FocusContextProvider = (props) => {
+export const FocusContextProviderWrong = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
-    const registry = useRef(new Map())
-    const adjacencyMap = useRef(new Map())
+    const registry = React.useRef(new Map())
+    const adjacencyMap = React.useRef(new Map())
 
     const { currentRoute, navPush } = useNavigationContext()
     const activeId = currentRoute?.routeParams?.focusedId
 
-    const rebuildAdjacencyTable = useCallback(() => {
+    const rebuildAdjacencyTable = React.useCallback(() => {
         const nodes = Array.from(registry.current.values())
         const newMap = new Map()
 
@@ -97,25 +198,25 @@ export const FocusContextProvider = (props) => {
         adjacencyMap.current = newMap
     }, [])
 
-    const scrollIntoView = useCallback((nodeId) => {
+    const scrollIntoView = React.useCallback((nodeId) => {
         const node = registry.current.get(nodeId)
         if (node?.ref.current && node.parentScrollRef?.current) {
-            const nodeTag = findNodeHandle(node.ref.current)
-            const scrollTag = findNodeHandle(node.parentScrollRef.current)
-            UIManager.measureLayout(nodeTag, scrollTag, () => { }, (xx, yy) => {
+            const nodeTag = ReactNative.findNodeHandle(node.ref.current)
+            const scrollTag = ReactNative.findNodeHandle(node.parentScrollRef.current)
+            ReactNative.UIManager.measureLayout(nodeTag, scrollTag, () => { }, (xx, yy) => {
                 node.parentScrollRef.current.scrollTo({ y: yy, animated: true })
             })
         }
     }, [])
 
-    const updateFocus = useCallback((nextId) => {
+    const updateFocus = React.useCallback((nextId) => {
         if (nextId && registry.current.has(nextId)) {
             navPush({ ...currentRoute.routeParams, focusedId: nextId })
             scrollIntoView(nextId)
         }
     }, [currentRoute, navPush, scrollIntoView])
 
-    const moveFocus = useCallback((direction) => {
+    const moveFocus = React.useCallback((direction) => {
         const current = registry.current.get(activeId)
         if (!current || current.locked) return
 
@@ -140,7 +241,7 @@ export const FocusContextProvider = (props) => {
         updateFocus(nextId)
     }, [activeId, updateFocus])
 
-    const interact = useCallback((action, id) => {
+    const interact = React.useCallback((action, id) => {
         return () => {
             if (!id) {
                 id = activeId
@@ -155,7 +256,7 @@ export const FocusContextProvider = (props) => {
         }
     }, [activeId, FOCUS_ENABLED, currentRoute, navPush])
 
-    const value = useMemo(() => ({
+    const value = React.useMemo(() => ({
         register: (id, data) => {
             registry.current.set(id, data)
             rebuildAdjacencyTable()

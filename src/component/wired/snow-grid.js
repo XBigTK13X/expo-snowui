@@ -23,6 +23,8 @@ export const SnowGrid = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { currentRoute } = useNavigationContext(props)
 
+    const { focusPath } = useFocusContext('grid', props)
+
     let itemsPerRow = 5
     if (props.itemsPerRow) {
         itemsPerRow = props.itemsPerRow
@@ -53,8 +55,8 @@ export const SnowGrid = (props) => {
     }
 
     let page = 0
-    if (currentRoute?.routeParams?.hasOwnProperty(`${props.focusKey}-grid-page`)) {
-        page = parseInt(currentRoute?.routeParams?.[`${props.focusKey}-grid-page`], 10) ?? 0
+    if (currentRoute?.routeParams?.hasOwnProperty(`${focusPath}-grid-page`)) {
+        page = parseInt(currentRoute?.routeParams?.[`${focusPath}-grid-page`], 10) ?? 0
     }
 
     const hasPageControls = items.length > itemsPerPage
@@ -68,23 +70,16 @@ export const SnowGrid = (props) => {
         lastElementColumn = itemsPerRow
     }
 
-    let gridFocusKey = `grid-${props.focusKey}`
-    if (props.snowFocus?.parent) {
-        gridFocusKey = `${props.parent}|${gridFocusKey}`
-    }
-
-
     let pageControls = null
     if (hasPageControls) {
         pageControls = (
             <SnowPager
                 maxPage={maxPage}
                 page={page}
-                snowFocus={{
-                    xx: 10,
-                    yy: 10,
-                    parent: gridFocusKey
-                }}
+                parentPath={focusPath}
+                focusKey={'pager'}
+                xx={10}
+                yy={10}
             />
         )
     }
@@ -98,12 +93,10 @@ export const SnowGrid = (props) => {
 
         if (props?.assignFocus !== false) {
             child = React.cloneElement(child, {
-                testID: focus.focusKey,
-                snowFocus: {
-                    yy: 20 + row,
-                    xx: 20 + column,
-                    parent: gridFocusKey
-                }
+                parentPath: focusPath,
+                focusKey: 'cell',
+                xx: 20 + column,
+                yy: 20 + renderRowIndex
             })
         }
 
@@ -133,11 +126,11 @@ export const SnowGrid = (props) => {
 
 
     return (
-        <View testID={props.testID} style={gridStyle} key={gridFocusKey}>
+        <View testID={props.testID} style={gridStyle} key={focusPath}>
             {pageControls}
             {rows.map((row, rowIndex) => {
                 return (
-                    <View key={`row-${gridFocusKey}-${rowIndex}`} style={rowStyle}>
+                    <View key={`row-${focusPath}-${rowIndex}`} style={rowStyle}>
                         {row.map(cell => { return cell })}
                     </View>
                 )

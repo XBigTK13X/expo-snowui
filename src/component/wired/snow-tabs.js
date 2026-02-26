@@ -5,7 +5,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowDropdown from './snow-dropdown'
 
-const SnowTabsW = (props) => {
+export const SnowTabs = (props) => {
     if (!props.headers) {
         return null
     }
@@ -13,8 +13,8 @@ const SnowTabsW = (props) => {
         return null
     }
     const { SnowStyle } = useStyleContext(props)
-    const { readFocusProps } = useFocusContext()
     const { navPush, currentRoute } = useNavigationContext(props)
+    const { focusPath } = useFocusContext('tabs', props)
 
     const tabKey = `${props.focusKey}-tab`
     const tabTrigger = `${props.focusKey}-tab-trigger`
@@ -63,18 +63,12 @@ const SnowTabsW = (props) => {
         })
     }
 
-    const innerFocusKey = `${props.focusKey}-tab`
-
-    const outerFocusProps = readFocusProps(props)
-    outerFocusProps.focusDown = `${innerFocusKey}-${tabIndex}`
-
     const tabs = React.Children.toArray(props.children).map((child, childIndex) => {
         if (React.isValidElement(child)) {
             return React.cloneElement(child, {
                 snowStyle: tabStyle,
-                focusKey: `${innerFocusKey}-${childIndex}`,
-                focusDown: props.focusDown,
-                focusUp: props.focusKey
+                parentPath: focusPath,
+                xx: childIndex
             })
         }
         return child
@@ -83,8 +77,8 @@ const SnowTabsW = (props) => {
     return (
         <>
             <SnowDropdown
-                {...outerFocusProps}
                 snowStyle={tabStyle}
+                parentPath={focusPath}
                 fade
                 options={props.headers}
                 onValueChange={changeTab}
@@ -97,9 +91,5 @@ const SnowTabsW = (props) => {
     )
 
 }
-
-SnowTabsW.isSnowFocusWired = true
-
-export const SnowTabs = SnowTabsW
 
 export default SnowTabs

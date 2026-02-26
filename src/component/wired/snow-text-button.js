@@ -5,8 +5,7 @@ import SnowText from '../snow-text'
 
 const SnowTextButtonW = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusEnabled, isFocused, action, useFocusWiring, tvRemoteProps } = useFocusContext()
-    const { elementRef } = useFocusWiring(props)
+    const { focusWrap, isFocused } = useFocusContext('text-button', props)
 
     let wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.short) {
@@ -19,7 +18,7 @@ const SnowTextButtonW = (props) => {
         if (props.selected) {
             wrapperStyle.push(SnowStyle.component.textButton.selected)
         }
-        if (isFocused(props.focusKey)) {
+        if (isFocused) {
             wrapperStyle.push(SnowStyle.component.textButton.focused)
         }
     }
@@ -53,28 +52,15 @@ const SnowTextButtonW = (props) => {
         textStyle.push(SnowStyle.component.textButton.fadeText)
     }
 
-    let onPress = props.onPress
-    let onLongPress = props.onLongPress
-    if (focusEnabled) {
-        onPress = action(props.focusKey)
-        onLongPress = focusLongPress(elementRef, props.focusKey)
-    }
-
     let containerStyle = [SnowStyle.component.textButton.textContainer]
     if (props.short) {
         containerStyle = [SnowStyle.component.textButton.shortContainer]
     }
 
-    return (
+    return focusWrap(
         <Pressable
-            ref={elementRef}
-            {...tvRemoteProps(props)}
-            testID={props.focusKey}
             style={wrapperStyle}
-            onPress={onPress}
-            onLongPress={onLongPress}
             disabled={props.disabled}
-
         >
             <View style={containerStyle}>
                 <SnowText noSelect style={textStyle}>{title}</SnowText>

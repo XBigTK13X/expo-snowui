@@ -4,10 +4,9 @@ import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 
-const SnowInputW = (props) => {
+export const SnowInput = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { isFocused, useFocusWiring, tvRemoteProps } = useFocusContext()
-    const { elementRef } = useFocusWiring(props)
+    const { focusWrap, isFocused } = useFocusContext()
     const inputRef = React.useRef(null)
 
     let textStyle = [SnowStyle.component.input.text]
@@ -61,10 +60,8 @@ const SnowInputW = (props) => {
         }
     }, [props, isFocused])
 
-    return (
+    return focusWrap(
         <Pressable
-            ref={elementRef}
-            {...tvRemoteProps(props)}
             onPress={onContainerPress}
             style={textStyle} >
             <TextInput
@@ -88,9 +85,5 @@ const SnowInputW = (props) => {
         </Pressable>
     )
 }
-
-SnowInputW.isSnowFocusWired = true
-
-export const SnowInput = SnowInputW
 
 export default SnowInput

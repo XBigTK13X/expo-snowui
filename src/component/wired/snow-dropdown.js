@@ -11,10 +11,7 @@ export const SnowDropdown = (props) => {
     if (props.valueIndex === undefined || props.valueIndex === null) {
         return null
     }
-    let focusKey = `dropdown-${props.focusKey}|`
-    if (props.snowFocus?.parent) {
-        focusKey = `${props.snowFocus.parent}|${focusKey}`
-    }
+    const { focusPath } = useFocusContext('dropdown', props)
     const choose = (chosenIndex) => {
         if (props.onValueChange) {
             props.onValueChange(chosenIndex, props.focusKey)
@@ -40,7 +37,7 @@ export const SnowDropdown = (props) => {
         return <>
             <SnowLabel center>{props.title}</SnowLabel>
             <SnowGrid
-                focusKey={focusKey}
+                parentPath={focusPath}
                 itemsPerRow={props.itemsPerRow}
                 items={props.options}
                 renderItem={renderItem}
@@ -49,7 +46,7 @@ export const SnowDropdown = (props) => {
     }
     return (
         <SnowGrid
-            focusKey={focusKey}
+            parentPath={focusPath}
             itemsPerRow={props.itemsPerRow}
             items={props.options}
             renderItem={renderItem}

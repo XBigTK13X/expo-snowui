@@ -5,10 +5,9 @@ import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowText from '../snow-text'
 
-const SnowImageButtonW = (props) => {
+export const SnowImageButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusEnabled, isFocused, useFocusWiring, focusPress, focusLongPress, tvRemoteProps } = useFocusContext()
-    const { elementRef } = useFocusWiring(props)
+    const { focusWrap, isFocused } = useFocusContext('image-button', props)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
@@ -55,39 +54,22 @@ const SnowImageButtonW = (props) => {
         }
     }
 
-    let onPress = props.onPress
-    let onLongPress = props.onLongPress
-    if (focusEnabled) {
-        onPress = focusPress(elementRef, props.focusKey)
-        onLongPress = focusLongPress(elementRef, props.focusKey)
-    }
+    return focusWrap(
+        <Pressable
+            style={wrapperStyle}
+        >
+            <Image
+                style={imageStyle}
+                contentFit="contain"
+                source={imageSource}
+                placeholder={props.placeholder}
+            />
+            <View style={textWrapperStyle}>
+                <SnowText style={fontStyle}>{title}</SnowText>
+            </View>
 
-    return (
-        <>
-            <Pressable
-                ref={elementRef}
-                {...tvRemoteProps(props)}
-                style={wrapperStyle}
-                onPress={onPress}
-                onLongPress={onLongPress}
-            >
-                <Image
-                    style={imageStyle}
-                    contentFit="contain"
-                    source={imageSource}
-                    placeholder={props.placeholder}
-                />
-                <View style={textWrapperStyle}>
-                    <SnowText style={fontStyle}>{title}</SnowText>
-                </View>
-
-            </Pressable>
-        </>
+        </Pressable>
     )
 }
-
-SnowImageButtonW.isSnowFocusWired = true
-
-export const SnowImageButton = SnowImageButtonW
 
 export default SnowImageButton
