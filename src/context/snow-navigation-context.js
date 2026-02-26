@@ -1,7 +1,6 @@
 import React from 'react'
 import { Platform, View } from 'react-native'
 
-import { useFocusContext } from './snow-focus-context'
 import { useInputContext } from './snow-input-context'
 import { useLayerContext } from './snow-layer-context'
 
@@ -44,7 +43,6 @@ export function NavigationContextProvider(props) {
     const DEBUG = props.DEBUG_NAVIGATION
 
     const { addBackListener, removeBackListener } = useInputContext()
-    const { pushFocusLayer, popFocusLayer, focusedLayer, isFocusedLayer } = useFocusContext()
     const { modalPayloads } = useLayerContext()
 
     const modalsVisibleRef = React.useRef()
@@ -55,24 +53,6 @@ export function NavigationContextProvider(props) {
     const [initialPath, setInitialPath] = React.useState(null)
 
     const [navigationHistory, setNavigationHistory] = React.useState(null)
-    const navigationHistoryRef = React.useRef(navigationHistory)
-
-    React.useEffect(() => {
-        navigationHistoryRef.current = navigationHistory
-        if (navigationHistory?.at(-1)?.routePath) {
-            let layerName = pageLookup[navigationHistory?.at(-1).routePath].pathKey
-            const gridPage = navigationHistory?.at(-1).routeParams?.['grid-page']
-            if (gridPage) {
-                layerName = layerName + '-' + gridPage
-            }
-            if (!isFocusedLayer(layerName)) {
-                pushFocusLayer(layerName)
-                return () => {
-                    popFocusLayer()
-                }
-            }
-        }
-    }, [navigationHistory])
 
     React.useEffect(() => {
         modalsVisibleRef.current = !!modalPayloads?.length
@@ -243,7 +223,7 @@ export function NavigationContextProvider(props) {
 
     if (!isReady) {
         if (DEBUG) {
-            prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, focusedLayer, props })
+            prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, props })
         }
         return <></>
     }

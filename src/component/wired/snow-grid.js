@@ -6,16 +6,8 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import SnowPager from './snow-pager'
 
-const emptyWiredGrid = () => {
-    return {
-        row: 0,
-        column: 0,
-        index: 0,
-        lastGridRow: 0
-    }
-}
 
-const SnowGridW = (props) => {
+export const SnowGrid = (props) => {
     if (!props.items && !props.children) {
         return null
     }
@@ -30,9 +22,6 @@ const SnowGridW = (props) => {
 
     const { SnowStyle } = useStyleContext(props)
     const { currentRoute } = useNavigationContext(props)
-    const { DEBUG_FOCUS } = useFocusContext(props)
-
-    const wiredGridRef = React.useRef(emptyWiredGrid())
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -79,13 +68,11 @@ const SnowGridW = (props) => {
         lastElementColumn = itemsPerRow
     }
 
-    let gridFocusKey = `${props.focusKey}-row-0-column-0`
-    let lastCellKey = `${props.focusKey}-grid-end`
-    let lastCellFullKey = `${props.focusKey}-row-${maxRow - 1}-column-${lastElementColumn - 1}`
-
-    if (gridFocusKey === lastCellFullKey) {
-        gridFocusKey = lastCellKey
+    let gridFocusKey = `grid-${props.focusKey}`
+    if (props.snowFocus?.parent) {
+        gridFocusKey = `${props.parent}|${gridFocusKey}`
     }
+
 
     let pageControls = null
     if (hasPageControls) {
@@ -93,132 +80,35 @@ const SnowGridW = (props) => {
             <SnowPager
                 maxPage={maxPage}
                 page={page}
-                focusUp={props.focusUp}
-                focusDown={gridFocusKey}
-                focusKey={props.focusKey}
+                snowFocus={{
+                    xx: 10,
+                    yy: 10,
+                    parent: gridFocusKey
+                }}
             />
         )
     }
 
-    wiredGridRef.current = emptyWiredGrid()
-
-    const renderKey = `${props.focusKey ?? ''}-grid-${itemsPerRow}-cols-page-${page}`
 
     const renderCell = (item, itemIndex, renderRowIndex) => {
         let child = renderItem(item, itemIndex)
 
-        let focus = {}
+        let row = Math.floor((itemIndex + 1) / itemsPerRow)
+        let column = itemIndex % itemsPerRow
 
-        if (child?.type?.isSnowFocusWired && props?.assignFocus !== false) {
-            let wired = wiredGridRef.current
-            let row = wired.row
-            let column = wired.column
-
-            if (child.props.focusKey) {
-                focus.focusKey = child.props.focusKey
-            }
-            else {
-                if (wired.index === 0 && !hasPageControls) {
-                    focus.focusKey = props.focusKey
+        if (props?.assignFocus !== false) {
+            child = React.cloneElement(child, {
+                testID: focus.focusKey,
+                snowFocus: {
+                    yy: 20 + row,
+                    xx: 20 + column,
+                    parent: gridFocusKey
                 }
-                else {
-                    focus.focusKey = `${props.focusKey}-row-${row}-column-${column}`
-                    if (focus.focusKey === lastCellFullKey) {
-                        focus.focusKey = lastCellKey
-                    }
-                }
-            }
-
-            if (currentRoute?.routeParams?.page === undefined) {
-                if (child.props.focusStart) {
-                    focus.focusStart = child.props.focusStart
-                } else {
-                    if (wired.index === 0 && props.focusStart) {
-                        focus.focusStart = true
-                    }
-                }
-            }
-
-            if (row === 0) {
-                if (hasPageControls) {
-                    focus.focusUp = `${props.focusKey}-next-page`
-                }
-                else {
-                    if (props.focusUp) {
-                        focus.focusUp = props.focusUp
-                    }
-                }
-            } else {
-                if (row - 1 === 0 && column === 0 && !hasPageControls) {
-                    focus.focusUp = props.focusKey
-                } else {
-                    focus.focusUp = `${props.focusKey}-row-${row - 1}-column-${column}`
-                }
-            }
-
-            if (row === maxRow - 1) {
-                if (props.focusDown) {
-                    focus.focusDown = props.focusDown
-                }
-
-            } else {
-                if (row === maxRow - 2 && column >= lastElementColumn - 1) {
-                    focus.focusDown = lastCellKey
-                } else {
-                    focus.focusDown = `${props.focusKey}-row-${row + 1}-column-${column}`
-                }
-            }
-
-            if (column === 0) {
-                if (props.focusLeft) {
-                    focus.focusLeft = props.focusLeft
-                }
-            } else {
-                if (column - 1 === 0 && row === 0) {
-                    focus.focusLeft = props.focusKey
-                } else {
-                    focus.focusLeft = `${props.focusKey}-row-${row}-column-${column - 1}`
-                }
-            }
-
-            if (column === maxColumn - 1) {
-                if (props.focusRight) {
-                    focus.focusRight = props.focusRight
-                }
-            } else {
-                focus.focusRight = `${props.focusKey}-row-${row}-column-${column + 1}`
-                if (row >= maxRow - 1 && column + 1 >= lastElementColumn - 1) {
-                    focus.focusRight = lastCellKey
-                }
-            }
-            let debugFocus = {}
-            if (DEBUG_FOCUS) {
-                debugFocus = {
-                    maxRow,
-                    maxColumn,
-                    lastElementColumn,
-                    row,
-                    column,
-                    lastCellKey,
-                    lastCellFullKey
-                }
-            }
-            row = Math.floor((itemIndex + 1) / itemsPerRow)
-            if (row > wired.lastGridRow) {
-                wired.row += 1
-                wired.column = 0
-                wired.lastGridRow = row
-            }
-            else {
-                wired.column += 1
-            }
-            wired.index += 1
-            wiredGridRef.current = wired
-            child = React.cloneElement(child, { ...focus, ...debugFocus, testID: focus.focusKey })
+            })
         }
 
         return (
-            <View key={`cell-${itemIndex}-${renderRowIndex}`}>
+            <View key={`cell-${row}-${column}`}>
                 {child}
             </View>
         )
@@ -243,11 +133,11 @@ const SnowGridW = (props) => {
 
 
     return (
-        <View testID={props.testID} style={gridStyle} key={renderKey}>
+        <View testID={props.testID} style={gridStyle} key={gridFocusKey}>
             {pageControls}
             {rows.map((row, rowIndex) => {
                 return (
-                    <View key={`row-${renderKey}-${rowIndex}`} style={rowStyle}>
+                    <View key={`row-${gridFocusKey}-${rowIndex}`} style={rowStyle}>
                         {row.map(cell => { return cell })}
                     </View>
                 )
@@ -255,9 +145,5 @@ const SnowGridW = (props) => {
         </View >
     )
 }
-
-SnowGridW.isSnowFocusWired = true
-
-export const SnowGrid = SnowGridW
 
 export default SnowGrid

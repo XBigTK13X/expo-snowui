@@ -1,180 +1,173 @@
-import React, { createContext, useContext, useMemo, useCallback, useRef } from 'react';
-import { UIManager, findNodeHandle, Platform } from 'react-native';
+import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from 'react'
+import { findNodeHandle, UIManager } from 'react-native'
 
-const SnowFocusContext = createContext(null);
+import { useNavigationContext } from './snow-navigation-context'
 
-/**
-Hierarchical spatial focus management\
+const FocusContext = createContext(null)
 
-Uses a single App-level provider to manage a global registry of components
-Focus is represented as a pipe-delimited string of segments such as 'root|container:0,0|item:2,5'
-Implements a "bubble-up" movement strategy: local coordinate search occurs first;
-    If a boundary is hit, the event repeats one level up at the parent
-Focus state is stored in the URL to support persistence, rehydration, and back navigation
-Supports focus trapping for modals by restricting bubbling to a designated id
-*/
+export const useFocusContext = (id, options = {}) => {
+    const { register, unregister, activeId } = useContext(FocusContext)
+    const elementRef = useRef(null)
 
-export function SnowFocusProvider(props) {
-    const registry = useRef(new Map());
-    const scrollRef = useRef(null);
+    const {
+        parentId = null,
+        parentScrollRef = null,
+        locked = false,
+        focusPosition,
+        fp,
+        onPress,
+        onLongPress
+    } = options
 
-    const focusPath = props.valueFromUrl || 'root';
-    const pathParts = useMemo(() => focusPath.split('|'), [focusPath]);
-    const activeLeafId = useMemo(() => {
-        const lastPart = pathParts[pathParts.length - 1];
-        return lastPart.split(':')[0];
-    }, [pathParts]);
+    const pos = useMemo(() => fp || focusPosition || { xx: 0, yy: 0 }, [fp, focusPosition])
 
-    const [focusRootId, setFocusRootId] = React.useState('root');
-
-    const scrollToElement = useCallback((elementRef) => {
-        if (!scrollRef.current || !elementRef.current) return;
-
-        const nodeHandle = findNodeHandle(elementRef.current);
-        const scrollHandle = findNodeHandle(scrollRef.current);
-
-        if (nodeHandle && scrollHandle) {
-            UIManager.measureLayout(
-                nodeHandle,
-                scrollHandle,
-                () => { },
-                (xx, yy, width, height) => {
-                    const offset = props.scrollOffset || 100;
-                    scrollRef.current.scrollTo({
-                        y: Math.max(0, yy - offset),
-                        animated: true
-                    });
-                }
-            );
-        }
-    }, [props.scrollOffset]);
-
-    const register = useCallback((id, parentId, coord, settings) => {
-        if (!registry.current.has(parentId)) {
-            registry.current.set(parentId, { coords: new Map(), isContainer: true });
-        }
-
-        const parentEntry = registry.current.get(parentId);
-        if (coord) {
-            parentEntry.coords.set(coord, id);
-        }
-
-        registry.current.set(id, {
+    useEffect(() => {
+        register(id, {
+            id,
+            ref: elementRef,
+            pos,
             parentId,
-            coords: new Map(),
-            isContainer: settings.isContainer,
-            onPress: settings.onPress,
-            onLongPress: settings.onLongPress,
-            ref: settings.ref
-        });
+            parentScrollRef,
+            locked,
+            onPress,
+            onLongPress
+        })
 
-        if (id === activeLeafId && settings.ref) {
-            scrollToElement(settings.ref);
-        }
+        return () => unregister(id)
+    }, [id, parentId, pos.xx, pos.yy, locked, onPress, onLongPress])
 
-        return () => {
-            const currentParent = registry.current.get(parentId);
-            if (currentParent) currentParent.coords.delete(coord);
-            registry.current.delete(id);
-        };
-    }, [activeLeafId, scrollToElement]);
+    return {
+        ref: elementRef,
+        isFocused: activeId === id
+    }
+}
 
-    const dispatchAction = useCallback((actionType) => {
-        const entry = registry.current.get(activeLeafId);
-        if (entry && entry[actionType]) {
-            entry[actionType]();
-            return true;
-        }
-        return false;
-    }, [activeLeafId]);
+const getDistance = (source, target, direction) => {
+    const dx = target.xx - source.xx
+    const dy = target.yy - source.yy
 
-    const move = useCallback((direction) => {
-        const rootIndex = pathParts.indexOf(focusRootId);
-        const stopAt = rootIndex !== -1 ? rootIndex : 0;
+    if (direction === 'up' && dy >= 0) return Infinity
+    if (direction === 'down' && dy <= 0) return Infinity
+    if (direction === 'left' && dx >= 0) return Infinity
+    if (direction === 'right' && dx <= 0) return Infinity
 
-        for (let ii = pathParts.length - 1; ii >= stopAt; ii--) {
-            const segment = pathParts[ii];
-            const [id, currentCoord] = segment.split(':');
-            const entry = registry.current.get(id);
+    return Math.sqrt(dx * dx + dy * dy)
+}
 
-            if (entry && currentCoord) {
-                let [xx, yy] = currentCoord.split(',').map(Number);
-                if (direction === 'up') yy--;
-                if (direction === 'down') yy++;
-                if (direction === 'left') xx--;
-                if (direction === 'right') xx++;
+export const FocusContextProvider = (props) => {
+    const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
+    const registry = useRef(new Map())
+    const adjacencyMap = useRef(new Map())
 
-                const nextCoordKey = `${xx},${yy}`;
-                const neighborId = entry.coords.get(nextCoordKey);
+    const { currentRoute, navPush } = useNavigationContext()
+    const activeId = currentRoute?.routeParams?.focusedId
 
-                if (neighborId) {
-                    const neighborEntry = registry.current.get(neighborId);
-                    let newSegment = neighborEntry?.isContainer
-                        ? `${neighborId}:0,0`
-                        : `${id}:${nextCoordKey}`;
+    const rebuildAdjacencyTable = useCallback(() => {
+        const nodes = Array.from(registry.current.values())
+        const newMap = new Map()
 
-                    const newPath = [...pathParts.slice(0, ii), newSegment].join('|');
-                    props.onUrlChange(newPath);
+        nodes.forEach((node) => {
+            const neighbors = { up: null, down: null, left: null, right: null, in: null, out: null }
+            const siblings = nodes.filter((nn) => nn.parentId === node.parentId && nn.id !== node.id)
+            const childrenNodes = nodes.filter((nn) => nn.parentId === node.id)
 
-                    if (neighborEntry && !neighborEntry.isContainer && neighborEntry.ref) {
-                        scrollToElement(neighborEntry.ref);
+            ['up', 'down', 'left', 'right'].forEach((dir) => {
+                let bestId = null
+                let minDistance = Infinity
+                siblings.forEach((sib) => {
+                    const dist = getDistance(node.pos, sib.pos, dir)
+                    if (dist < minDistance) {
+                        minDistance = dist
+                        bestId = sib.id
                     }
-                    return true;
+                })
+                neighbors[dir] = bestId
+            })
+
+            if (childrenNodes.length > 0) {
+                const firstChild = childrenNodes.sort((aa, bb) =>
+                    (aa.pos.yy - bb.pos.yy) || (aa.pos.xx - bb.pos.xx)
+                )[0]
+                neighbors.in = firstChild.id
+            }
+            neighbors.out = node.parentId
+            newMap.set(node.id, neighbors)
+        })
+
+        adjacencyMap.current = newMap
+    }, [])
+
+    const scrollIntoView = useCallback((nodeId) => {
+        const node = registry.current.get(nodeId)
+        if (node?.ref.current && node.parentScrollRef?.current) {
+            const nodeTag = findNodeHandle(node.ref.current)
+            const scrollTag = findNodeHandle(node.parentScrollRef.current)
+            UIManager.measureLayout(nodeTag, scrollTag, () => { }, (xx, yy) => {
+                node.parentScrollRef.current.scrollTo({ y: yy, animated: true })
+            })
+        }
+    }, [])
+
+    const updateFocus = useCallback((nextId) => {
+        if (nextId && registry.current.has(nextId)) {
+            navPush({ ...currentRoute.routeParams, focusedId: nextId })
+            scrollIntoView(nextId)
+        }
+    }, [currentRoute, navPush, scrollIntoView])
+
+    const moveFocus = useCallback((direction) => {
+        const current = registry.current.get(activeId)
+        if (!current || current.locked) return
+
+        const neighbors = adjacencyMap.current.get(activeId)
+        if (!neighbors) return
+
+        let nextId = neighbors[direction]
+
+        if (!nextId) {
+            if ((direction === 'down' || direction === 'right') && neighbors.in) {
+                nextId = neighbors.in
+            } else if (neighbors.out) {
+                const parent = registry.current.get(neighbors.out)
+                if (parent) {
+                    updateFocus(parent.id)
+                    moveFocus(direction)
+                    return
                 }
             }
         }
-        return false;
-    }, [pathParts, focusRootId, props.onUrlChange, scrollToElement]);
 
-    const moveUp = useCallback(() => { move('up') })
-    const moveLeft = useCallback(() => { move('left') })
-    const moveRight = useCallback(() => { move('right') })
-    const moveDown = useCallback(() => { move('down') })
+        updateFocus(nextId)
+    }, [activeId, updateFocus])
 
-    const contextValue = {
-        focusPath,
-        activeLeafId,
-        register,
-        move,
-        dispatchAction,
-        setFocusRoot: setFocusRootId,
-        setScrollRef: (ref) => { scrollRef.current = ref; }
-    };
-
-    return (
-        <SnowFocusContext.Provider value={contextValue}>
-            {props.children}
-        </SnowFocusContext.Provider>
-    );
-}
-
-export function useFocus(id, parentId, focusSettings) {
-    const context = useContext(SnowFocusContext);
-    if (!context) {
-        throw new Error("useFocus must be used within SnowFocusProvider");
-    }
-
-    const coordKey = `${focusSettings.xx},${focusSettings.yy}`;
-
-    const isActive = useMemo(() => {
-        return context.pathParts.some(part => part.startsWith(`${id}:`) || part === id);
-    }, [context.pathParts, id]);
-
-    React.useEffect(() => {
-        const unregisterFunc = context.register(
-            id,
-            parentId,
-            coordKey,
-            focusSettings.isContainer
-        );
-
+    const interact = useCallback((action, id) => {
         return () => {
-            unregisterFunc();
-        };
-    }, [id, parentId, coordKey, focusSettings.isContainer]);
+            if (!id) {
+                id = activeId
+            } else {
+                navPush({ params: { ...currentRoute.routeParams, focusedId: id }, func: false })
+            }
+            const current = registry.current.get(activeId)
+            if (current && current[action]) {
+                return current[action]()
+            }
+            return null
+        }
+    }, [activeId, FOCUS_ENABLED, currentRoute, navPush])
 
-    return {
-        isActive,
-        move: context.move
-    };
+    const value = useMemo(() => ({
+        register: (id, data) => {
+            registry.current.set(id, data)
+            rebuildAdjacencyTable()
+        },
+        unregister: (id) => {
+            registry.current.delete(id)
+            rebuildAdjacencyTable()
+        },
+        activeId,
+        moveFocus,
+        interact
+    }), [activeId, rebuildAdjacencyTable, moveFocus, interact])
+
+    return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
 }

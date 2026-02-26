@@ -4,15 +4,17 @@ import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowTextButton from './snow-text-button'
 
-const SnowDropdownW = (props) => {
-    const { readFocusProps } = useFocusContext()
+export const SnowDropdown = (props) => {
     if (!props.options) {
         return null
     }
     if (props.valueIndex === undefined || props.valueIndex === null) {
         return null
     }
-
+    let focusKey = `dropdown-${props.focusKey}|`
+    if (props.snowFocus?.parent) {
+        focusKey = `${props.snowFocus.parent}|${focusKey}`
+    }
     const choose = (chosenIndex) => {
         if (props.onValueChange) {
             props.onValueChange(chosenIndex, props.focusKey)
@@ -38,7 +40,7 @@ const SnowDropdownW = (props) => {
         return <>
             <SnowLabel center>{props.title}</SnowLabel>
             <SnowGrid
-                {...readFocusProps(props)}
+                focusKey={focusKey}
                 itemsPerRow={props.itemsPerRow}
                 items={props.options}
                 renderItem={renderItem}
@@ -47,16 +49,12 @@ const SnowDropdownW = (props) => {
     }
     return (
         <SnowGrid
-            {...readFocusProps(props)}
+            focusKey={focusKey}
             itemsPerRow={props.itemsPerRow}
             items={props.options}
             renderItem={renderItem}
         />
     )
 }
-
-SnowDropdownW.isSnowFocusWired = true
-
-export const SnowDropdown = SnowDropdownW
 
 export default SnowDropdown

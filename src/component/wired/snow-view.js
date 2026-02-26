@@ -9,36 +9,39 @@ import { useFocusContext } from '../../context/snow-focus-context'
 // Focus props goto the first child
 // Style props goto all children
 
-const SnowViewW = (props) => {
+export const SnowView = (props) => {
     let styleProps = {}
+    let focusKey = `view-${props.focusKey}|`
+    if (props.snowFocus?.parent) {
+        focusKey = `${props.snowFocus.parent}|${focusKey}`
+    }
     if (props.snowStyle) {
         styleProps.snowStyle = props.snowStyle
     }
     if (props.snowConfig) {
         styleProps.snowConfig = props.snowConfig
     }
-    const { readFocusProps } = useFocusContext()
 
     const children = React.Children.toArray(props.children).map((child, childIndex) => {
         if (React.isValidElement(child)) {
-            if (childIndex === 0) {
-                return React.cloneElement(child, { ...readFocusProps(props), ...styleProps })
-            }
-            return React.cloneElement(child, { ...styleProps })
+            return React.cloneElement(child, {
+                snowFocus: {
+                    xx: 0,
+                    yy: childIndex,
+                    parent: focusKey
+                },
+                ...styleProps
+            })
         }
         return child;
     }).filter(child => child !== null);
 
     return (<View
-        {...readFocusProps(props)}
+        focusKey={focusKey}
         {...styleProps}
         style={props.style}
         children={children}
     />)
 }
-
-SnowViewW.isSnowFocusWired = true
-
-export const SnowView = SnowViewW
 
 export default SnowView

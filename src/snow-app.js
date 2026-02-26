@@ -63,8 +63,12 @@ function SnowApp(props) {
                 <InputContextProvider
                     DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
-                    <LayerContextProvider
-                        DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
+                    <NavigationContextProvider
+                        routePaths={props.routePaths}
+                        routePages={props.routePages}
+                        initialRoutePath={props.initialRoutePath}
+                        resetRoutePath={props.resetRoutePath}
+                        DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
 
                         <FocusContextProvider
                             DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
@@ -72,12 +76,9 @@ function SnowApp(props) {
                             focusVerticalOffset={props.focusVerticalOffset}
                         >
 
-                            <NavigationContextProvider
-                                routePaths={props.routePaths}
-                                routePages={props.routePages}
-                                initialRoutePath={props.initialRoutePath}
-                                resetRoutePath={props.resetRoutePath}
-                                DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+                            <LayerContextProvider
+                                DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
+
                                 <ToastProvider>
 
                                     <SnowContextProvider >
@@ -88,12 +89,12 @@ function SnowApp(props) {
 
                                     </SnowContextProvider>
                                 </ToastProvider>
-                            </NavigationContextProvider>
+                            </LayerContextProvider>
                         </FocusContextProvider>
-                    </LayerContextProvider>
+                    </NavigationContextProvider>
                 </InputContextProvider>
             </StyleContextProvider >
-        </Sentry.ErrorBoundary>
+        </Sentry.ErrorBoundary >
     )
 }
 
