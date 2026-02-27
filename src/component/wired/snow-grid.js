@@ -88,15 +88,18 @@ export const SnowGrid = (props) => {
     const renderCell = (item, itemIndex, renderRowIndex) => {
         let child = renderItem(item, itemIndex)
 
-        let row = Math.floor((itemIndex + 1) / itemsPerRow)
+        let row = Math.floor((itemIndex) / itemsPerRow)
         let column = itemIndex % itemsPerRow
+
+        // TODO pass in the focusStart xx and yy
 
         if (props?.assignFocus !== false) {
             child = React.cloneElement(child, {
                 parentPath: focusPath,
                 focusKey: 'cell',
                 xx: 20 + column,
-                yy: 20 + renderRowIndex
+                yy: 20 + renderRowIndex,
+                focusStart: props.focusStart && column == 0 && row == 0
             })
         }
 

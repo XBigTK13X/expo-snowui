@@ -53,10 +53,15 @@ export function NavigationContextProvider(props) {
     const [initialPath, setInitialPath] = React.useState(null)
 
     const [navigationHistory, setNavigationHistory] = React.useState(null)
+    const navigationHistoryRef = React.useRef(null)
 
     React.useEffect(() => {
         modalsVisibleRef.current = !!modalPayloads?.length
     }, [modalPayloads])
+
+    React.useEffect(() => {
+        navigationHistoryRef.current = navigationHistory
+    }, [navigationHistory])
 
     React.useEffect(() => {
         let lookup = {}

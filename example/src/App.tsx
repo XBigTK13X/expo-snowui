@@ -36,6 +36,7 @@ function AppPage() {
         />
         <Snow.Label>Components</Snow.Label>
         <Snow.Grid
+          focusStart
           yy={1}
           itemsPerRow={1}
           items={components}

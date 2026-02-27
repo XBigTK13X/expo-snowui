@@ -3,7 +3,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 import SnowText from '../snow-text'
 
-const SnowTextButtonW = (props) => {
+export const SnowTextButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { focusWrap, isFocused } = useFocusContext('text-button', props)
 
@@ -68,9 +68,5 @@ const SnowTextButtonW = (props) => {
         </Pressable >
     )
 }
-
-SnowTextButtonW.isSnowFocusWired = true
-
-export const SnowTextButton = SnowTextButtonW
 
 export default SnowTextButton

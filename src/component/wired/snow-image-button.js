@@ -39,7 +39,7 @@ export const SnowImageButton = (props) => {
         wrapperStyle.push(SnowStyle.component.imageButton.selected)
         textWrapperStyle.push(SnowStyle.component.imageButton.selected)
     }
-    if (isFocused(props.focusKey)) {
+    if (isFocused) {
         wrapperStyle.push(SnowStyle.component.imageButton.focused)
         textWrapperStyle.push(SnowStyle.component.imageButton.focused)
     }
