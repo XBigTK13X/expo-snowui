@@ -55,6 +55,8 @@ export const useFocusContext = (componentName, props) => {
     let focusKey = props.focusKey || null
     let canFocus = props.canFocus ?? false
     let focusStart = (props.focusStart ?? false) && canFocus
+    let trapFocusRight = props.trapFocusRight ?? false
+    let trapFocusLeft = props.trapFocusLeft ?? false
 
     let focusPath = `${componentName}-${xx}x-${yy}y`
     if (focusKey) {
@@ -76,7 +78,9 @@ export const useFocusContext = (componentName, props) => {
             xx,
             yy,
             onPress: actionPress,
-            onLongPress: actionLongPress
+            onLongPress: actionLongPress,
+            trapFocusLeft,
+            trapFocusRight
         })
         if (focusStart) {
             setFocusStart(focusPath)
@@ -195,6 +199,13 @@ export const FocusContextProvider = (props) => {
     }
 
     const moveFocus = React.useCallback((direction) => {
+        const sourceEntry = registryRef.current.find(focusedPathRef.current)?.value || {}
+        if (direction === 'left' && sourceEntry.trapFocusLeft) {
+            return
+        }
+        if (direction === 'right' && sourceEntry.trapFocusRight) {
+            return
+        }
         const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
         if (destinationFocusPath) {
             navPush({

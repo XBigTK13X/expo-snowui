@@ -1,11 +1,13 @@
 import { View } from 'react-native'
+
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
-const SnowTargetW = (props) => {
+import SnowView from './snow-view'
+
+export const SnowTarget = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { isFocused, useFocusWiring } = useFocusContext()
-    const { elementRef } = useFocusWiring(props)
+    const { isFocused, focusWrap } = useFocusContext('target', { ...props, canFocus: true })
 
     let outerStyle = [SnowStyle.component.target.outer]
 
@@ -14,7 +16,7 @@ const SnowTargetW = (props) => {
     }
 
     let innerStyle = [SnowStyle.component.target.inner]
-    if (isFocused(props.focusKey)) {
+    if (isFocused) {
         innerStyle.push(SnowStyle.component.target.focused)
     }
 
@@ -22,15 +24,11 @@ const SnowTargetW = (props) => {
         innerStyle.push(props.innerStyle)
     }
 
-    return (
-        <View style={outerStyle}>
-            <View ref={elementRef} style={innerStyle} />
-        </View>
+    return focusWrap(
+        <SnowView style={outerStyle}>
+            <View style={innerStyle} />
+        </SnowView>
     )
 }
-
-SnowTargetW.isSnowFocusWired = true
-
-export const SnowTarget = SnowTargetW
 
 export default SnowTarget

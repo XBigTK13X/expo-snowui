@@ -10,6 +10,8 @@ import { useInputContext } from '../../context/snow-input-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
+import SnowView from './snow-view'
+
 const min = 0.0
 const max = 1.0
 const step = 0.01
@@ -34,7 +36,12 @@ const step = 0.01
 const SnowRangeSliderW = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { addActionListener, removeActionListener } = useInputContext()
-    const { useFocusWiring, isFocused } = useFocusContext()
+    const { focusWrap, focusPath, isFocused } = useFocusContext('slider', {
+        ...props,
+        canFocus: true,
+        trapFocusLeft: true,
+        trapFocusRight: true
+    })
 
     const isDraggingRef = React.useRef(false)
     const [percent, setPercent] = React.useState(() => typeof props.percent === 'number' ? props.percent : 0)
@@ -44,8 +51,6 @@ const SnowRangeSliderW = (props) => {
 
     const trackRef = React.useRef(null)
     const trackXRef = React.useRef(0)
-
-    const { elementRef } = useFocusWiring(props)
 
     let sliderWidth = SnowStyle.component.rangeSlider.trackWrapper.width
     if (props.width) {
@@ -128,13 +133,13 @@ const SnowRangeSliderW = (props) => {
     React.useEffect(() => {
         const actionListenerKey = addActionListener({
             onRight: () => {
-                if (isFocused(props.focusKey)) {
+                if (isFocused) {
                     applyStep(step)
                     clearInterval(applyIntervalRef.current)
                 }
             },
             onLongRightStart: () => {
-                if (isFocused(props.focusKey)) {
+                if (isFocused) {
                     longPress(step * 2)
                 }
             },
@@ -142,13 +147,13 @@ const SnowRangeSliderW = (props) => {
                 clearInterval(applyIntervalRef.current)
             },
             onLeft: () => {
-                if (isFocused(props.focusKey)) {
+                if (isFocused) {
                     applyStep(-step)
                     clearInterval(applyIntervalRef.current)
                 }
             },
             onLongLeftStart: () => {
-                if (isFocused(props.focusKey)) {
+                if (isFocused) {
                     longPress(-step * 2)
                 }
             },
@@ -176,7 +181,7 @@ const SnowRangeSliderW = (props) => {
         { left: thumbX - SnowStyle.component.rangeSlider.thumb.width / 2 }
     ]
 
-    if (isFocused(props.focusKey)) {
+    if (isFocused) {
         thumbStyle.push({
             backgroundColor: SnowStyle.color.hover,
             borderColor: SnowStyle.color.hoverDark
@@ -184,9 +189,10 @@ const SnowRangeSliderW = (props) => {
     }
 
     return (
-        <View style={SnowStyle.component.rangeSlider.wrapper}>
-            <View
+        <SnowView style={SnowStyle.component.rangeSlider.wrapper}>
+            <SnowView
                 ref={trackRef}
+                parentPath={focusPath}
                 onLayout={() => {
                     trackRef.current?.measureInWindow((x) => {
                         trackXRef.current = x
@@ -197,17 +203,12 @@ const SnowRangeSliderW = (props) => {
             >
                 <View style={leftTrackStyle} />
                 <View style={SnowStyle.component.rangeSlider.rightTrack} />
-                <Pressable
-                    ref={elementRef}
+                {focusWrap(<Pressable
                     style={thumbStyle}
-                    focusKey={props.focusKey}
-                    focusRight={props.focusKey}
-                    focusLeft={props.focusKey}
-                    focusUp={props.focusUp}
-                    focusDown={props.focusDown}
-                />
-            </View>
-        </View>
+                    focusKey={'thumb'}
+                />)}
+            </SnowView>
+        </SnowView>
     )
 }
 

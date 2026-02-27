@@ -381,18 +381,21 @@ export function createStyle(overrides) {
         target: {
             outer: {
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
             },
             inner: {
-                width: '80%',
+                width: 400,
+                height: 20,
                 borderWidth: AppStyle.button.borderRadius,
+                backgroundColor: AppStyle.color.core,
                 borderColor: AppStyle.color.core,
                 borderRadius: AppStyle.button.borderRadius,
                 outlineStyle: 'none', // Disable web default white outline on focused element
                 outline: 'none', // Disable web default white outline on focused element
             },
             focused: {
-                borderColor: AppStyle.color.hover
+                borderColor: AppStyle.color.hover,
+                backgroundColor: AppStyle.color.hover
             }
         },
         textButton: {
