@@ -22,7 +22,7 @@ export default function TabsPage() {
   return (
     <>
       <Snow.Label>Component: Tabs</Snow.Label>
-      <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
+      <Snow.Tabs headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
         <Snow.Text>You have reached the second tab.</Snow.Text>
         <Snow.ImageGrid

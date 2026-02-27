@@ -6,6 +6,7 @@ import {
 } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 
+import { useInputContext } from './snow-input-context'
 import { useNavigationContext } from './snow-navigation-context'
 
 import Tree from './tree'
@@ -56,12 +57,12 @@ export const useFocusContext = (componentName, props) => {
         focusPath = `${parentPath}${Tree.DELIM}${focusPath}`
     }
 
-
     let actionPress = props.onPress
     let actionLongPress = props.onLongPresss
 
     React.useEffect(() => {
         registerFocus({
+            canFocus,
             focusPath,
             focusRef,
             focusStart,
@@ -122,8 +123,10 @@ export const useFocusContext = (componentName, props) => {
 export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
     const { currentRoute, navPush } = useNavigationContext()
+    const { addActionListener, removeActionListener } = useInputContext(props)
 
     const focusedPath = currentRoute?.routeParams?.focusedPath
+    const focusedPathRef = React.useRef(focusedPath)
     const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
 
@@ -143,6 +146,7 @@ export const FocusContextProvider = (props) => {
                 func: false,
                 replace: true
             })
+            focusStartRef.current = null
         }
         registryRef.current.debug()
     }, RebuildDebounceMilliseconds))
@@ -154,7 +158,7 @@ export const FocusContextProvider = (props) => {
     }
 
     const scrollIntoView = React.useCallback((focusPath) => {
-        const node = registryRef.current.get(focusPath)
+        const node = registryRef.current.find(focusPath)
         if (node?.ref?.current && scrollViewRef?.current) {
             const nodeTag = findNodeHandle(node.ref.current)
             const scrollTag = findNodeHandle(node.parentScrollRef.current)
@@ -175,17 +179,18 @@ export const FocusContextProvider = (props) => {
     }
 
     const moveFocus = React.useCallback((direction) => {
-        const dest = adjacenciesRef.current?.get(sourceFocusPath)?.get(direction)
-        if (dest) {
+        const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
+        console.log({ focusedPath: focusedPathRef.current, destinationFocusPath, direction })
+        if (destinationFocusPath) {
             navPush({
                 params: {
                     ...currentRoute.routeParams,
-                    focusedPath: dest.focusPath
+                    focusedPath: destinationFocusPath
                 },
                 func: false,
                 replace: true
             })
-            scrollIntoView(dest.focusPath)
+            scrollIntoView(destinationFocusPath)
         }
     })
 
@@ -201,6 +206,23 @@ export const FocusContextProvider = (props) => {
     const longPressFocused = () => {
 
     }
+
+
+    React.useEffect(() => {
+        focusedPathRef.current = focusedPath
+    }, [focusedPath])
+
+    React.useEffect(() => {
+        addActionListener('focus-context', {
+            onUp: moveFocusUp,
+            onDown: moveFocusDown,
+            onRight: moveFocusRight,
+            onLeft: moveFocusLeft
+        })
+        return () => {
+            removeActionListener('focus-context')
+        }
+    }, [])
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,

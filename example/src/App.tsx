@@ -29,7 +29,7 @@ function AppPage() {
 
   return (
     <Snow.View style={{ flexDirection: 'row', flex: 1 }}>
-      <Snow.View style={{ width: "25%" }}>
+      <Snow.View xx={0} yy={0} style={{ width: "25%" }}>
         <Snow.TextButton
           yy={0}
           title="Focus Test"
@@ -47,7 +47,7 @@ function AppPage() {
         <Snow.Text>App, FillView, SafeArea, useSnowContext.</Snow.Text>
       </Snow.View>
       <Snow.Break style={{ width: "5%" }} vertical />
-      <Snow.View style={{ width: "70%" }}>
+      <Snow.View xx={1} yy={0} style={{ width: "70%" }}>
         <CurrentPage key={renderKey} />
       </Snow.View>
     </Snow.View>

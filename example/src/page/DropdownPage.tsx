@@ -24,44 +24,34 @@ export default function DropdownPage() {
     <>
       <Snow.Label>Component: Dropdown</Snow.Label>
       <Snow.Dropdown
-        focusKey="tab-entry"
-        focusDown="player-choice"
+        yy={0}
         options={['Yes', 'No']}
         valueIndex={dropdownIndex}
         onValueChange={setDropdownIndex} />
       <Snow.Break />
       <Snow.Dropdown
-        focusKey="player-choice"
-        focusDown="always-transcode"
+        yy={1}
         title="Always Use Player"
         options={['MPV', 'EXO']}
         onValueChange={changeForm('playerChoice')}
         valueIndex={form.playerChoice} />
-      <Snow.Grid assignFocus={false} itemsPerRow={2}>
+      <Snow.Grid yy={2} itemsPerRow={2}>
         <Snow.Dropdown
-          focusKey="always-transcode"
-          focusDown="hardware-decoder"
-          focusRight="audio-compression"
           title="Always Transcode"
           options={['No', 'Yes']}
           onValueChange={changeForm('alwaysTranscode')}
           valueIndex={form.alwaysTranscode} />
         <Snow.Dropdown
-          focusKey="audio-compression"
-          focusDown="fast-mpv"
           title="Audio Compression (mpv)"
           options={['No', 'Yes']}
           onValueChange={changeForm('audioCompression')}
           valueIndex={form.audioCompression} />
         <Snow.Dropdown
-          focusKey="hardware-decoder"
-          focusRight="fast-mpv"
           title="Hardware Decoder (mpv)"
           options={['No', 'Yes']}
           onValueChange={changeForm('hardwareDecoder')}
           valueIndex={form.hardwareDecoder} />
         <Snow.Dropdown
-          focusKey="fast-mpv"
           title="Fast Config (mpv)"
           options={['No', 'Yes']}
           onValueChange={changeForm('fastMpv')}
