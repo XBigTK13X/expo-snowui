@@ -38,7 +38,7 @@ function AppPage() {
         <Snow.Grid
           focusStart
           yy={1}
-          itemsPerRow={1}
+          itemsPerRow={2}
           items={components}
           renderItem={(item: any) => {
             return <Snow.TextButton title={item[0]} onPress={navPush({ path: item[1] })} />

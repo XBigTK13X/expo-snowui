@@ -16,11 +16,10 @@ export default function InputPage() {
   }
 
   return (
-    <>
+    <Snow.View>
       <Snow.Label>Component: Input</Snow.Label>
       <Snow.Input
-        focusKey="tab-entry"
-        focusDown="grid-input"
+        focusKey="search"
         value={inputValue}
         onValueChange={updateQuery}
         onSubmit={executeQuery}
@@ -28,7 +27,7 @@ export default function InputPage() {
       />
       <Snow.Text>Query: {query}</Snow.Text>
       <Snow.Text>Result {results}</Snow.Text>
-      <Snow.Grid focusKey="grid-input" itemsPerRow={3}>
+      <Snow.Grid focusKey="multi" itemsPerRow={3}>
         <Snow.Input
           value={inputValue}
           onValueChange={updateQuery}
@@ -48,6 +47,6 @@ export default function InputPage() {
           onDebounce={executeQuery}
         />
       </Snow.Grid>
-    </>
+    </Snow.View>
   )
 }

@@ -13,7 +13,7 @@ export const SnowInput = (props) => {
     if (props.short) {
         textStyle.push(SnowStyle.component.input.small)
     }
-    if (isFocused(props.focusKey)) {
+    if (isFocused) {
         textStyle.push(SnowStyle.component.input.focused)
     }
 
