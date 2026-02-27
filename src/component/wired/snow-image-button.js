@@ -7,7 +7,7 @@ import SnowText from '../snow-text'
 
 export const SnowImageButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusWrap, isFocused } = useFocusContext('image-button', props)
+    const { focusWrap, isFocused } = useFocusContext('image-button', { ...props, canFocus: true })
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title

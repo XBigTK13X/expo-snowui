@@ -22,8 +22,7 @@ export const SnowGrid = (props) => {
 
     const { SnowStyle } = useStyleContext(props)
     const { currentRoute } = useNavigationContext(props)
-
-    const { focusPath } = useFocusContext('grid', props)
+    const { focusPath } = useFocusContext('grid', { ...props, canFocus: false })
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {

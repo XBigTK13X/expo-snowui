@@ -45,19 +45,17 @@ export const useFocusContext = (componentName, props) => {
     let yy = props.yy ?? 0
     let parentPath = props.parentPath || null
     let focusKey = props.focusKey || null
-    let focusStart = props.focusStart ?? false
+    let canFocus = props.canFocus ?? false
+    let focusStart = (props.focusStart ?? false) && canFocus
 
     let focusPath = `${componentName}-${xx}x-${yy}y`
     if (focusKey) {
         focusPath = `${focusKey}-${focusPath}`
     }
     if (parentPath) {
-        focusPath = `${parentPath}|${focusPath}`
+        focusPath = `${parentPath}${Tree.DELIM}${focusPath}`
     }
 
-    if (focusStart) {
-        setFocusStart(focusPath)
-    }
 
     let actionPress = props.onPress
     let actionLongPress = props.onLongPresss
@@ -72,6 +70,10 @@ export const useFocusContext = (componentName, props) => {
             onPress: actionPress,
             onLongPress: actionLongPress
         })
+        if (focusStart) {
+            console.log({ focusStart, focusPath })
+            setFocusStart(focusPath)
+        }
         return () => {
             unregisterFocus(focusPath)
         }
@@ -121,11 +123,11 @@ export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
     const { currentRoute, navPush } = useNavigationContext()
 
-    const routeParamsRef = React.useRef(currentRoute?.routeParams)
-    const registryRef = React.useRef(new Tree())
+    const focusedPath = currentRoute?.routeParams?.focusedPath
+    const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
-    const focusStartRef = React.useRef(null)
 
+    const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
         focusStartRef.current = focusStart
     }
@@ -135,7 +137,7 @@ export const FocusContextProvider = (props) => {
         if (focusStartRef?.current) {
             navPush({
                 params: {
-                    ...routeParamsRef.current,
+                    ...currentRoute.routeParams,
                     focusedPath: focusStartRef.current
                 },
                 func: false,
@@ -177,7 +179,7 @@ export const FocusContextProvider = (props) => {
         if (dest) {
             navPush({
                 params: {
-                    ...routeParamsRef.current,
+                    ...currentRoute.routeParams,
                     focusedPath: dest.focusPath
                 },
                 func: false,
@@ -202,7 +204,7 @@ export const FocusContextProvider = (props) => {
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,
-        focusedPath: routeParamsRef.current?.focusedPath,
+        focusedPath,
         longPressFocused,
         moveFocusDown,
         moveFocusLeft,
@@ -214,162 +216,7 @@ export const FocusContextProvider = (props) => {
         setFocusStart,
         setScrollViewRef,
         scrollViewRef
-    }), [routeParamsRef?.current, moveFocus])
-
-    return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
-}
-
-export const useFocusContextWrong = (id, options = {}) => {
-    const { register, unregister, activeId } = React.useContext(FocusContext)
-    const elementRef = React.useRef(null)
-
-    const {
-        parentId = null,
-        parentScrollRef = null,
-        locked = false,
-        focusPosition,
-        fp,
-        onPress,
-        onLongPress
-    } = options
-
-    const pos = React.useMemo(() => fp || focusPosition || { xx: 0, yy: 0 }, [fp, focusPosition])
-
-    React.useEffect(() => {
-        register(id, {
-            id,
-            ref: elementRef,
-            pos,
-            parentId,
-            parentScrollRef,
-            locked,
-            onPress,
-            onLongPress
-        })
-
-        return () => unregister(id)
-    }, [id, parentId, pos.xx, pos.yy, locked, onPress, onLongPress])
-
-    return {
-        ref: elementRef,
-        isFocused: activeId === id
-    }
-}
-
-export const FocusContextProviderWrong = (props) => {
-    const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
-    const registry = React.useRef(new Map())
-    const adjacencyMap = React.useRef(new Map())
-
-    const { currentRoute, navPush } = useNavigationContext()
-    const activeId = currentRoute?.routeParams?.focusedId
-
-    const rebuildAdjacencyTable = React.useCallback(() => {
-        const nodes = Array.from(registry.current.values())
-        const newMap = new Map()
-
-        nodes.forEach((node) => {
-            const neighbors = { up: null, down: null, left: null, right: null, in: null, out: null }
-            const siblings = nodes.filter((nn) => nn.parentId === node.parentId && nn.id !== node.id)
-            const childrenNodes = nodes.filter((nn) => nn.parentId === node.id)
-
-            ['up', 'down', 'left', 'right'].forEach((dir) => {
-                let bestId = null
-                let minDistance = Infinity
-                siblings.forEach((sib) => {
-                    const dist = getDistance(node.pos, sib.pos, dir)
-                    if (dist < minDistance) {
-                        minDistance = dist
-                        bestId = sib.id
-                    }
-                })
-                neighbors[dir] = bestId
-            })
-
-            if (childrenNodes.length > 0) {
-                const firstChild = childrenNodes.sort((aa, bb) =>
-                    (aa.pos.yy - bb.pos.yy) || (aa.pos.xx - bb.pos.xx)
-                )[0]
-                neighbors.in = firstChild.id
-            }
-            neighbors.out = node.parentId
-            newMap.set(node.id, neighbors)
-        })
-
-        adjacencyMap.current = newMap
-    }, [])
-
-    const scrollIntoView = React.useCallback((nodeId) => {
-        const node = registry.current.get(nodeId)
-        if (node?.ref.current && node.parentScrollRef?.current) {
-            const nodeTag = ReactNative.findNodeHandle(node.ref.current)
-            const scrollTag = ReactNative.findNodeHandle(node.parentScrollRef.current)
-            ReactNative.UIManager.measureLayout(nodeTag, scrollTag, () => { }, (xx, yy) => {
-                node.parentScrollRef.current.scrollTo({ y: yy, animated: true })
-            })
-        }
-    }, [])
-
-    const updateFocus = React.useCallback((nextId) => {
-        if (nextId && registry.current.has(nextId)) {
-            navPush({ ...currentRoute.routeParams, focusedId: nextId })
-            scrollIntoView(nextId)
-        }
-    }, [currentRoute, navPush, scrollIntoView])
-
-    const moveFocus = React.useCallback((direction) => {
-        const current = registry.current.get(activeId)
-        if (!current || current.locked) return
-
-        const neighbors = adjacencyMap.current.get(activeId)
-        if (!neighbors) return
-
-        let nextId = neighbors[direction]
-
-        if (!nextId) {
-            if ((direction === 'down' || direction === 'right') && neighbors.in) {
-                nextId = neighbors.in
-            } else if (neighbors.out) {
-                const parent = registry.current.get(neighbors.out)
-                if (parent) {
-                    updateFocus(parent.id)
-                    moveFocus(direction)
-                    return
-                }
-            }
-        }
-
-        updateFocus(nextId)
-    }, [activeId, updateFocus])
-
-    const interact = React.useCallback((action, id) => {
-        return () => {
-            if (!id) {
-                id = activeId
-            } else {
-                navPush({ params: { ...currentRoute.routeParams, focusedId: id }, func: false })
-            }
-            const current = registry.current.get(activeId)
-            if (current && current[action]) {
-                return current[action]()
-            }
-            return null
-        }
-    }, [activeId, FOCUS_ENABLED, currentRoute, navPush])
-
-    const value = React.useMemo(() => ({
-        register: (id, data) => {
-            registry.current.set(id, data)
-            rebuildAdjacencyTable()
-        },
-        unregister: (id) => {
-            registry.current.delete(id)
-            rebuildAdjacencyTable()
-        },
-        activeId,
-        moveFocus,
-        interact
-    }), [activeId, rebuildAdjacencyTable, moveFocus, interact])
+    }), [currentRoute, scrollViewRef.current, focusStartRef.current])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
 }

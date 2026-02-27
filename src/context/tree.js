@@ -1,5 +1,7 @@
 import util from '../util'
 
+export const DELIM = '__'
+
 export class Tree {
     constructor() {
         this.root = {
@@ -7,11 +9,11 @@ export class Tree {
             parent: null,
             value: null,
             segmentName: 'root',
-            path: '|'
+            path: DELIM
         }
         this.lookup = new Map()
-        this.lookup.set('|', this.root)
-        this.delimiter = '|'
+        this.lookup.set(DELIM, this.root)
+        this.delimiter = DELIM
     }
 
     getFocusPaths() {
@@ -99,4 +101,7 @@ export class Tree {
     }
 }
 
-export default Tree
+export default {
+    Tree,
+    DELIM
+}

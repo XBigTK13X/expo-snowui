@@ -6,7 +6,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 
 export const SnowInput = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { focusWrap, isFocused } = useFocusContext()
+    const { focusWrap, isFocused } = useFocusContext('text-input', { ...props, canFocus: true })
     const inputRef = React.useRef(null)
 
     let textStyle = [SnowStyle.component.input.text]
