@@ -12,6 +12,7 @@ export const SnowPager = (props) => {
 
     const pageKey = `${props.focusKey}-grid-page`
     const pageTrigger = `${props.focusKey}-page-trigger`
+    const pageCountTestId = `${props.focusKey}-page-count`
 
     const gotoPage = (page) => {
         let params = {
