@@ -19,35 +19,35 @@ const imageItems = [
 ]
 
 
-export default function ImageGridPage() {
+export default function ImageGridPage(props: any) {
   return (
-    <>
+    <Snow.View {...props}>
       <Snow.Label>Component: Image Grid</Snow.Label>
       <Snow.ImageGrid
-        focusKey="tab-entry"
-        focusDown="wide-image"
+        focusKey="tall"
         items={[...imageItems, ...imageItems, ...imageItems, ...imageItems, ...imageItems]}
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}
       />
+      <Snow.Break />
       <Snow.ImageGrid
-        focusKey="wide-image"
-        focusDown="square-image"
+        focusKey="wide"
         items={imageItems}
         wideImage
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}
       />
+      <Snow.Break />
       <Snow.ImageGrid
-        focusKey="square-image"
+        focusKey="square"
         items={imageItems}
         squareImage
         getItemImageUrl={(item: any) => { return item.imageUrl }}
         getItemImageSource={(item: any) => { return item.imageSource }}
         getItemName={(item: any) => { return item.title }}
       />
-    </>
+    </Snow.View>
   )
 }

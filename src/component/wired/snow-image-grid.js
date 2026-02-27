@@ -1,5 +1,8 @@
 import React from 'react'
+
 import { useFocusContext } from '../../context/snow-focus-context'
+
+import SnowView from './snow-view'
 import SnowLabel from '../snow-label'
 import SnowGrid from './snow-grid'
 import SnowImageButton from './snow-image-button'
@@ -11,6 +14,7 @@ export const SnowImageGrid = (props) => {
     const { focusPath } = useFocusContext('image-grid', props)
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
+
     const renderItem = (item, itemIndex) => {
         let sourceProps = {}
         if (props.getItemImageUrl) {
@@ -44,6 +48,7 @@ export const SnowImageGrid = (props) => {
         }
 
         return <SnowImageButton
+            parentPath={focusPath}
             {...sourceProps}
             snowStyle={props.snowStyle}
             wide={props.wideImage}
@@ -81,7 +86,7 @@ export const SnowImageGrid = (props) => {
         gridProps.itemsPerPage = props.itemsPerPage
     }
     return (
-        <>
+        <SnowView>
             {props.title ?
                 <SnowLabel>
                     {props.title} ({props.items.length})
@@ -92,7 +97,7 @@ export const SnowImageGrid = (props) => {
                 items={props.items}
                 renderItem={renderItem}
             />
-        </>
+        </SnowView>
     )
 }
 
