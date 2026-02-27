@@ -75,8 +75,8 @@ export const SnowGrid = (props) => {
             <SnowPager
                 maxPage={maxPage}
                 page={page}
-                parentPath={focusPath}
                 focusKey={'pager'}
+                parentPath={focusPath}
                 xx={10}
                 yy={10}
             />
@@ -91,6 +91,7 @@ export const SnowGrid = (props) => {
         let column = itemIndex % itemsPerRow
 
         // TODO pass in the focusStart xx and yy
+        // To support rehydrating last select element in grid
 
         if (props?.assignFocus !== false) {
             child = React.cloneElement(child, {

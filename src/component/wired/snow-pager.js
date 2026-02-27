@@ -74,9 +74,7 @@ export const SnowPager = (props) => {
         <View style={SnowStyle.component.grid.pager} key={pagerFocusKey}>
             <SnowTextButton
                 focusKey={'first-page-btn'}
-                parentPath={focusPath}
                 xx={0}
-                yy={0}
                 title="<<<"
                 short
                 onPress={firstPage}
@@ -84,9 +82,7 @@ export const SnowPager = (props) => {
 
             <SnowTextButton
                 focusKey={'first-half-btn'}
-                parentPath={focusPath}
                 xx={1}
-                yy={0}
                 title="<<"
                 short
                 onPress={previousHalf}
@@ -94,9 +90,7 @@ export const SnowPager = (props) => {
 
             <SnowTextButton
                 focusKey={'previous-page-btn'}
-                parentPath={focusPath}
                 xx={2}
-                yy={0}
                 title="<"
                 short
                 onPress={previousPage}
@@ -106,9 +100,7 @@ export const SnowPager = (props) => {
 
             <SnowTextButton
                 focusKey={'next-page-btn'}
-                parentPath={focusPath}
                 xx={3}
-                yy={0}
                 title=">"
                 short
                 onPress={nextPage}
@@ -116,9 +108,7 @@ export const SnowPager = (props) => {
 
             <SnowTextButton
                 focusKey={'next-half-btn'}
-                parentPath={focusPath}
                 xx={4}
-                yy={0}
                 title=">>"
                 short
                 onPress={nextHalf}
@@ -126,9 +116,7 @@ export const SnowPager = (props) => {
 
             <SnowTextButton
                 focusKey={'final-page-btn'}
-                parentPath={focusPath}
                 xx={5}
-                yy={0}
                 title=">>>"
                 short
                 onPress={finalPage}

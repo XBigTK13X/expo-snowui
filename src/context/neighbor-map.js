@@ -21,27 +21,41 @@ export const build = (tree) => {
 
 function findSpatialNeighbor(tree, startPath, direction) {
     const originNode = tree.find(startPath)
-    if (!originNode) return null
+    if (!originNode || !originNode.value) return null
 
-    let allCandidates = []
     let currentSearchNode = originNode
 
     while (currentSearchNode.parent) {
+        const siblings = []
         for (const [name, child] of currentSearchNode.parent.children) {
             if (name !== currentSearchNode.segmentName) {
-                collectLeafCandidates(child, allCandidates)
+                siblings.push(child)
             }
         }
+
+        const bestSibling = getClosestInDirection(currentSearchNode, siblings, direction)
+
+        if (bestSibling) {
+            if (bestSibling.value && bestSibling.value.canFocus) {
+                return bestSibling.path
+            }
+
+            const branchCandidates = []
+            collectLeafCandidates(bestSibling, branchCandidates)
+
+            if (branchCandidates.length > 0) {
+                const entryLeaf = getEntryLeaf(branchCandidates, direction)
+                return entryLeaf ? entryLeaf.path : null
+            }
+        }
+
         currentSearchNode = currentSearchNode.parent
     }
 
-    const bestNeighbor = getClosestInDirection(originNode, allCandidates, direction)
-    return bestNeighbor ? bestNeighbor.path : null
+    return null
 }
 
 function getClosestInDirection(origin, candidates, direction) {
-    if (!origin.value) return null
-
     let bestCandidate = null
     let minDistance = Infinity
 
@@ -55,43 +69,88 @@ function getClosestInDirection(origin, candidates, direction) {
         const cy = candidate.value.yy
 
         let isInDirection = false
-        let distance = 0
-
-        const offAxisMultiplier = 10
+        let primaryDiff = 0
+        let secondaryDiff = 0
 
         switch (direction) {
             case 'up':
                 if (cy < oy) {
                     isInDirection = true
-                    distance = (oy - cy) + (Math.abs(ox - cx) * offAxisMultiplier)
+                    primaryDiff = oy - cy
+                    secondaryDiff = Math.abs(ox - cx)
                 }
                 break
             case 'down':
                 if (cy > oy) {
                     isInDirection = true
-                    distance = (cy - oy) + (Math.abs(cx - ox) * offAxisMultiplier)
+                    primaryDiff = cy - oy
+                    secondaryDiff = Math.abs(ox - cx)
                 }
                 break
             case 'left':
                 if (cx < ox) {
                     isInDirection = true
-                    distance = (ox - cx) + (Math.abs(oy - cy) * offAxisMultiplier)
+                    primaryDiff = ox - cx
+                    secondaryDiff = Math.abs(oy - cy)
                 }
                 break
             case 'right':
                 if (cx > ox) {
                     isInDirection = true
-                    distance = (cx - ox) + (Math.abs(cy - oy) * offAxisMultiplier)
+                    primaryDiff = cx - ox
+                    secondaryDiff = Math.abs(oy - cy)
                 }
                 break
         }
 
-        if (isInDirection && distance < minDistance) {
-            minDistance = distance
-            bestCandidate = candidate
+        if (isInDirection) {
+            const distance = primaryDiff + (secondaryDiff * 100)
+            if (distance < minDistance) {
+                minDistance = distance
+                bestCandidate = candidate
+            }
         }
     }
 
+    return bestCandidate
+}
+
+function getEntryLeaf(candidates, direction) {
+    let bestCandidate = null
+    let minVal = Infinity
+    let maxVal = -Infinity
+
+    for (const candidate of candidates) {
+        const xx = candidate.value.xx
+        const yy = candidate.value.yy
+
+        switch (direction) {
+            case 'down':
+                if (yy < minVal) {
+                    minVal = yy
+                    bestCandidate = candidate
+                }
+                break
+            case 'up':
+                if (yy > maxVal) {
+                    maxVal = yy
+                    bestCandidate = candidate
+                }
+                break
+            case 'right':
+                if (xx < minVal) {
+                    minVal = xx
+                    bestCandidate = candidate
+                }
+                break
+            case 'left':
+                if (xx > maxVal) {
+                    maxVal = xx
+                    bestCandidate = candidate
+                }
+                break
+        }
+    }
     return bestCandidate
 }
 

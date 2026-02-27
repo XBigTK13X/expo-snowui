@@ -77,9 +77,8 @@ export const SnowTabs = (props) => {
     return (
         <>
             <SnowDropdown
-                snowStyle={tabStyle}
-                parentPath={focusPath}
                 fade
+                snowStyle={tabStyle}
                 options={props.headers}
                 onValueChange={changeTab}
                 valueIndex={tabIndex}

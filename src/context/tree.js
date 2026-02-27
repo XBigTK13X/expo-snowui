@@ -87,13 +87,13 @@ export class Tree {
     }
 
     debug(node = this.root, indent = 0) {
-        const space = '\t'.repeat(indent)
+        const space = '└─'.repeat(indent)
 
         if (node == this.root) {
             console.log("Showing debug info for tree")
         }
 
-        console.log(`${space}└─ ${node.segmentName}`)
+        console.log(`${space}${node.segmentName}`)
 
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)

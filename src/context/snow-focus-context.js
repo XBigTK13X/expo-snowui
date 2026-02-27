@@ -14,6 +14,11 @@ import NeighborMap from './neighbor-map'
 
 const RebuildDebounceMilliseconds = 100
 
+// This is a component level context to track parentPath
+// without needing to pass it all the way from root to leaf
+const ParentPathContext = React.createContext(null);
+
+// This is an app level context to handle everything else
 const FocusContext = React.createContext(null)
 
 /*
@@ -33,18 +38,19 @@ export const useFocusAppContext = () => {
 
 export const useFocusContext = (componentName, props) => {
     const {
-        FOCUS_ENABLED,
         registerFocus,
         unregisterFocus,
         focusedPath,
         setFocusStart
     } = React.useContext(FocusContext)
 
+    const inheritedParentPath = React.useContext(ParentPathContext)
+
     const focusRef = React.useRef(null)
 
     let xx = props.xx ?? 0
     let yy = props.yy ?? 0
-    let parentPath = props.parentPath || null
+    let parentPath = props.parentPath || inheritedParentPath || null
     let focusKey = props.focusKey || null
     let canFocus = props.canFocus ?? false
     let focusStart = (props.focusStart ?? false) && canFocus
@@ -102,14 +108,18 @@ export const useFocusContext = (componentName, props) => {
         if (actionLongPress) {
             actions.onLongPress = actionLongPress
         }
-        return React.cloneElement(child, {
-            ...tvRemoteProps,
-            ...actions,
-            isFocused,
-            focusPath,
-            ref: focusRef,
-            testID: focusPath
-        })
+        return (
+            <ParentPathContext.Provider value={focusPath}>
+                {React.cloneElement(child, {
+                    ...tvRemoteProps,
+                    ...actions,
+                    isFocused,
+                    focusPath,
+                    ref: focusRef,
+                    testID: focusPath
+                })}
+            </ParentPathContext.Provider>
+        )
     }
 
     return {

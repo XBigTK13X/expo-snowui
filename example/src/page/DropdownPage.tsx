@@ -1,7 +1,7 @@
 import React from 'react'
 import Snow from 'expo-snowui'
 
-export default function DropdownPage() {
+export default function DropdownPage(props) {
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
 
   const [form, setForm] = React.useState({
@@ -21,21 +21,19 @@ export default function DropdownPage() {
     }
   }
   return (
-    <>
+    <Snow.View {...props}>
       <Snow.Label>Component: Dropdown</Snow.Label>
       <Snow.Dropdown
-        yy={0}
         options={['Yes', 'No']}
         valueIndex={dropdownIndex}
         onValueChange={setDropdownIndex} />
       <Snow.Break />
       <Snow.Dropdown
-        yy={1}
         title="Always Use Player"
         options={['MPV', 'EXO']}
         onValueChange={changeForm('playerChoice')}
         valueIndex={form.playerChoice} />
-      <Snow.Grid yy={2} itemsPerRow={2}>
+      <Snow.Grid itemsPerRow={2}>
         <Snow.Dropdown
           title="Always Transcode"
           options={['No', 'Yes']}
@@ -57,6 +55,6 @@ export default function DropdownPage() {
           onValueChange={changeForm('fastMpv')}
           valueIndex={form.fastMpv} />
       </Snow.Grid>
-    </>
+    </Snow.View>
   )
 }

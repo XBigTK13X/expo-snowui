@@ -6,8 +6,6 @@ import { useFocusContext } from '../../context/snow-focus-context'
 // These children are usually wrapped in a <View>
 // However, the View would strip out props used by snowui
 // Instead this component can be used to make sure props properly propogate.
-// Focus props goto the first child
-// Style props goto all children
 
 export const SnowView = (props) => {
     const { focusWrap, focusPath } = useFocusContext('view', props)
@@ -24,8 +22,8 @@ export const SnowView = (props) => {
         if (React.isValidElement(child)) {
             return React.cloneElement(child, {
                 parentPath: focusPath,
-                xx: 0,
-                yy: childIndex,
+                xx: child.props?.xx ?? 0,
+                yy: child.props?.yy ?? childIndex,
                 ...styleProps
             })
         }

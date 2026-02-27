@@ -89,7 +89,6 @@ export const SnowImageGrid = (props) => {
                 : null}
             <SnowGrid
                 {...gridProps}
-                parentPath={focusPath}
                 items={props.items}
                 renderItem={renderItem}
             />
