@@ -132,7 +132,7 @@ export const useFocusContext = (componentName, props) => {
 
 export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
-    const [debug, setDebug] = React.useState(true)
+    const [debug, setDebug] = React.useState(false)
     const { currentRoute, navPush } = useNavigationContext()
     const { addActionListener, removeActionListener } = useInputContext(props)
 
