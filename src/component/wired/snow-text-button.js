@@ -5,7 +5,10 @@ import SnowText from '../snow-text'
 
 export const SnowTextButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusWrap, isFocused } = useFocusContext('text-button', { ...props, canFocus: true })
+    const { focusWrap, isFocused } = useFocusContext('text-button', {
+        ...props,
+        canFocus: props.canFocus ?? true
+    })
 
     let wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.short) {

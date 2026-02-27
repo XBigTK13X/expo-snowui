@@ -2,6 +2,7 @@ import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+import SnowView from './snow-view'
 import SnowText from '../snow-text'
 import SnowTextButton from './snow-text-button'
 
@@ -61,10 +62,6 @@ export const SnowPager = (props) => {
         gotoPage(Math.floor((props.page + props.maxPage) / 2))
     }
 
-    let pagerFocusKey = `${props.focusKey ?? ''}-pager-${props.page}`
-    if (props.snowFocus?.parent) {
-        pagerFocusKey = `${props.snowFocus.parent}|${pagerFocusKey}`
-    }
 
     let buttonFocusStart = null
     if (currentRoute?.routeParams?.hasOwnProperty(pageTrigger)) {
@@ -72,26 +69,29 @@ export const SnowPager = (props) => {
     }
 
     return (
-        <View style={SnowStyle.component.grid.pager} key={pagerFocusKey}>
+        <SnowView parentPath={focusPath} style={SnowStyle.component.grid.pager}>
             <SnowTextButton
-                focusKey={'first-page-btn'}
+                focusKey={'first-page-button'}
                 xx={0}
+                yy={0}
                 title="<<<"
                 short
                 onPress={firstPage}
             />
 
             <SnowTextButton
-                focusKey={'first-half-btn'}
+                focusKey={'first-half-button'}
                 xx={1}
+                yy={0}
                 title="<<"
                 short
                 onPress={previousHalf}
             />
 
             <SnowTextButton
-                focusKey={'previous-page-btn'}
+                focusKey={'previous-page-button'}
                 xx={2}
+                yy={0}
                 title="<"
                 short
                 onPress={previousPage}
@@ -100,29 +100,32 @@ export const SnowPager = (props) => {
             <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
 
             <SnowTextButton
-                focusKey={'next-page-btn'}
+                focusKey={'next-page-button'}
                 xx={3}
+                yy={0}
                 title=">"
                 short
                 onPress={nextPage}
             />
 
             <SnowTextButton
-                focusKey={'next-half-btn'}
+                focusKey={'next-half-button'}
                 xx={4}
+                yy={0}
                 title=">>"
                 short
                 onPress={nextHalf}
             />
 
             <SnowTextButton
-                focusKey={'final-page-btn'}
+                focusKey={'final-page-button'}
                 xx={5}
+                yy={0}
                 title=">>>"
                 short
                 onPress={finalPage}
             />
-        </View>
+        </SnowView>
     )
 }
 

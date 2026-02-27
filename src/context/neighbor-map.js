@@ -26,26 +26,18 @@ function findSpatialNeighbor(tree, startPath, direction) {
     let currentSearchNode = originNode
 
     while (currentSearchNode.parent) {
-        const siblings = []
-        for (const [name, child] of currentSearchNode.parent.children) {
-            if (name !== currentSearchNode.segmentName) {
-                siblings.push(child)
+        const siblings = Array.from(currentSearchNode.parent.children.values())
+            .filter(node => node !== currentSearchNode)
+
+        const candidates = getSortedCandidates(currentSearchNode, siblings, direction)
+
+        for (const sibling of candidates) {
+            if (sibling.value?.canFocus) {
+                return sibling.path
             }
-        }
-
-        const bestSibling = getClosestInDirection(currentSearchNode, siblings, direction)
-
-        if (bestSibling) {
-            if (bestSibling.value && bestSibling.value.canFocus) {
-                return bestSibling.path
-            }
-
-            const branchCandidates = []
-            collectLeafCandidates(bestSibling, branchCandidates)
-
-            if (branchCandidates.length > 0) {
-                const entryLeaf = getEntryLeaf(branchCandidates, direction)
-                return entryLeaf ? entryLeaf.path : null
+            const entryLeaf = findEntryNodeInBranch(sibling, direction)
+            if (entryLeaf) {
+                return entryLeaf.path
             }
         }
 
@@ -55,112 +47,69 @@ function findSpatialNeighbor(tree, startPath, direction) {
     return null
 }
 
-function getClosestInDirection(origin, candidates, direction) {
-    let bestCandidate = null
-    let minDistance = Infinity
-
+function getSortedCandidates(origin, siblings, direction) {
     const ox = origin.value.xx
     const oy = origin.value.yy
 
-    for (const candidate of candidates) {
-        if (!candidate.value) continue
+    return siblings
+        .filter(node => {
+            if (!node.value) return false
+            const cx = node.value.xx
+            const cy = node.value.yy
 
-        const cx = candidate.value.xx
-        const cy = candidate.value.yy
-
-        let isInDirection = false
-        let primaryDiff = 0
-        let secondaryDiff = 0
-
-        switch (direction) {
-            case 'up':
-                if (cy < oy) {
-                    isInDirection = true
-                    primaryDiff = oy - cy
-                    secondaryDiff = Math.abs(ox - cx)
-                }
-                break
-            case 'down':
-                if (cy > oy) {
-                    isInDirection = true
-                    primaryDiff = cy - oy
-                    secondaryDiff = Math.abs(ox - cx)
-                }
-                break
-            case 'left':
-                if (cx < ox) {
-                    isInDirection = true
-                    primaryDiff = ox - cx
-                    secondaryDiff = Math.abs(oy - cy)
-                }
-                break
-            case 'right':
-                if (cx > ox) {
-                    isInDirection = true
-                    primaryDiff = cx - ox
-                    secondaryDiff = Math.abs(oy - cy)
-                }
-                break
-        }
-
-        if (isInDirection) {
-            const distance = primaryDiff + (secondaryDiff * 100)
-            if (distance < minDistance) {
-                minDistance = distance
-                bestCandidate = candidate
+            switch (direction) {
+                case 'up': return cy < oy
+                case 'down': return cy > oy
+                case 'left': return cx < ox
+                case 'right': return cx > ox
+                default: return false
             }
+        })
+        .sort((aa, bb) => {
+            const distA = Math.abs(aa.value.xx - ox) + Math.abs(aa.value.yy - oy)
+            const distB = Math.abs(bb.value.xx - ox) + Math.abs(bb.value.yy - oy)
+            return distA - distB
+        })
+}
+
+function findEntryNodeInBranch(parentNode, direction) {
+    if (!parentNode.children || parentNode.children.size === 0) return null
+
+    const candidates = Array.from(parentNode.children.values())
+    let edgeNodes = []
+    let minMax = (direction === 'down' || direction === 'right') ? Infinity : -Infinity
+
+    for (const node of candidates) {
+        if (!node.value) continue
+
+        const val = (direction === 'up' || direction === 'down')
+            ? node.value.yy
+            : node.value.xx
+
+        if ((direction === 'down' || direction === 'right') && val < minMax) {
+            minMax = val
+            edgeNodes = [node]
+        } else if ((direction === 'up' || direction === 'left') && val > minMax) {
+            minMax = val
+            edgeNodes = [node]
+        } else if (val === minMax) {
+            edgeNodes.push(node)
         }
     }
 
-    return bestCandidate
-}
+    edgeNodes.sort((aa, bb) => {
+        const valA = (direction === 'up' || direction === 'down') ? aa.value.xx : aa.value.yy
+        const valB = (direction === 'up' || direction === 'down') ? bb.value.xx : bb.value.yy
+        return valA - valB
+    })
 
-function getEntryLeaf(candidates, direction) {
-    let bestCandidate = null
-    let minVal = Infinity
-    let maxVal = -Infinity
-
-    for (const candidate of candidates) {
-        const xx = candidate.value.xx
-        const yy = candidate.value.yy
-
-        switch (direction) {
-            case 'down':
-                if (yy < minVal) {
-                    minVal = yy
-                    bestCandidate = candidate
-                }
-                break
-            case 'up':
-                if (yy > maxVal) {
-                    maxVal = yy
-                    bestCandidate = candidate
-                }
-                break
-            case 'right':
-                if (xx < minVal) {
-                    minVal = xx
-                    bestCandidate = candidate
-                }
-                break
-            case 'left':
-                if (xx > maxVal) {
-                    maxVal = xx
-                    bestCandidate = candidate
-                }
-                break
-        }
+    for (const node of edgeNodes) {
+        if (node.value?.canFocus) return node
+        const deeper = findEntryNodeInBranch(node, direction)
+        if (deeper) return deeper
     }
-    return bestCandidate
-}
 
-function collectLeafCandidates(node, list) {
-    if (node.value && node.value.canFocus === true) {
-        list.push(node)
-    }
-    for (const child of node.children.values()) {
-        collectLeafCandidates(child, list)
-    }
+    return null
 }
 
 export default { build }

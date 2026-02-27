@@ -1,7 +1,7 @@
 import React from 'react'
 import Snow from 'expo-snowui'
 
-export default function DropdownPage(props) {
+export default function DropdownPage(props: any) {
   const [dropdownIndex, setDropdownIndex] = React.useState(0)
 
   const [form, setForm] = React.useState({

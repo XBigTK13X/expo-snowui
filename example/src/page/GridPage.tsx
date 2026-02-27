@@ -1,10 +1,10 @@
 import React from 'react'
 import Snow from 'expo-snowui'
 
-export default function GridPage() {
+export default function GridPage(props: any) {
   const [clickedNumber, setClickedNumber] = React.useState(0)
   return (
-    <>
+    <Snow.View {...props}>
       <Snow.Label>Component: Grid</Snow.Label>
       <Snow.Grid
         focusKey="tab-entry"
@@ -12,35 +12,36 @@ export default function GridPage() {
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
         }} />
+      <Snow.Break />
       <Snow.Grid
-        focusKey="inferred-test"
-        focusUp="tab-entry"
-        focusDown="child-key-test"
+        focusKey="inferred"
         items={['Should', 'Be', 'Inferred']}
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
         }} />
-      <Snow.Grid>
-        <Snow.TextButton focusKey='child-key-test' focusDown='paged-grid-test' title={"Button with key"} />
+      <Snow.Break />
+      <Snow.Grid focusKey="single">
+        <Snow.TextButton title={"Button with key"} />
       </Snow.Grid>
-      <Snow.TextButton title="This should never get focus" />
+      <Snow.Break />
+      <Snow.TextButton canFocus={false} title="This should never get focus" />
+      <Snow.Break />
       <Snow.Text>Clicked {clickedNumber}</Snow.Text>
       <Snow.Grid
+        focusKey="paged"
         itemsPerPage={15}
         itemsPerRow={4}
-        focusKey="paged-grid-test"
-        focusUp='child-key-test'
-        focusDown='null-select-test'
         items={[...Array(100).keys()].slice(1)}
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} onPress={() => { setClickedNumber(item) }} />
         }}
       />
-      <Snow.Grid focusKey="null-select-test">
+      <Snow.Break />
+      <Snow.Grid focusKey="bottom">
         <Snow.TextButton title={"Nothing"} />
         <Snow.TextButton title={"Below"} />
         <Snow.TextButton title={"Here"} />
       </Snow.Grid>
-    </>
+    </Snow.View>
   )
 }

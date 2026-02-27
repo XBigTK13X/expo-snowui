@@ -93,7 +93,7 @@ export class Tree {
             console.log("Showing debug info for tree")
         }
 
-        console.log(`${space}${node.segmentName}`)
+        console.log(`${space} ${node.segmentName}`)
 
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)

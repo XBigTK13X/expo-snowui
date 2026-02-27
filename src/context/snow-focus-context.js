@@ -6,6 +6,7 @@ import {
 } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 
+import util from '../util'
 import { useInputContext } from './snow-input-context'
 import { useNavigationContext } from './snow-navigation-context'
 
@@ -78,7 +79,6 @@ export const useFocusContext = (componentName, props) => {
             onLongPress: actionLongPress
         })
         if (focusStart) {
-            console.log({ focusStart, focusPath })
             setFocusStart(focusPath)
         }
         return () => {
@@ -132,6 +132,7 @@ export const useFocusContext = (componentName, props) => {
 
 export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
+    const [debug, setDebug] = React.useState(true)
     const { currentRoute, navPush } = useNavigationContext()
     const { addActionListener, removeActionListener } = useInputContext(props)
 
@@ -158,7 +159,12 @@ export const FocusContextProvider = (props) => {
             })
             focusStartRef.current = null
         }
-        registryRef.current.debug()
+        if (!debug) {
+            registryRef.current.debug()
+            util.prettyLog({ neighbors: adjacenciesRef.current })
+            setDebug(true)
+        }
+
     }, RebuildDebounceMilliseconds))
 
     const scrollViewRef = React.useRef(null)
@@ -190,7 +196,6 @@ export const FocusContextProvider = (props) => {
 
     const moveFocus = React.useCallback((direction) => {
         const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
-        console.log({ focusedPath: focusedPathRef.current, destinationFocusPath, direction })
         if (destinationFocusPath) {
             navPush({
                 params: {

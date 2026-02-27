@@ -4,6 +4,8 @@ import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
+
+import SnowView from './snow-view'
 import SnowPager from './snow-pager'
 
 
@@ -22,7 +24,7 @@ export const SnowGrid = (props) => {
 
     const { SnowStyle } = useStyleContext(props)
     const { currentRoute } = useNavigationContext(props)
-    const { focusPath } = useFocusContext('grid', { ...props, canFocus: false })
+    const { focusPath, focusWrap } = useFocusContext('grid', { ...props, canFocus: false })
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
@@ -69,18 +71,15 @@ export const SnowGrid = (props) => {
         lastElementColumn = itemsPerRow
     }
 
+    let gridYOffset = 0
     let pageControls = null
     if (hasPageControls) {
-        pageControls = (
+        pageControls =
             <SnowPager
                 maxPage={maxPage}
                 page={page}
-                focusKey={'pager'}
-                parentPath={focusPath}
-                xx={10}
-                yy={10}
             />
-        )
+        gridYOffset = 1
     }
 
 
@@ -95,10 +94,9 @@ export const SnowGrid = (props) => {
 
         if (props?.assignFocus !== false) {
             child = React.cloneElement(child, {
-                parentPath: focusPath,
                 focusKey: 'cell',
-                xx: 20 + column,
-                yy: 20 + renderRowIndex,
+                xx: column,
+                yy: gridYOffset + renderRowIndex,
                 focusStart: props.focusStart && column == 0 && row == 0
             })
         }
@@ -127,18 +125,19 @@ export const SnowGrid = (props) => {
         }
     }
 
-
     return (
-        <View testID={props.testID} style={gridStyle} key={focusPath}>
+        <SnowView parentPath={focusPath} testID={props.testID} style={gridStyle} key={focusPath}>
             {pageControls}
-            {rows.map((row, rowIndex) => {
-                return (
-                    <View key={`row-${focusPath}-${rowIndex}`} style={rowStyle}>
-                        {row.map(cell => { return cell })}
-                    </View>
-                )
-            })}
-        </View >
+            <SnowView xx={0} yy={gridYOffset}>
+                {rows.map((row, rowIndex) => {
+                    return (
+                        <View key={`row-${focusPath}-${rowIndex}`} style={rowStyle}>
+                            {row.map(cell => { return cell })}
+                        </View>
+                    )
+                })}
+            </SnowView>
+        </SnowView >
     )
 }
 
