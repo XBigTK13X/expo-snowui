@@ -20,17 +20,17 @@ export default function ModalPage() {
 
   const RegularModal = () => {
     return (
-      <>
+      <Snow.View>
         <Snow.TextButton focusStart focusKey="modal-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
-        <View style={{ height: 1000 }}>
+        <View style={{ height: 200 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>
         </View>
         <Snow.Text>And a focusable blank target</Snow.Text>
         <Snow.Target focusKey="modal-target" focusDown="modal-bottom" />
         <Snow.Text>And then the end</Snow.Text>
         <Snow.TextButton focusKey="modal-bottom" title="Close" onPress={toggleModal} />
-      </>
+      </Snow.View>
     )
   }
 

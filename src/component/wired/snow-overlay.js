@@ -2,22 +2,22 @@ import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
+
 import SnowText from '../snow-text'
 import SnowFillView from '../snow-fill-view'
 
-const SnowOverlayW = (props) => {
+export const SnowOverlay = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const {
         focusLongPress,
         focusPress,
-        tvRemoteProps,
-        pushFocusLayer,
-        popFocusLayer,
-        focusedLayer,
-        addFocusMap,
-        readFocusProps,
-        focusEnabled
-    } = useFocusContext()
+        focusEnabled,
+        focusWrap,
+        focusPath
+    } = useFocusContext('overlay', {
+        ...props,
+        boundary: true
+    })
 
     if (!props.focusLayer) {
         return <SnowText>SnowOverlay requires a focusLayer prop</SnowText>
@@ -67,11 +67,8 @@ const SnowOverlayW = (props) => {
         onLongPress = focusLongPress(elementRef, props.focusKey)
     }
 
-    return (
+    return focusWrap(
         <TouchableOpacity
-            ref={elementRef}
-            {...tvRemoteProps}
-            {...readFocusProps(props)}
             style={style}
             activeOpacity={1} // Without this, the overlay applies a white filter to anything underneath
             onPress={onPress}
@@ -80,9 +77,5 @@ const SnowOverlayW = (props) => {
         </TouchableOpacity>
     )
 }
-
-SnowOverlayW.isSnowFocusWired = true
-
-export const SnowOverlay = SnowOverlayW
 
 export default SnowOverlay
