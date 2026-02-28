@@ -43,7 +43,12 @@ export const useFocusContext = (componentName, props) => {
         unregisterFocus,
         focusedPath,
         setFocusStart,
-        setFocusBoundaryPath
+        setFocusBoundaryPath,
+        moveFocusRight,
+        moveFocusUp,
+        moveFocusDown,
+        moveFocusLeft,
+        pressFocused
     } = React.useContext(FocusContext)
 
     const inheritedParentPath = React.useContext(ParentPathContext)
@@ -128,7 +133,7 @@ export const useFocusContext = (componentName, props) => {
                     isFocused,
                     focusPath,
                     ref: focusRef,
-                    testID: focusPath
+                    testID: focusKey ?? focusPath
                 })}
             </ParentPathContext.Provider>
         )
@@ -139,6 +144,11 @@ export const useFocusContext = (componentName, props) => {
         focusPath,
         focusWrap,
         isFocused,
+        moveFocusRight,
+        moveFocusUp,
+        moveFocusDown,
+        moveFocusLeft,
+        pressFocused
     }
 }
 
