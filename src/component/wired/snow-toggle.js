@@ -3,17 +3,19 @@ import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { SnowLabel } from '../snow-label'
 
-const SnowToggleW = (props) => {
+export const SnowToggle = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { useFocusWiring, isFocused, tvRemoteProps } = useFocusContext()
-    const { elementRef } = useFocusWiring(props)
+    const { focusPath, isFocused, focusWrap } = useFocusContext('toggle', {
+        ...props,
+        canFocus: true
+    })
 
     const toggleValue = () => {
         props.onValueChange(!props.value)
     }
 
     let thumbColor = SnowStyle.component.toggle.color.thumb
-    if (isFocused(props.focusKey)) {
+    if (isFocused) {
         thumbColor = SnowStyle.color.hover
     } else {
         if (props.value) {
@@ -25,10 +27,8 @@ const SnowToggleW = (props) => {
 
 
 
-    return (
+    return focusWrap(
         <Pressable
-            ref={elementRef}
-            {...tvRemoteProps(props)}
             style={SnowStyle.component.toggle.center}
             onPress={toggleValue}
         >
@@ -46,9 +46,5 @@ const SnowToggleW = (props) => {
         </Pressable>
     )
 }
-
-SnowToggleW.isSnowFocusWired = true
-
-export const SnowToggle = SnowToggleW
 
 export default SnowToggle
