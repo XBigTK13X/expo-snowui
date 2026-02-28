@@ -133,7 +133,7 @@ export const useFocusContext = (componentName, props) => {
                     isFocused,
                     focusPath,
                     ref: focusRef,
-                    testID: focusKey ?? focusPath
+                    testID: focusPath
                 })}
             </ParentPathContext.Provider>
         )
