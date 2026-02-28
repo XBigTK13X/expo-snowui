@@ -87,7 +87,7 @@ export class Tree {
     }
 
     debug(node = this.root, indent = 0) {
-        const space = '└─'.repeat(indent)
+        const space = String(indent).padStart(2, '0') + ' ' + '__'.repeat(indent)
 
         if (node == this.root) {
             console.log("Showing debug info for tree")

@@ -20,11 +20,11 @@ const imageItems = [
 
 
 
-export default function TabsMorePage() {
+export default function TabsMorePage(props: any) {
   return (
-    <>
-      <Snow.Label>Component: Tabs</Snow.Label>
-      <Snow.Tabs focusKey="tab-entry" headers={["First", "Second", "Third"]}>
+    <Snow.View {...props}>
+      <Snow.Label>Component: Tabs (More)</Snow.Label>
+      <Snow.Tabs focusKey="tabs" headers={["First", "Second", "Third"]}>
         <Snow.ImageGrid
           items={imageItems}
           itemsPerPage={2}
@@ -35,6 +35,7 @@ export default function TabsMorePage() {
         <Snow.ImageGrid
           items={imageItems}
           itemsPerPage={2}
+          wideImage
           getItemImageUrl={(item: any) => { return item.imageUrl }}
           getItemImageSource={(item: any) => { return item.imageSource }}
           getItemName={(item: any) => { return item.title }}
@@ -42,11 +43,12 @@ export default function TabsMorePage() {
         <Snow.ImageGrid
           items={imageItems}
           itemsPerPage={2}
+          squareImage
           getItemImageUrl={(item: any) => { return item.imageUrl }}
           getItemImageSource={(item: any) => { return item.imageSource }}
           getItemName={(item: any) => { return item.title }}
         />
       </Snow.Tabs>
-    </>
+    </Snow.View>
   )
 }

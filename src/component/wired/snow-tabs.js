@@ -3,6 +3,8 @@ import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
+
+import SnowView from './snow-view'
 import SnowDropdown from './snow-dropdown'
 
 export const SnowTabs = (props) => {
@@ -68,25 +70,29 @@ export const SnowTabs = (props) => {
             return React.cloneElement(child, {
                 snowStyle: tabStyle,
                 parentPath: focusPath,
-                xx: childIndex
+                xx: childIndex,
+                yy: 1
             })
         }
         return child
     }).filter(child => child !== null)
 
     return (
-        <>
+        <SnowView>
             <SnowDropdown
                 fade
+                parentPath={focusPath}
+                xx={0}
+                yy={0}
                 snowStyle={tabStyle}
                 options={props.headers}
                 onValueChange={changeTab}
                 valueIndex={tabIndex}
                 itemsPerRow={props.headers.length} />
-            <View style={SnowStyle.component.tabs.panel}>
+            <SnowView style={SnowStyle.component.tabs.panel}>
                 {tabs[tabIndex]}
-            </View>
-        </>
+            </SnowView>
+        </SnowView>
     )
 
 }

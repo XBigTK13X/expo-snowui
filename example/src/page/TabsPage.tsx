@@ -17,10 +17,10 @@ const imageItems = [
     title: 'Another Poster'
   }
 ]
-export default function TabsPage() {
+export default function TabsPage(props: any) {
 
   return (
-    <>
+    <Snow.View {...props}>
       <Snow.Label>Component: Tabs</Snow.Label>
       <Snow.Tabs headers={["First", "Second", "Third"]}>
         <Snow.Text>This is the first tab.</Snow.Text>
@@ -32,6 +32,6 @@ export default function TabsPage() {
           getItemName={(item: any) => { return item.title }}
         />
       </Snow.Tabs>
-    </>
+    </Snow.View>
   )
 }

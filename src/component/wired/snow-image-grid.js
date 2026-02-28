@@ -11,7 +11,10 @@ export const SnowImageGrid = (props) => {
     if (!props.items || !props.items.length) {
         return null
     }
-    const { focusPath } = useFocusContext('image-grid', props)
+    const { focusPath } = useFocusContext('image-grid', {
+        ...props,
+        canFocus: false
+    })
     const [toggledItems, setToggledItems] = React.useState({})
     const itemsPerRow = props.itemsPerRow || 5
 
@@ -48,7 +51,6 @@ export const SnowImageGrid = (props) => {
         }
 
         return <SnowImageButton
-            parentPath={focusPath}
             {...sourceProps}
             snowStyle={props.snowStyle}
             wide={props.wideImage}
@@ -94,6 +96,7 @@ export const SnowImageGrid = (props) => {
                 : null}
             <SnowGrid
                 {...gridProps}
+                parentPath={focusPath}
                 items={props.items}
                 renderItem={renderItem}
             />

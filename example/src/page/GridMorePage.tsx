@@ -10,7 +10,7 @@ export default function GridMorePage(props: any) {
       <>
         <Snow.Modal focusLayer="grid-more" onRequestClose={() => { setShowModal(false) }}>
           <Snow.View>
-            <Snow.Label>Component: Grid</Snow.Label>
+            <Snow.Label>Component: Grid (More)</Snow.Label>
             <Snow.Grid
               focusKey="first-grid"
               focusDown="second-grid"
