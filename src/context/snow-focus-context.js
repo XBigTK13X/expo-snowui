@@ -171,16 +171,20 @@ export const FocusContextProvider = (props) => {
 
     const updateAdjacencies = React.useCallback(useDebouncedCallback(() => {
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
-        if (focusStartRef?.current) {
+        const currentFocusInUrl = currentRoute?.routeParams?.focusedPath
+
+        if (focusStartRef.current && !currentFocusInUrl) {
+            const target = focusStartRef.current
+            focusStartRef.current = null
+
             navPush({
                 params: {
                     ...currentRoute.routeParams,
-                    focusedPath: focusStartRef.current
+                    focusedPath: target
                 },
                 func: false,
                 replace: true
             })
-            focusStartRef.current = null
         }
         if (!debug) {
             registryRef.current.debug()
@@ -200,6 +204,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const scrollIntoView = React.useCallback((focusPath) => {
+        if (Platform.OS === 'web') {
+            return
+        }
         const node = registryRef.current.find(focusPath)
         const targetRef = node?.value?.focusRef?.current
         const scrollRef = scrollViewRef?.current
@@ -337,7 +344,13 @@ export const FocusContextProvider = (props) => {
         setFocusBoundaryPath,
         setScrollViewRef,
         scrollViewRef
-    }), [currentRoute, scrollViewRef.current, focusStartRef.current])
+    }), [
+        currentRoute.routeParams?.focusedPath,
+        currentRoute.routeParams?.focusStart,
+        scrollViewRef.current,
+        focusStartRef.current,
+        focusedPath
+    ])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
 }

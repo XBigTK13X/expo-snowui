@@ -15,6 +15,7 @@ export default function GridPage(props: any) {
       <Snow.Break />
       <Snow.Grid
         focusKey="inferred"
+        focusStart
         items={['Should', 'Be', 'Inferred']}
         renderItem={(item: any) => {
           return <Snow.TextButton title={item} />
