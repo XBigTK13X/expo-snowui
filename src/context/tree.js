@@ -1,5 +1,19 @@
 export const DELIM = '_'
 
+export const getPathHash = (focusPath) => {
+    const offset_basis = 2166136261
+    const prime = 16777619
+
+    let hash_value = offset_basis
+
+    for (let ii = 0; ii < focusPath.length; ii++) {
+        hash_value ^= focusPath.charCodeAt(ii)
+        hash_value = Math.imul(hash_value, prime)
+    }
+
+    return (hash_value >>> 0).toString(16)
+}
+
 export class Tree {
     constructor() {
         this.root = {
@@ -9,13 +23,19 @@ export class Tree {
             segmentName: 'root',
             path: DELIM
         }
-        this.lookup = new Map()
-        this.lookup.set(DELIM, this.root)
+        this.pathLookup = new Map()
+        this.pathLookup.set(DELIM, this.root)
+        this.hashLookup = new Map()
+        this.hashLookup.set(getPathHash(DELIM), DELIM)
         this.delimiter = DELIM
     }
 
-    getFocusPaths() {
-        return this.lookup.keys()
+    getPaths() {
+        return this.pathLookup.keys()
+    }
+
+    getHashes() {
+        return this.hashLookup.keys()
     }
 
     insert(path, value = null) {
@@ -27,16 +47,19 @@ export class Tree {
                 currentPath += (currentPath === '' ? '' : this.delimiter) + segment
 
                 if (!currentNode.children.has(segment)) {
+                    const focusHash = getPathHash(currentPath)
                     const newNode = {
                         children: new Map(),
                         parent: currentNode,
                         value: null,
                         path: currentPath,
+                        hash: focusHash,
                         segmentName: segment
                     }
 
                     currentNode.children.set(segment, newNode)
-                    this.lookup.set(currentPath, newNode)
+                    this.pathLookup.set(currentPath, newNode)
+                    this.hashLookup.set(focusHash, currentPath)
                 }
                 currentNode = currentNode.children.get(segment)
             }
@@ -54,7 +77,7 @@ export class Tree {
                 for (const childNode of node.children.values()) {
                     removeFromLookup(childNode)
                 }
-                this.lookup.delete(node.path)
+                this.pathLookup.delete(node.path)
             }
             removeFromLookup(targetNode)
             targetNode.parent.children.delete(targetNode.segmentName)
@@ -62,8 +85,16 @@ export class Tree {
         })
     }
 
+    pruneHash(pathHash) {
+        return prune(this.hashLookup.get(pathHash))
+    }
+
     find(path) {
-        return this.lookup.get(path) || null
+        return this.pathLookup.get(path) || null
+    }
+
+    findHash(pathHash) {
+        return this.find(this.hashLookup.get(pathHash))
     }
 
     getSiblings(path) {
@@ -77,6 +108,11 @@ export class Tree {
         }
         return siblings
     }
+
+    getSiblingsHash(pathHash) {
+        return getSiblings(this.hashLookup.get(pathHash))
+    }
+
     findTopLeft() {
         return new Promise((resolve) => {
             const nodeQueue = [this.root]
@@ -102,6 +138,7 @@ export class Tree {
         if (node?.value?.canFocus) {
             entry += ' [f]'
         }
+        entry += ' - ' + node.focusHash
         console.log(entry)
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)
@@ -111,5 +148,6 @@ export class Tree {
 
 export default {
     Tree,
-    DELIM
+    DELIM,
+    getPathHash
 }

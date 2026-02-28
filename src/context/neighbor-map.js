@@ -1,7 +1,7 @@
 export const build = (tree) => {
     const neighborMap = new Map()
 
-    for (const focusPath of tree.getFocusPaths()) {
+    for (const focusPath of tree.getPaths()) {
         const directions = new Map([
             ['up', null],
             ['down', null],

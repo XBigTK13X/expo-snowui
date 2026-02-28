@@ -41,7 +41,7 @@ export const useFocusContext = (componentName, props) => {
     const {
         registerFocus,
         unregisterFocus,
-        focusedPath,
+        focusedHash,
         setFocusStart,
         setFocusBoundaryPath,
         moveFocusRight,
@@ -73,6 +73,8 @@ export const useFocusContext = (componentName, props) => {
         focusPath = `${parentPath}${Tree.DELIM}${focusPath}`
     }
 
+    let focusHash = Tree.getPathHash(focusPath)
+
     let actionPress = props.onPress
     let actionLongPress = props.onLongPresss
 
@@ -80,6 +82,7 @@ export const useFocusContext = (componentName, props) => {
         registerFocus({
             canFocus,
             focusPath,
+            focusHash,
             focusRef,
             focusStart,
             xx,
@@ -90,7 +93,7 @@ export const useFocusContext = (componentName, props) => {
             trapFocusRight
         })
         if (focusStart) {
-            setFocusStart(focusPath)
+            setFocusStart(focusHash)
         }
         if (focusBoundary) {
             setFocusBoundaryPath(focusPath)
@@ -103,7 +106,7 @@ export const useFocusContext = (componentName, props) => {
         }
     }, [])
 
-    const isFocused = focusedPath == focusPath
+    const isFocused = focusedHash == focusHash
 
     const focusWrap = (child) => {
         /*
@@ -142,6 +145,7 @@ export const useFocusContext = (componentName, props) => {
     return {
         focusRef,
         focusPath,
+        focusHash,
         focusWrap,
         isFocused,
         moveFocusRight,
@@ -158,10 +162,10 @@ export const FocusContextProvider = (props) => {
     const { currentRoute, navPush } = useNavigationContext()
     const { addActionListener, removeActionListener } = useInputContext(props)
 
-    const focusedPath = currentRoute?.routeParams?.focusedPath
-    const focusedPathRef = React.useRef(focusedPath)
     const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
+    const focusedHash = currentRoute?.routeParams?.focusedHash
+    const focusedPathRef = React.useRef(null)
     const [focusBoundaryPath, setFocusBoundaryPath] = React.useState(null)
 
     const focusStartRef = React.useRef(null)
@@ -171,7 +175,7 @@ export const FocusContextProvider = (props) => {
 
     const updateAdjacencies = React.useCallback(useDebouncedCallback(() => {
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
-        const currentFocusInUrl = currentRoute?.routeParams?.focusedPath
+        const currentFocusInUrl = registryRef.current.findHash(focusedHash)?.value?.path
 
         if (focusStartRef.current && !currentFocusInUrl) {
             const target = focusStartRef.current
@@ -180,11 +184,12 @@ export const FocusContextProvider = (props) => {
             navPush({
                 params: {
                     ...currentRoute.routeParams,
-                    focusedPath: target
+                    focusedHash: target
                 },
                 func: false,
                 replace: true
             })
+            focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
         }
         if (!debug) {
             registryRef.current.debug()
@@ -236,6 +241,7 @@ export const FocusContextProvider = (props) => {
 
     const registerFocus = async (payload) => {
         await registryRef.current.insert(payload.focusPath, payload)
+
         updateAdjacencies()
     }
 
@@ -254,6 +260,8 @@ export const FocusContextProvider = (props) => {
         }
         const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
 
+        console.log({ direction, destinationFocusPath, sourceEntry })
+
         if (focusBoundaryPath && destinationFocusPath) {
             if (!destinationFocusPath.startsWith(focusBoundaryPath)) {
                 return;
@@ -264,7 +272,7 @@ export const FocusContextProvider = (props) => {
             navPush({
                 params: {
                     ...currentRoute.routeParams,
-                    focusedPath: destinationFocusPath
+                    focusedHash: registryRef.current.find(destinationFocusPath)?.hash
                 },
                 func: false,
                 replace: true
@@ -277,7 +285,7 @@ export const FocusContextProvider = (props) => {
         navPush({
             params: {
                 ...currentRoute.routeParams,
-                focusedPath: target
+                focusedHash: registryRef.current.find(target)?.hash
             },
             func: false,
             replace: true
@@ -290,7 +298,6 @@ export const FocusContextProvider = (props) => {
     const moveFocusUp = React.useCallback(() => { moveFocus('up') })
     const pressFocused = React.useCallback(async () => {
         const node = registryRef.current.find(focusedPathRef.current)
-        console.log({ focusedPath: focusedPathRef.current, node })
         if (!focusedPathRef.current || !node) {
             // Focus has been lost, try to find it again
             let topLeft = await registryRef.current.findTopLeft()
@@ -312,10 +319,6 @@ export const FocusContextProvider = (props) => {
     })
 
     React.useEffect(() => {
-        focusedPathRef.current = focusedPath
-    }, [focusedPath])
-
-    React.useEffect(() => {
         addActionListener('focus-context', {
             onUp: moveFocusUp,
             onDown: moveFocusDown,
@@ -331,7 +334,7 @@ export const FocusContextProvider = (props) => {
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,
-        focusedPath,
+        focusedHash,
         longPressFocused,
         moveFocusDown,
         moveFocusLeft,
@@ -345,11 +348,11 @@ export const FocusContextProvider = (props) => {
         setScrollViewRef,
         scrollViewRef
     }), [
-        currentRoute.routeParams?.focusedPath,
+        currentRoute.routeParams?.focusedHash,
         currentRoute.routeParams?.focusStart,
         scrollViewRef.current,
         focusStartRef.current,
-        focusedPath
+        focusedPathRef.current
     ])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
