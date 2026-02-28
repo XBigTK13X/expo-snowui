@@ -42,7 +42,8 @@ export const useFocusContext = (componentName, props) => {
         registerFocus,
         unregisterFocus,
         focusedPath,
-        setFocusStart
+        setFocusStart,
+        setFocusBoundaryPath
     } = React.useContext(FocusContext)
 
     const inheritedParentPath = React.useContext(ParentPathContext)
@@ -57,6 +58,7 @@ export const useFocusContext = (componentName, props) => {
     let focusStart = (props.focusStart ?? false) && canFocus
     let trapFocusRight = props.trapFocusRight ?? false
     let trapFocusLeft = props.trapFocusLeft ?? false
+    let focusBoundary = props.boundary ?? null
 
     let focusPath = `${componentName}-${xx}x-${yy}y`
     if (focusKey) {
@@ -85,8 +87,14 @@ export const useFocusContext = (componentName, props) => {
         if (focusStart) {
             setFocusStart(focusPath)
         }
+        if (focusBoundary) {
+            setFocusBoundaryPath(focusPath)
+        }
         return () => {
             unregisterFocus(focusPath)
+            if (focusBoundary) {
+                setFocusBoundaryPath(null)
+            }
         }
     }, [])
 
@@ -144,6 +152,7 @@ export const FocusContextProvider = (props) => {
     const focusedPathRef = React.useRef(focusedPath)
     const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
+    const [focusBoundaryPath, setFocusBoundaryPath] = React.useState(null)
 
     const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
@@ -167,6 +176,9 @@ export const FocusContextProvider = (props) => {
             registryRef.current.debug()
             util.prettyLog({ neighbors: adjacenciesRef.current })
             setDebug(true)
+        }
+        if (focusBoundaryPath) {
+            console.log(`Bounded by ${focusBoundaryPath}`)
         }
 
     }, RebuildDebounceMilliseconds))
@@ -207,6 +219,13 @@ export const FocusContextProvider = (props) => {
             return
         }
         const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
+
+        if (focusBoundaryPath && destinationFocusPath) {
+            if (!destinationFocusPath.startsWith(focusBoundaryPath)) {
+                return;
+            }
+        }
+
         if (destinationFocusPath) {
             navPush({
                 params: {
@@ -262,6 +281,7 @@ export const FocusContextProvider = (props) => {
         registerFocus,
         unregisterFocus,
         setFocusStart,
+        setFocusBoundaryPath,
         setScrollViewRef,
         scrollViewRef
     }), [currentRoute, scrollViewRef.current, focusStartRef.current])

@@ -25,8 +25,6 @@ export const SnowToggle = (props) => {
         }
     }
 
-
-
     return focusWrap(
         <Pressable
             style={SnowStyle.component.toggle.center}
