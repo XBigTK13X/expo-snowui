@@ -50,7 +50,10 @@ export function SnowSafeArea(props) {
     return (
         <>
             <ScrollView
-                ref={scrollViewRef}
+                ref={(ref) => {
+                    scrollViewRef.current = ref;
+                    setScrollViewRef(ref);
+                }}
                 style={SnowStyle.component.safeArea}
                 snowStyle={SnowStyle}
                 showsVerticalScrollIndicator={!modals} >

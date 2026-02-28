@@ -191,14 +191,31 @@ export const FocusContextProvider = (props) => {
 
     const scrollIntoView = React.useCallback((focusPath) => {
         const node = registryRef.current.find(focusPath)
-        if (node?.ref?.current && scrollViewRef?.current) {
-            const nodeTag = findNodeHandle(node.ref.current)
-            const scrollTag = findNodeHandle(node.parentScrollRef.current)
-            UIManager.measureLayout(nodeTag, scrollTag, () => { }, (xx, yy) => {
-                scrollViewRef.current.scrollTo({ y: yy, animated: true })
+        const targetRef = node?.value?.focusRef?.current
+        const scrollRef = scrollViewRef?.current
+
+        if (targetRef && scrollRef) {
+            const nodeTag = findNodeHandle(targetRef)
+            const scrollTag = findNodeHandle(scrollRef)
+
+            requestAnimationFrame(() => {
+                UIManager.measureLayout(
+                    nodeTag,
+                    scrollTag,
+                    (err) => console.error("Measure Layout Failed", err),
+                    (xx, yy, width, height) => {
+                        const lead = 300
+                        const scrollTarget = Math.max(0, yy - lead)
+
+                        scrollRef.scrollTo({
+                            y: scrollTarget,
+                            animated: false
+                        })
+                    }
+                )
             })
         }
-    }, [])
+    }, [scrollViewRef])
 
     const registerFocus = async (payload) => {
         await registryRef.current.insert(payload.focusPath, payload)
@@ -257,7 +274,7 @@ export const FocusContextProvider = (props) => {
     const pressFocused = React.useCallback(async () => {
         const node = registryRef.current.find(focusedPathRef.current)
         console.log({ focusedPath: focusedPathRef.current, node })
-        if (!focusedPathRef.current && !node) {
+        if (!focusedPathRef.current || !node) {
             // Focus has been lost, try to find it again
             let topLeft = await registryRef.current.findTopLeft()
             if (topLeft) {

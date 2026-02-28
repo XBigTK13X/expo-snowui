@@ -1,6 +1,4 @@
-import util from '../util'
-
-export const DELIM = '__'
+export const DELIM = '_'
 
 export class Tree {
     constructor() {
@@ -25,7 +23,6 @@ export class Tree {
             const segments = path.split(this.delimiter).filter((ss) => ss.length > 0)
             let currentNode = this.root
             let currentPath = ''
-
             for (const segment of segments) {
                 currentPath += (currentPath === '' ? '' : this.delimiter) + segment
 
@@ -53,18 +50,14 @@ export class Tree {
         return new Promise((resolve) => {
             const targetNode = this.find(path)
             if (!targetNode || !targetNode.parent) return
-
             const removeFromLookup = (node) => {
                 for (const childNode of node.children.values()) {
                     removeFromLookup(childNode)
                 }
                 this.lookup.delete(node.path)
             }
-
             removeFromLookup(targetNode)
-
             targetNode.parent.children.delete(targetNode.segmentName)
-
             return resolve(true)
         })
     }
@@ -76,7 +69,6 @@ export class Tree {
     getSiblings(path) {
         const node = this.find(path)
         if (!node || !node.parent) return []
-
         const siblings = []
         for (const [name, child] of node.parent.children) {
             if (name !== node.segmentName) {
@@ -88,36 +80,29 @@ export class Tree {
     findTopLeft() {
         return new Promise((resolve) => {
             const nodeQueue = [this.root]
-
             while (nodeQueue.length > 0) {
                 const currentNode = nodeQueue.shift()
-
                 if (currentNode?.value?.canFocus) {
                     return resolve(currentNode?.value?.focusPath)
                 }
-
                 for (const childNode of currentNode.children.values()) {
                     nodeQueue.push(childNode)
                 }
             }
-
             return resolve(null)
         })
     }
 
     debug(node = this.root, indent = 0) {
         const space = String(indent).padStart(2, '0') + ' ' + '__'.repeat(indent)
-
         if (node == this.root) {
             console.log("Showing debug info for tree")
         }
-
         let entry = `${space} ${node.segmentName}`
         if (node?.value?.canFocus) {
             entry += ' [f]'
         }
         console.log(entry)
-
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)
         }
