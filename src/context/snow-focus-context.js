@@ -239,19 +239,43 @@ export const FocusContextProvider = (props) => {
         }
     })
 
+    const focusOn = React.useCallback((target) => {
+        navPush({
+            params: {
+                ...currentRoute.routeParams,
+                focusedPath: target
+            },
+            func: false,
+            replace: true
+        })
+    })
+
     const moveFocusDown = React.useCallback(() => { moveFocus('down') })
     const moveFocusLeft = React.useCallback(() => { moveFocus('left') })
     const moveFocusRight = React.useCallback(() => { moveFocus('right') })
     const moveFocusUp = React.useCallback(() => { moveFocus('up') })
+    const pressFocused = React.useCallback(async () => {
+        const node = registryRef.current.find(focusedPathRef.current)
+        console.log({ focusedPath: focusedPathRef.current, node })
+        if (!focusedPathRef.current && !node) {
+            // Focus has been lost, try to find it again
+            let topLeft = await registryRef.current.findTopLeft()
+            if (topLeft) {
+                focusOn(topLeft)
+            }
+        }
+        if (node?.value?.onPress) {
+            node.value.onPress()
+        }
+    })
 
-    const pressFocused = () => {
+    const longPressFocused = React.useCallback(() => {
+        const node = registryRef.current.find(focusedPathRef.current)
 
-    }
-
-    const longPressFocused = () => {
-
-    }
-
+        if (node?.value?.onLongPress) {
+            node.value.onLongPress()
+        }
+    })
 
     React.useEffect(() => {
         focusedPathRef.current = focusedPath
@@ -262,7 +286,9 @@ export const FocusContextProvider = (props) => {
             onUp: moveFocusUp,
             onDown: moveFocusDown,
             onRight: moveFocusRight,
-            onLeft: moveFocusLeft
+            onLeft: moveFocusLeft,
+            onPress: pressFocused,
+            onLongPress: longPressFocused
         })
         return () => {
             removeActionListener('focus-context')

@@ -24,8 +24,8 @@ export const focusedColor = AppStyle.component.textButton.focused.borderColor
 
 let capturedFocusMethods = null;
 
-const FocusSpy = () => {
-    capturedFocusMethods = useFocusContext();
+const FocusSpy = (props) => {
+    capturedFocusMethods = useFocusContext('spy', props);
     return null;
 };
 
@@ -67,7 +67,7 @@ const TestApp = (props) => {
             routePages={pages}
             initialRoutePath={routes.testPage}
         >
-            <FocusSpy />
+            <FocusSpy {...props} />
             {props.children}
         </SnowApp>
     );

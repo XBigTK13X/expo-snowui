@@ -85,6 +85,25 @@ export class Tree {
         }
         return siblings
     }
+    findTopLeft() {
+        return new Promise((resolve) => {
+            const nodeQueue = [this.root]
+
+            while (nodeQueue.length > 0) {
+                const currentNode = nodeQueue.shift()
+
+                if (currentNode?.value?.canFocus) {
+                    return resolve(currentNode?.value?.focusPath)
+                }
+
+                for (const childNode of currentNode.children.values()) {
+                    nodeQueue.push(childNode)
+                }
+            }
+
+            return resolve(null)
+        })
+    }
 
     debug(node = this.root, indent = 0) {
         const space = String(indent).padStart(2, '0') + ' ' + '__'.repeat(indent)
@@ -93,7 +112,11 @@ export class Tree {
             console.log("Showing debug info for tree")
         }
 
-        console.log(`${space} ${node.segmentName}`)
+        let entry = `${space} ${node.segmentName}`
+        if (node?.value?.canFocus) {
+            entry += ' [f]'
+        }
+        console.log(entry)
 
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)

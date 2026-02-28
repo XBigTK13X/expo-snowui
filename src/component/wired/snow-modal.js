@@ -18,8 +18,6 @@ export const SnowModal = (props) => {
         return <SnowText>SnowModal requires an onRequestClose prop</SnowText>
     }
 
-
-
     React.useEffect(() => {
         const backListenerKey = addBackListener(() => {
             props.onRequestClose()

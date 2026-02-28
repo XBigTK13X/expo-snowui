@@ -192,6 +192,11 @@ export function InputContextProvider(props) {
                         case 'select':
                             listener.onPress?.()
                             break
+                        case 'longselect':
+                            if (action === 1) {
+                                listener.onLongPress?.()
+                            }
+                            break
                         default:
                             break
                     }
