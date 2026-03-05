@@ -34,7 +34,7 @@ function AppPage() {
           yy={0}
           title="Focus Test"
         />
-        <Snow.Label>Components</Snow.Label>
+        <Snow.Label center>Components</Snow.Label>
         <Snow.Grid
           focusStart
           yy={1}
@@ -43,8 +43,8 @@ function AppPage() {
           renderItem={(item: any) => {
             return <Snow.TextButton title={item[0]} onPress={navPush({ path: item[1] })} />
           }} />
-        <Snow.Label>App Level entities</Snow.Label>
-        <Snow.Text>App, FillView, SafeArea, useSnowContext.</Snow.Text>
+        <Snow.Label center>App Level entities</Snow.Label>
+        <Snow.Text center>App, FillView, SafeArea, useSnowContext.</Snow.Text>
       </Snow.View>
       <Snow.Break style={{ width: "5%" }} vertical />
       <Snow.View focusKey="page" xx={1} yy={0} style={{ width: "70%" }}>

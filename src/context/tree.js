@@ -97,22 +97,6 @@ export class Tree {
         return this.find(this.hashLookup.get(pathHash))
     }
 
-    getSiblings(path) {
-        const node = this.find(path)
-        if (!node || !node.parent) return []
-        const siblings = []
-        for (const [name, child] of node.parent.children) {
-            if (name !== node.segmentName) {
-                siblings.push(child)
-            }
-        }
-        return siblings
-    }
-
-    getSiblingsHash(pathHash) {
-        return getSiblings(this.hashLookup.get(pathHash))
-    }
-
     findTopLeft() {
         return new Promise((resolve) => {
             const nodeQueue = [this.root]
@@ -138,7 +122,7 @@ export class Tree {
         if (node?.value?.canFocus) {
             entry += ' [f]'
         }
-        entry += ' - ' + node.focusHash
+        entry += ' - ' + node.hash
         console.log(entry)
         for (const childNode of node.children.values()) {
             this.debug(childNode, indent + 1)

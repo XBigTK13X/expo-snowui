@@ -160,6 +160,7 @@ export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
     const [debug, setDebug] = React.useState(false)
     const { currentRoute, navPush } = useNavigationContext()
+    const focusPathRef = React.useRef(null)
     const { addActionListener, removeActionListener } = useInputContext(props)
 
     const registryRef = React.useRef(new Tree.Tree())
@@ -170,7 +171,11 @@ export const FocusContextProvider = (props) => {
 
     const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
-        focusStartRef.current = focusStart
+        console.log({ currentRoute })
+        if (focusPathRef.current != currentRoute?.routePath) {
+            focusPathRef.current = currentRoute?.routePath
+            focusStartRef.current = focusStart
+        }
     }
 
     const updateAdjacencies = React.useCallback(useDebouncedCallback(() => {
@@ -189,7 +194,6 @@ export const FocusContextProvider = (props) => {
                 func: false,
                 replace: true
             })
-            focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
         }
         if (!debug) {
             registryRef.current.debug()
@@ -331,6 +335,10 @@ export const FocusContextProvider = (props) => {
             removeActionListener('focus-context')
         }
     }, [])
+
+    React.useEffect(() => {
+        focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
+    }, [currentRoute?.routeParams])
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,

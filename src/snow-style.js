@@ -3,28 +3,40 @@ import { Platform, Dimensions } from 'react-native';
 const isTV = Platform.isTV
 const isAndroid = Platform.OS === 'android'
 const isWeb = Platform.OS === 'web'
-const isPortrait = Dimensions.get('window').width < Dimensions.get('window').height
 import _ from 'lodash'
 
-let scaleMultiplier = 0.75
+const getScaleMultiplier = () => {
+    const isPortrait = Dimensions.get('window').width < Dimensions.get('window').height + 100
 
-let isTablet = false
+    let scaleMultiplier = 0.75
 
-if (isTV) {
-    scaleMultiplier = 0.5
-} else {
-    if (isAndroid) {
+    let isTablet = false
+
+    if (isTV) {
         scaleMultiplier = 0.5
-        const { width, height } = Dimensions.get('window');
-        if (Math.min(width, height) >= 600) {
-            isTablet = true
-            scaleMultiplier = 0.75
+    } else {
+        if (isAndroid) {
+            scaleMultiplier = 0.5
+            const { width, height } = Dimensions.get('window');
+            if (Math.min(width, height) >= 600) {
+                isTablet = true
+                scaleMultiplier = 0.75
+            }
         }
+    }
+
+    if (isPortrait) {
+        scaleMultiplier = .5
+    }
+    return {
+        scaleMultiplier,
+        isPortrait,
+        isTablet
     }
 }
 
 const scaled = (input) => {
-    return Math.round(input * scaleMultiplier)
+    return Math.round(input * getScaleMultiplier().scaleMultiplier)
 }
 
 export function getWindowHeight() {
@@ -512,11 +524,13 @@ export function createStyle(overrides) {
         }
     }
 
+    const mult = getScaleMultiplier()
+
     AppStyle.isTV = isTV
     AppStyle.isWeb = isWeb
     AppStyle.isAndroid = isAndroid
-    AppStyle.isPortrait = isPortrait
-    AppStyle.isTablet = isTablet
+    AppStyle.isPortrait = mult.isPortrait
+    AppStyle.isTablet = mult.isTablet
 
     if (overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)
