@@ -47,6 +47,7 @@ export const SnowTabs = (props) => {
     }
 
     const changeTab = (newIndex, trigger) => {
+        console.log({ trigger })
         let params = {
             [tabKey]: newIndex,
             [tabTrigger]: trigger
@@ -82,6 +83,7 @@ export const SnowTabs = (props) => {
             <SnowDropdown
                 fade
                 parentPath={focusPath}
+                focusKey={tabKey}
                 xx={0}
                 yy={0}
                 snowStyle={tabStyle}

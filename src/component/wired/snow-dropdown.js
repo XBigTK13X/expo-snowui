@@ -12,9 +12,9 @@ export const SnowDropdown = (props) => {
         return null
     }
     const { focusPath } = useFocusContext('dropdown', props)
-    const choose = (chosenIndex) => {
+    const choose = (chosenIndex, entryFocusKey) => {
         if (props.onValueChange) {
-            props.onValueChange(chosenIndex, props.focusKey)
+            props.onValueChange(chosenIndex, entryFocusKey)
         }
     }
 
@@ -25,12 +25,14 @@ export const SnowDropdown = (props) => {
                 selected = true
             }
         }
+        const entryFocusKey = props.focusKey + '-' + itemIndex
         return <SnowTextButton
             snowStyle={props.snowStyle}
+            focusKey={entryFocusKey}
             fade={selected && props.fade}
             selected={selected}
             title={item.name ? item.name : item}
-            onPress={() => { choose(item.index ? item.index : itemIndex) }} />
+            onPress={() => { choose(item.index ? item.index : itemIndex, entryFocusKey) }} />
     }
 
     if (props.title) {
