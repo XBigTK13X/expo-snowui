@@ -171,7 +171,6 @@ export const FocusContextProvider = (props) => {
 
     const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
-        console.log({ currentRoute })
         if (focusPathRef.current != currentRoute?.routePath) {
             focusPathRef.current = currentRoute?.routePath
             focusStartRef.current = focusStart
@@ -263,8 +262,6 @@ export const FocusContextProvider = (props) => {
             return
         }
         const destinationFocusPath = adjacenciesRef.current?.get(focusedPathRef.current)?.get(direction)
-
-        console.log({ direction, destinationFocusPath, sourceEntry })
 
         if (focusBoundaryPath && destinationFocusPath) {
             if (!destinationFocusPath.startsWith(focusBoundaryPath)) {

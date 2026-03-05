@@ -56,8 +56,8 @@ export const SnowGrid = (props) => {
     }
 
     let page = 0
-    if (currentRoute?.routeParams?.hasOwnProperty(`${focusPath}-grid-page`)) {
-        page = parseInt(currentRoute?.routeParams?.[`${focusPath}-grid-page`], 10) ?? 0
+    if (currentRoute?.routeParams?.hasOwnProperty(`${props.focusKey}-pager-grid-page`)) {
+        page = parseInt(currentRoute?.routeParams?.[`${props.focusKey}-pager-grid-page`], 10) ?? 0
     }
 
     const hasPageControls = items.length > itemsPerPage
@@ -76,6 +76,7 @@ export const SnowGrid = (props) => {
     if (hasPageControls) {
         pageControls =
             <SnowPager
+                focusKey={props.focusKey + '-pager'}
                 maxPage={maxPage}
                 page={page}
             />

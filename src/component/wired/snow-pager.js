@@ -17,7 +17,7 @@ export const SnowPager = (props) => {
 
     const gotoPage = (page) => {
         let params = {
-            [pageKey]: pageYOffset
+            [pageKey]: pageKey
         }
         if (currentRoute?.routeParams) {
             params = {
