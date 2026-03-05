@@ -2,6 +2,8 @@ import React from 'react';
 
 import { prettyLog } from '../util'
 
+import { useFocusAppContext } from './snow-focus-context'
+
 const LayerContext = React.createContext({});
 
 export function useLayerContext() {
@@ -15,6 +17,8 @@ export function useLayerContext() {
 export function LayerContextProvider(props) {
     const [modalPayloads, setModalPayloads] = React.useState([])
     const [overlayPayload, setOverlayPayload] = React.useState(null)
+
+    const { focusOn } = useFocusAppContext()
 
     const DEBUG = props.DEBUG_LAYERS
 
@@ -33,6 +37,9 @@ export function LayerContextProvider(props) {
     }
 
     const pushModal = (payload) => {
+        if (payload?.focusPath) {
+            focusOn(payload?.focusPath)
+        }
         if (DEBUG) {
             prettyLog({ context: 'layer', action: 'pushModal', modalPayloads, payload })
         }

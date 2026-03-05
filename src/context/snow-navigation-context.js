@@ -233,6 +233,14 @@ export function NavigationContextProvider(props) {
         return <></>
     }
 
+    const navUpdate = ((delta) => {
+        navPush({
+            params: { ...currentRoute?.routeParams, ...delta },
+            func: false,
+            replace: true
+        })
+    })
+
     const currentRoute = { ...navigationHistory.at(-1) }
     let CurrentPage = pageLookup[currentRoute?.routePath]?.page
 
@@ -247,6 +255,7 @@ export function NavigationContextProvider(props) {
         navPush,
         navPop,
         navReset,
+        navUpdate,
         navigationHistory
     }
 

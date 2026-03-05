@@ -4,6 +4,7 @@ import { useStyleContext } from '../context/snow-style-context'
 import { useFocusAppContext } from '../context/snow-focus-context'
 import { useLayerContext } from '../context/snow-layer-context'
 import util from '../util'
+import { SnowView } from './wired/snow-view'
 import { SnowModal } from './wired/snow-modal'
 import { SnowOverlay } from './wired/snow-overlay'
 
@@ -18,9 +19,10 @@ export function SnowSafeArea(props) {
     // It requires a rendering function instead of computed JSX
     // Otherwise controlled forms inside a modal would not update their state
     let modals = null
+    console.log({ modalPayloads })
     if (modalPayloads?.length) {
         modals = (
-            <>
+            <SnowView>
                 {modalPayloads.map((modalPayload, modalIndex) => {
                     return <SnowModal
                         key={modalIndex}
@@ -28,7 +30,7 @@ export function SnowSafeArea(props) {
                         {...modalPayload.props}
                         render={modalPayload.render} />
                 })}
-            </>
+            </SnowView>
         )
     }
 

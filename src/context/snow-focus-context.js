@@ -42,6 +42,7 @@ export const useFocusContext = (componentName, props) => {
         registerFocus,
         unregisterFocus,
         focusedHash,
+        focusOn,
         setFocusStart,
         setFocusBoundaryPath,
         moveFocusRight,
@@ -55,15 +56,15 @@ export const useFocusContext = (componentName, props) => {
 
     const focusRef = React.useRef(null)
 
-    let xx = props.xx ?? 0
-    let yy = props.yy ?? 0
-    let parentPath = props.parentPath || inheritedParentPath || null
-    let focusKey = props.focusKey || null
-    let canFocus = props.canFocus ?? false
-    let focusStart = (props.focusStart ?? false) && canFocus
-    let trapFocusRight = props.trapFocusRight ?? false
-    let trapFocusLeft = props.trapFocusLeft ?? false
-    let focusBoundary = props.boundary ?? null
+    let xx = props?.xx ?? 0
+    let yy = props?.yy ?? 0
+    let parentPath = props?.parentPath || inheritedParentPath || null
+    let focusKey = props?.focusKey || null
+    let canFocus = props?.canFocus ?? false
+    let focusStart = (props?.focusStart ?? false) && canFocus
+    let trapFocusRight = props?.trapFocusRight ?? false
+    let trapFocusLeft = props?.trapFocusLeft ?? false
+    let focusBoundary = props?.boundary ?? null
 
     let focusPath = `${componentName}-${xx}x-${yy}y`
     if (focusKey) {
@@ -75,8 +76,8 @@ export const useFocusContext = (componentName, props) => {
 
     let focusHash = Tree.getPathHash(focusPath)
 
-    let actionPress = props.onPress
-    let actionLongPress = props.onLongPresss
+    let actionPress = props?.onPress
+    let actionLongPress = props?.onLongPresss
 
     React.useEffect(() => {
         registerFocus({
@@ -143,6 +144,7 @@ export const useFocusContext = (componentName, props) => {
     }
 
     return {
+        focusOn,
         focusRef,
         focusPath,
         focusHash,
@@ -340,6 +342,7 @@ export const FocusContextProvider = (props) => {
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,
         focusedHash,
+        focusOn,
         longPressFocused,
         moveFocusDown,
         moveFocusLeft,

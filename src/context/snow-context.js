@@ -3,7 +3,7 @@ import React from 'react'
 import { useToast } from 'expo-toast'
 
 import { useStyleContext } from './snow-style-context'
-import { useFocusAppContext } from './snow-focus-context'
+import { useFocusAppContext, useFocusContext } from './snow-focus-context'
 import { useInputContext } from './snow-input-context'
 import { useNavigationContext } from './snow-navigation-context'
 import { useLayerContext } from './snow-layer-context'
@@ -32,14 +32,16 @@ export function SnowContextProvider(props) {
         ...FocusContext,
         ...NavigationContext,
         ...LayerContext,
-        toast: { ...toast }
+        toast: { ...toast },
+        useFocusContext
     }), [
         StyleContext,
         InputContext,
         FocusContext,
         NavigationContext,
         LayerContext,
-        toast
+        toast,
+        useFocusContext
     ]);
 
     return (

@@ -3,13 +3,14 @@ import { useFocusContext } from '../../context/snow-focus-context'
 import { useInputContext } from '../../context/snow-input-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
+import SnowView from './snow-view'
 import SnowFillView from '../snow-fill-view'
 import SnowText from '../snow-text'
 
 export const SnowModal = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { addBackListener, removeBackListener } = useInputContext()
-    const { focusPath, focusWrap } = useFocusContext('modal', {
+    const { focusPath, focusWrap, focusOn } = useFocusContext('modal', {
         ...props,
         boundary: true
     })
@@ -52,7 +53,7 @@ export const SnowModal = (props) => {
             scroll={props.scroll}
             style={style}
         >
-            {props.render()}
+            {props.render({ focusWrap, focusOn, parentPath: focusPath })}
         </SnowFillView>
     )
 }

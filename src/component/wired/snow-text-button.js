@@ -40,10 +40,13 @@ export const SnowTextButton = (props) => {
 
     let textStyle = [SnowStyle.component.textButton.text]
     let title = props.title
-    if (props.title.length > 60) {
+    if (!title) {
+        title = ''
+    }
+    if (title.length > 60) {
         textStyle.push(SnowStyle.component.textButton.smallText)
     }
-    if (props.title.length > 120) {
+    if (title.length > 120) {
         title = title.substring(0, 120) + '...'
     }
 

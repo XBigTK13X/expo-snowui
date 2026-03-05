@@ -2,8 +2,14 @@ import React from 'react'
 import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
-export default function ModalPage() {
-  const { pushModal, popModal, clearModals, openOverlay, closeOverlay } = Snow.useLayerContext()
+export default function ModalPage(props: any) {
+  const {
+    pushModal,
+    popModal,
+    clearModals,
+    openOverlay,
+    closeOverlay
+  } = Snow.useLayerContext()
 
   const [showExample, setShowExample] = React.useState(false)
   const toggleModal = () => { setShowExample(!showExample) }
@@ -18,18 +24,25 @@ export default function ModalPage() {
   const [showNested, setShowNested] = React.useState(false)
   const toggleNested = () => { setShowNested(!showNested) }
 
-  const RegularModal = () => {
+  const RegularModal = (props: any) => {
     return (
       <Snow.View>
-        <Snow.TextButton focusStart focusKey="modal-entry" focusDown="modal-target" title="Close" onPress={toggleModal} />
+        <Snow.TextButton
+          focusStart
+          focusKey="modal-entry"
+          title="Close"
+          onPress={toggleModal} />
         <Snow.Text>Hi, I am a modal.</Snow.Text>
         <View style={{ height: 200 }}>
           <Snow.Text>There should be scrolling.</Snow.Text>
         </View>
         <Snow.Text>And a focusable blank target</Snow.Text>
-        <Snow.Target focusKey="modal-target" focusDown="modal-bottom" />
+        <Snow.Target focusKey="modal-target" />
         <Snow.Text>And then the end</Snow.Text>
-        <Snow.TextButton focusKey="modal-bottom" title="Close" onPress={toggleModal} />
+        <Snow.TextButton
+          focusKey="modal-bottom"
+          title="Close"
+          onPress={toggleModal} />
       </Snow.View>
     )
   }
@@ -40,7 +53,6 @@ export default function ModalPage() {
         props: {
           focusStart: true,
           focusKey: "fullscreen-overlay",
-          focusLayer: "fullscreen-modal",
           onPress: toggleFullscreen
         }
       })
@@ -50,7 +62,9 @@ export default function ModalPage() {
     return (
       <Snow.FillView style={{ backgroundColor: 'green' }}>
         <Snow.Text>This should be fullscreen with no border.</Snow.Text>
-        <Snow.Target focusStart focusKey="fullscreen-modal" />
+        <Snow.Target
+          focusStart
+          focusKey="fullscreen-modal" />
       </Snow.FillView>
     )
   }
@@ -61,11 +75,14 @@ export default function ModalPage() {
         <Snow.TextButton
           focusStart
           focusKey="close-button"
-          focusDown="modal-input"
           title="Close Modal"
           onPress={toggleInputs}
         />
-        <Snow.Input focusStart focusKey="modal-input" value={textInput} onValueChange={setTextInput} />
+        <Snow.Input
+          focusStart
+          focusKey="modal-input"
+          value={textInput}
+          onValueChange={setTextInput} />
       </>
     )
   }
@@ -77,7 +94,14 @@ export default function ModalPage() {
           return (
             <>
               <Snow.Text>This is the second layer of modal. Should be on top.</Snow.Text>
-              <Snow.TextButton focusStart focusKey="close-top-button" title="Close Top" onPress={() => { setShowNested(false); clearModals() }} />
+              <Snow.TextButton
+                focusStart
+                focusKey="close-top-button"
+                title="Close Top"
+                onPress={() => {
+                  setShowNested(false);
+                  clearModals()
+                }} />
             </>
           )
         },
@@ -103,31 +127,68 @@ export default function ModalPage() {
   React.useEffect(() => {
     const hasModal = showExample || showFullscreen || showInputs || showNested
     if (showExample) {
-      pushModal({ render: RegularModal, props: { focusLayer: 'example-modal', scroll: true, onRequestClose: toggleModal } })
+      pushModal({
+        render: RegularModal,
+        props: {
+          scroll: true,
+          onRequestClose: toggleModal
+        }
+      })
     }
     if (showFullscreen) {
-      pushModal({ render: FullscreenModal, props: { assignFocus: false, onRequestClose: toggleFullscreen } })
+      pushModal({
+        render: FullscreenModal,
+        props: {
+          assignFocus: false,
+          onRequestClose: toggleFullscreen
+        }
+      })
     }
     if (showInputs) {
-      pushModal({ render: InputsModal, props: { focusLayer: 'inputs-modal', onRequestClose: toggleInputs } })
+      pushModal({
+        render: InputsModal,
+        props: {
+          onRequestClose: toggleInputs
+        }
+      })
     }
     if (showNested) {
-      pushModal({ render: NestedModal, props: { focusLayer: 'nested-modal', onRequestClose: () => { setShowNested(false) } } })
+      pushModal({
+        render: NestedModal,
+        props: {
+          focusLayer: 'nested-modal',
+          onRequestClose: () => {
+            setShowNested(false)
+          }
+        }
+      })
     }
     return () => {
       if (hasModal) {
         popModal()
       }
     }
-  }, [showExample, showFullscreen, showInputs, showNested, textInput])
+  }, [showExample, showFullscreen, showInputs, showNested])
 
   return (
-    <>
+    <Snow.View {...props}>
       <Snow.Label>Component: Modal</Snow.Label>
-      <Snow.TextButton focusKey="tab-entry" focusDown="modal-two" title="Show Modal" onPress={toggleModal} />
-      <Snow.TextButton focusKey="modal-two" focusDown="modal-three" title="Test Fullscreen" onPress={toggleFullscreen} />
-      <Snow.TextButton focusKey="modal-three" focusDown="nested-modal" title="Inputs" onPress={toggleInputs} />
-      <Snow.TextButton focusKey="nested-modal" title="Nested Modal" onPress={toggleNested} />
-    </>
+      <Snow.TextButton
+        focusKey="tab-entry"
+        title="Show Modal"
+        onPress={toggleModal} />
+      <Snow.TextButton
+        focusKey="modal-two"
+        title="Test Fullscreen"
+        onPress={toggleFullscreen} />
+      <Snow.TextButton
+        focusKey="modal-three"
+        title="Inputs"
+        onPress={toggleInputs} />
+      <Snow.TextButton
+        focusKey="nested-modal"
+        title="Nested"
+        onPress={toggleNested} />
+    </Snow.View>
   )
 }
