@@ -3,7 +3,6 @@ import { Platform } from 'react-native'
 import { useDebounce } from 'use-debounce'
 
 import { useInputContext } from './snow-input-context'
-import { useLayerContext } from './snow-layer-context'
 
 import util, { prettyLog } from '../util'
 
@@ -42,9 +41,12 @@ export function NavigationContextProvider(props) {
     const DEBUG = props.DEBUG_NAVIGATION
 
     const { addBackListener, removeBackListener } = useInputContext()
-    const { modalPayloads } = useLayerContext()
 
-    const modalsVisibleRef = React.useRef()
+    const blockBackActionRef = React.useRef(false)
+
+    const blockBackAction = (block) => {
+        blockBackActionRef.current = block
+    }
 
     const [isReady, setIsReady] = React.useState(false)
 
@@ -56,10 +58,6 @@ export function NavigationContextProvider(props) {
 
     // Debounce the history so children only see the "settled" state (e.g. after multiple unmounts)
     const [debouncedHistory] = useDebounce(navigationHistory, 100)
-
-    React.useEffect(() => {
-        modalsVisibleRef.current = !!modalPayloads?.length
-    }, [modalPayloads])
 
     React.useEffect(() => {
         navigationHistoryRef.current = navigationHistory
@@ -204,10 +202,10 @@ export function NavigationContextProvider(props) {
     React.useEffect(() => {
         addBackListener('navigation-context', () => {
             if (DEBUG) {
-                prettyLog({ context: 'navigation', action: 'backListener', modalShowing: modalsVisibleRef.current })
+                prettyLog({ context: 'navigation', action: 'backListener', blockBackAction: blockBackActionRef.current })
             }
-            if (modalsVisibleRef.current) {
-                // When a modal is shown, prevent default event handlers from exiting the app/page
+            if (blockBackActionRef.current) {
+                // For example: When a modal is shown, prevent default event handlers from exiting the app/page
                 return true
             }
             if (navigationHistoryRef.current.length > 1) {
@@ -272,6 +270,7 @@ export function NavigationContextProvider(props) {
         navReset,
         navRemove,
         navUpdate,
+        blockBackAction,
         navigationHistory: debouncedHistory
     }
 

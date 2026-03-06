@@ -254,20 +254,42 @@ export const FocusContextProvider = (props) => {
             const scrollTag = findNodeHandle(scrollRef)
 
             requestAnimationFrame(() => {
-                UIManager.measureLayout(
-                    nodeTag,
-                    scrollTag,
-                    (err) => console.error("Measure Layout Failed", err),
-                    (xx, yy, width, height) => {
-                        const lead = 300
-                        const scrollTarget = Math.max(0, yy - lead)
+                // We need the scroll container's measurements to know the viewport height
+                UIManager.measure(scrollTag, (sx, sy, sWidth, sHeight, sPageX, sPageY) => {
+                    UIManager.measureLayout(
+                        nodeTag,
+                        scrollTag,
+                        (err) => console.error("Measure Layout Failed", err),
+                        (xx, yy, width, height) => {
+                            const lead = 300
+                            const viewportHeight = sHeight
+                            const bottomThreshold = viewportHeight - 200 // Trigger scroll before hitting bottom
 
-                        scrollRef.scrollTo({
-                            y: scrollTarget,
-                            animated: false
-                        })
-                    }
-                )
+                            // Get current scroll position if possible,
+                            // though measureLayout yy is relative to the scroll content start.
+
+                            // Logic: If the element's bottom is beyond our threshold,
+                            // scroll so the element sits at the 'lead' distance from top.
+                            // But ONLY if yy is large enough that scrolling wouldn't
+                            // just jump to the top unnecessarily.
+
+                            if (yy > bottomThreshold) {
+                                const scrollTarget = yy - lead
+
+                                scrollRef.scrollTo({
+                                    y: Math.max(0, scrollTarget),
+                                    animated: true // Set to true for smoother TV transitions
+                                })
+                            } else if (yy < lead) {
+                                // Optional: If moving UP and hitting the top lead
+                                scrollRef.scrollTo({
+                                    y: 0,
+                                    animated: true
+                                })
+                            }
+                        }
+                    )
+                })
             })
         }
     }, [scrollViewRef])

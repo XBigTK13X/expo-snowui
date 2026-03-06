@@ -2,6 +2,7 @@ import React from 'react';
 
 import { prettyLog } from '../util'
 
+import { useNavigationContext } from './snow-navigation-context'
 import { useFocusAppContext } from './snow-focus-context'
 
 const LayerContext = React.createContext({});
@@ -15,12 +16,17 @@ export function useLayerContext() {
 }
 
 export function LayerContextProvider(props) {
+    const { focusOn } = useFocusAppContext()
+    const { blockBackAction } = useNavigationContext()
+
+    const DEBUG = props.DEBUG_LAYERS
+
     const [modalPayloads, setModalPayloads] = React.useState([])
     const [overlayPayload, setOverlayPayload] = React.useState(null)
 
-    const { focusOn } = useFocusAppContext()
-
-    const DEBUG = props.DEBUG_LAYERS
+    React.useEffect(() => {
+        blockBackAction(!!modalPayloads?.length)
+    }, [modalPayloads])
 
     const openOverlay = (payload) => {
         if (DEBUG) {
