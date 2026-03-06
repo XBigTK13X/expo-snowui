@@ -8,7 +8,7 @@ export const SnowOverlay = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { focusWrap } = useFocusContext('overlay', {
         ...props,
-        boundary: true
+        boundary: props.boundary ?? 'overlay'
     })
 
     let style = [SnowStyle.component.overlay.touchable]

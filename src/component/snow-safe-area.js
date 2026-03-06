@@ -19,7 +19,6 @@ export function SnowSafeArea(props) {
     // It requires a rendering function instead of computed JSX
     // Otherwise controlled forms inside a modal would not update their state
     let modals = null
-    console.log({ modalPayloads })
     if (modalPayloads?.length) {
         modals = (
             <>

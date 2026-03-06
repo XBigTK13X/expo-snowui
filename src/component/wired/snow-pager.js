@@ -8,7 +8,7 @@ import SnowTextButton from './snow-text-button'
 
 export const SnowPager = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { navPush, currentRoute } = useNavigationContext(props)
+    const { navUpdate, currentRoute } = useNavigationContext(props)
     const { focusPath } = useFocusContext('pager', props)
 
     const pageKey = `${props.focusKey}-grid-page`
@@ -16,19 +16,8 @@ export const SnowPager = (props) => {
     const pageCountTestId = `${props.focusKey}-page-count`
 
     const gotoPage = (page) => {
-        let params = {
-            [pageKey]: pageKey
-        }
-        if (currentRoute?.routeParams) {
-            params = {
-                ...currentRoute.routeParams,
-                [pageKey]: page
-            }
-        }
-        navPush({
-            params: params,
-            replace: true,
-            func: false
+        navUpdate({
+            [pageKey]: page
         })
     }
 

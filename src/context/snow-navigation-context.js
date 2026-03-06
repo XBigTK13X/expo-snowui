@@ -1,12 +1,11 @@
 import React from 'react'
-import { Platform, View } from 'react-native'
+import { Platform } from 'react-native'
+import { useDebounce } from 'use-debounce'
 
 import { useInputContext } from './snow-input-context'
 import { useLayerContext } from './snow-layer-context'
 
 import util, { prettyLog } from '../util'
-
-import SnowText from '../component/snow-text'
 
 const NavigationContext = React.createContext({});
 
@@ -55,6 +54,9 @@ export function NavigationContextProvider(props) {
     const [navigationHistory, setNavigationHistory] = React.useState(null)
     const navigationHistoryRef = React.useRef(null)
 
+    // Debounce the history so children only see the "settled" state (e.g. after multiple unmounts)
+    const [debouncedHistory] = useDebounce(navigationHistory, 100)
+
     React.useEffect(() => {
         modalsVisibleRef.current = !!modalPayloads?.length
     }, [modalPayloads])
@@ -81,9 +83,11 @@ export function NavigationContextProvider(props) {
             console.log(`routePages is required for SnowNavigationContext`)
         }
         for (let pageKey of Object.keys(props.routePages)) {
-            lookup[pageKey].page = props.routePages[pageKey]
-            if (pageKey === props.initialRoutePath) {
-                lookup['/'].page = props.routePages[pageKey]
+            if (lookup[pageKey]) {
+                lookup[pageKey].page = props.routePages[pageKey]
+                if (pageKey === props.initialRoutePath) {
+                    lookup['/'].page = props.routePages[pageKey]
+                }
             }
         }
 
@@ -226,7 +230,7 @@ export function NavigationContextProvider(props) {
         }
     }, [pageLookup, navigationHistory])
 
-    if (!isReady) {
+    if (!isReady || !debouncedHistory) {
         if (DEBUG) {
             prettyLog({ context: 'navigation', action: 'render short circuit', initialPath, pageLookup, navigationHistory, props })
         }
@@ -234,24 +238,25 @@ export function NavigationContextProvider(props) {
     }
 
     const navUpdate = ((delta) => {
+        const latestParams = navigationHistoryRef.current?.at(-1)?.routeParams || {}
         navPush({
-            params: { ...currentRoute?.routeParams, ...delta },
+            params: { ...latestParams, ...delta },
             func: false,
             replace: true
         })
     })
 
     const navRemove = ((urlParam) => {
-        let params = { ...currentRoute?.routeParams }
-        delete params[urlParam]
+        const latestParams = { ...(navigationHistoryRef.current?.at(-1)?.routeParams || {}) }
+        delete latestParams[urlParam]
         navPush({
-            params: params,
+            params: latestParams,
             func: false,
             replace: true
         })
     })
 
-    const currentRoute = { ...navigationHistory.at(-1) }
+    const currentRoute = { ...debouncedHistory.at(-1) }
     let CurrentPage = pageLookup[currentRoute?.routePath]?.page
 
     if (DEBUG === 'verbose') {
@@ -267,7 +272,7 @@ export function NavigationContextProvider(props) {
         navReset,
         navRemove,
         navUpdate,
-        navigationHistory
+        navigationHistory: debouncedHistory
     }
 
     return (

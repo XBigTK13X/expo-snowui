@@ -44,7 +44,7 @@ export const useFocusContext = (componentName, props) => {
         focusedHash,
         focusOn,
         setFocusStart,
-        setFocusBoundaryPath,
+        setBoundary,
         moveFocusRight,
         moveFocusUp,
         moveFocusDown,
@@ -64,7 +64,7 @@ export const useFocusContext = (componentName, props) => {
     let focusStart = (props?.focusStart ?? false) && canFocus
     let trapFocusRight = props?.trapFocusRight ?? false
     let trapFocusLeft = props?.trapFocusLeft ?? false
-    let focusBoundary = props?.boundary ?? null
+    let boundaryName = props?.boundary ?? null
 
     let focusPath = `${componentName}-${xx}x-${yy}y`
     if (focusKey) {
@@ -96,13 +96,13 @@ export const useFocusContext = (componentName, props) => {
         if (focusStart) {
             setFocusStart(focusHash)
         }
-        if (focusBoundary) {
-            setFocusBoundaryPath(focusPath)
+        if (boundaryName) {
+            setBoundary(boundaryName, focusPath)
         }
         return () => {
             unregisterFocus(focusPath)
-            if (focusBoundary) {
-                setFocusBoundaryPath(null)
+            if (boundaryName) {
+                setBoundary(null)
             }
         }
     }, [])
@@ -161,21 +161,38 @@ export const useFocusContext = (componentName, props) => {
 export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
     const [debug, setDebug] = React.useState(false)
-    const { currentRoute, navPush } = useNavigationContext()
+    const { currentRoute, navUpdate, navRemove } = useNavigationContext()
     const focusPathRef = React.useRef(null)
+    const boundaryNameRef = React.useRef(null)
     const { addActionListener, removeActionListener } = useInputContext(props)
 
     const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
     const focusedHash = currentRoute?.routeParams?.focusedHash
     const focusedPathRef = React.useRef(null)
-    const [focusBoundaryPath, setFocusBoundaryPath] = React.useState(null)
+    const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
+
+    const setBoundary = (name, path) => {
+        if (name) {
+            boundaryNameRef.current = name
+            setBoundaryPath(path)
+            navUpdate({
+                boundaryName: name
+            })
+        }
+        else {
+            boundaryNameRef.current = null
+            setBoundaryPath(null)
+            navRemove('boundaryName')
+        }
+    }
 
     const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
-        if (focusPathRef.current != currentRoute?.routePath) {
+        if (focusPathRef.current != currentRoute?.routePath || boundaryNameRef.current != currentRoute?.routeParams?.boundaryName) {
             focusPathRef.current = currentRoute?.routePath
             focusStartRef.current = focusStart
+            boundaryNameRef.current = currentRoute?.routeParams?.boundaryName
         }
     }
 
@@ -187,22 +204,12 @@ export const FocusContextProvider = (props) => {
             const target = focusStartRef.current
             focusStartRef.current = null
 
-            navPush({
-                params: {
-                    ...currentRoute.routeParams,
-                    focusedHash: target
-                },
-                func: false,
-                replace: true
-            })
+            navUpdate({ focusedHash: target })
         }
-        if (!debug) {
+        if (debug) {
             registryRef.current.debug()
             util.prettyLog({ neighbors: adjacenciesRef.current })
-            setDebug(true)
-        }
-        if (focusBoundaryPath) {
-            console.log(`Bounded by ${focusBoundaryPath}`)
+            setDebug(false)
         }
 
     }, RebuildDebounceMilliseconds))
@@ -272,27 +279,13 @@ export const FocusContextProvider = (props) => {
         }
 
         if (destinationFocusPath) {
-            navPush({
-                params: {
-                    ...currentRoute.routeParams,
-                    focusedHash: registryRef.current.find(destinationFocusPath)?.hash
-                },
-                func: false,
-                replace: true
-            })
+            navUpdate({ focusedHash: registryRef.current.find(destinationFocusPath)?.hash })
             scrollIntoView(destinationFocusPath)
         }
     })
 
     const focusOn = React.useCallback((target) => {
-        navPush({
-            params: {
-                ...currentRoute.routeParams,
-                focusedHash: registryRef.current.find(target)?.hash
-            },
-            func: false,
-            replace: true
-        })
+        navUpdate({ focusedHash: registryRef.current.find(target)?.hash })
     })
 
     const moveFocusDown = React.useCallback(() => { moveFocus('down') })
@@ -352,12 +345,13 @@ export const FocusContextProvider = (props) => {
         registerFocus,
         unregisterFocus,
         setFocusStart,
-        setFocusBoundaryPath,
+        setBoundary,
         setScrollViewRef,
         scrollViewRef
     }), [
         currentRoute.routeParams?.focusedHash,
         currentRoute.routeParams?.focusStart,
+        currentRoute.routeParams?.boundary,
         scrollViewRef.current,
         focusStartRef.current,
         focusedPathRef.current

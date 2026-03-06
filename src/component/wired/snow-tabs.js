@@ -15,7 +15,7 @@ export const SnowTabs = (props) => {
         return null
     }
     const { SnowStyle } = useStyleContext(props)
-    const { navPush, currentRoute } = useNavigationContext(props)
+    const { navUpdate, currentRoute } = useNavigationContext(props)
     const { focusPath } = useFocusContext('tabs', props)
 
     const tabKey = `${props.focusKey}-tab`
@@ -47,22 +47,9 @@ export const SnowTabs = (props) => {
     }
 
     const changeTab = (newIndex, trigger) => {
-        console.log({ trigger })
-        let params = {
+        navUpdate({
             [tabKey]: newIndex,
             [tabTrigger]: trigger
-        }
-        if (currentRoute?.routeParams) {
-            params = {
-                ...currentRoute.routeParams,
-                [tabKey]: newIndex,
-                [tabTrigger]: trigger
-            }
-        }
-        navPush({
-            params: params,
-            replace: true,
-            func: false
         })
     }
 

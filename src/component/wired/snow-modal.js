@@ -12,7 +12,7 @@ export const SnowModal = (props) => {
     const { addBackListener, removeBackListener } = useInputContext()
     const { focusPath, focusWrap, focusOn } = useFocusContext('modal', {
         ...props,
-        boundary: true
+        boundary: props.boundary ?? 'modal'
     })
 
     if (!props.onRequestClose) {
@@ -53,7 +53,7 @@ export const SnowModal = (props) => {
             scroll={props.scroll}
             style={style}
         >
-            {props.render(props)}
+            {props.render({ ...props, parentPath: focusPath })}
         </SnowFillView>
     )
 }

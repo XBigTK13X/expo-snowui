@@ -146,7 +146,6 @@ export default function ModalPage(props: any) {
       Modal = NestedModal
     }
     if (Modal) {
-      console.log("Rendering modal " + activeModal)
       pushModal({
         render: (props: any) => { return <Modal {...props} /> },
         props: {
@@ -163,12 +162,11 @@ export default function ModalPage(props: any) {
     }
     return () => {
       if (activeModal) {
-        console.log("Removing " + activeModal)
         popModal()
       }
     }
 
-  }, [currentRoute?.routeParams?.activeModal])
+  }, [currentRoute?.routeParams])
 
   return (
     <Snow.View {...props}>
