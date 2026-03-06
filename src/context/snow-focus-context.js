@@ -109,6 +109,23 @@ export const useFocusContext = (componentName, props) => {
 
     const isFocused = focusedHash == focusHash
 
+    React.useEffect(() => {
+        if (Platform.OS === 'android' && isFocused && focusRef.current) {
+            if (focusRef.current.focus) {
+                focusRef.current.focus()
+            } else {
+                const node = findNodeHandle(focusRef.current)
+                if (node) {
+                    UIManager.dispatchViewManagerCommand(
+                        node,
+                        UIManager.getViewManagerConfig('RCTView').Commands.focus,
+                        null
+                    )
+                }
+            }
+        }
+    }, [isFocused])
+
     const focusWrap = (child) => {
         /*
         If these are omitted, then TV remote doesn't work on first launch
@@ -120,7 +137,11 @@ export const useFocusContext = (componentName, props) => {
         if (Platform.OS.isTV && (onPress || onLongPress)) {
             tvRemoteProps = {
                 focusable: isFocused,
-                hasTVPreferredFocus: isFocused
+                hasTVPreferredFocus: isFocused,
+                nextFocusUp: findNodeHandle(focusRef.current),
+                nextFocusDown: findNodeHandle(focusRef.current),
+                nextFocusLeft: findNodeHandle(focusRef.current),
+                nextFocusRight: findNodeHandle(focusRef.current)
             }
         }
         if (actionPress) {
