@@ -206,7 +206,7 @@ export const FocusContextProvider = (props) => {
 
             navUpdate({ focusedHash: target })
         }
-        if (debug) {
+        if (debug || props.DEBUG_FOCUS_TREE) {
             registryRef.current.debug()
             util.prettyLog({ neighbors: adjacenciesRef.current })
             setDebug(false)

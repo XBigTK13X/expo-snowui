@@ -72,6 +72,7 @@ function SnowApp(props) {
 
                         <FocusContextProvider
                             DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
+                            DEBUG_FOCUS_TREE={props?.DEBUG_FOCUS_TREE ?? false}
                             ENABLE_FOCUS={props?.ENABLE_FOCUS}
                             focusVerticalOffset={props.focusVerticalOffset}
                         >
