@@ -48,12 +48,12 @@ export const SnowModal = (props) => {
     if (props.style) {
         style.push(props.style)
     }
-    return focusWrap(
+    return (
         <SnowFillView
             scroll={props.scroll}
             style={style}
         >
-            {props.render({ focusWrap, focusOn, parentPath: focusPath })}
+            {props.render(props)}
         </SnowFillView>
     )
 }

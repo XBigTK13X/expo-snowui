@@ -22,7 +22,7 @@ export function SnowSafeArea(props) {
     console.log({ modalPayloads })
     if (modalPayloads?.length) {
         modals = (
-            <SnowView>
+            <>
                 {modalPayloads.map((modalPayload, modalIndex) => {
                     return <SnowModal
                         key={modalIndex}
@@ -30,7 +30,7 @@ export function SnowSafeArea(props) {
                         {...modalPayload.props}
                         render={modalPayload.render} />
                 })}
-            </SnowView>
+            </>
         )
     }
 

@@ -241,6 +241,16 @@ export function NavigationContextProvider(props) {
         })
     })
 
+    const navRemove = ((urlParam) => {
+        let params = { ...currentRoute?.routeParams }
+        delete params[urlParam]
+        navPush({
+            params: params,
+            func: false,
+            replace: true
+        })
+    })
+
     const currentRoute = { ...navigationHistory.at(-1) }
     let CurrentPage = pageLookup[currentRoute?.routePath]?.page
 
@@ -255,6 +265,7 @@ export function NavigationContextProvider(props) {
         navPush,
         navPop,
         navReset,
+        navRemove,
         navUpdate,
         navigationHistory
     }
