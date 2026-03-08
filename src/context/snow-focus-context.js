@@ -184,6 +184,7 @@ export const FocusContextProvider = (props) => {
     const focusPathRef = React.useRef(null)
     const boundaryNameRef = React.useRef(null)
     const { addActionListener, removeActionListener } = useInputContext(props)
+    const actionsRef = React.useRef({})
 
     const registryRef = React.useRef(new Tree.Tree())
     const adjacenciesRef = React.useRef(new Map())
@@ -361,15 +362,31 @@ export const FocusContextProvider = (props) => {
         }
     }, [focusedHash])
 
+    actionsRef.current = {
+        onUp: moveFocusUp,
+        onDown: moveFocusDown,
+        onRight: moveFocusRight,
+        onLeft: moveFocusLeft,
+        onPress: pressFocused,
+        onLongPress: longPressFocused
+    }
+
     React.useEffect(() => {
+        const executeAction = (key) => (...args) => {
+            if (actionsRef.current[key]) {
+                actionsRef.current[key](...args)
+            }
+        }
+
         addActionListener('focus-context', {
-            onUp: moveFocusUp,
-            onDown: moveFocusDown,
-            onRight: moveFocusRight,
-            onLeft: moveFocusLeft,
-            onPress: pressFocused, // This now stays fresh
-            onLongPress: longPressFocused
+            onUp: executeAction('onUp'),
+            onDown: executeAction('onDown'),
+            onRight: executeAction('onRight'),
+            onLeft: executeAction('onLeft'),
+            onPress: executeAction('onPress'),
+            onLongPress: executeAction('onLongPress')
         })
+
         return () => {
             removeActionListener('focus-context')
         }
