@@ -425,12 +425,9 @@ export const FocusContextProvider = (props) => {
         setScrollViewRef,
         scrollViewRef
     }), [
-        currentRoute.routeParams?.focusedHash,
-        currentRoute.routeParams?.focusStart,
-        currentRoute.routeParams?.boundary,
-        scrollViewRef.current,
-        focusStartRef.current,
-        focusedPathRef.current
+        focusedHash,
+        focusedPathRef.current,
+        focusBoundaryPath
     ])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
