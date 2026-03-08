@@ -336,29 +336,38 @@ export const FocusContextProvider = (props) => {
     const moveFocusLeft = React.useCallback(() => { moveFocus('left') })
     const moveFocusRight = React.useCallback(() => { moveFocus('right') })
     const moveFocusUp = React.useCallback(() => { moveFocus('up') })
+
     const pressFocused = React.useCallback(async () => {
-        if (!focusedPathRef.current && focusedHash) {
-            focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
+        let targetNode = registryRef.current.findHash(focusedHash)
+
+        if (!targetNode && focusedPathRef.current) {
+            targetNode = registryRef.current.find(focusedPathRef.current)
         }
-        const node = registryRef.current.find(focusedPathRef.current)
-        // Focus has been lost, try to find it again
-        if (!focusedPathRef.current || !node) {
-            let topLeft = await registryRef.current.findTopLeft()
+
+        if (targetNode?.value?.onPress) {
+            targetNode.value.onPress()
+        } else {
+            const topLeft = await registryRef.current.findTopLeft()
             if (topLeft) {
                 focusOn(topLeft)
             }
-            return
-        }
-        if (node?.value?.onPress) {
-            node.value.onPress()
         }
     }, [focusedHash])
 
-    const longPressFocused = React.useCallback(() => {
-        const node = registryRef.current.find(focusedPathRef.current)
+    const longPressFocused = React.useCallback(async () => {
+        let targetNode = registryRef.current.findHash(focusedHash)
 
-        if (node?.value?.onLongPress) {
-            node.value.onLongPress()
+        if (!targetNode && focusedPathRef.current) {
+            targetNode = registryRef.current.find(focusedPathRef.current)
+        }
+
+        if (targetNode?.value?.onLongPress) {
+            targetNode.value.onLongPress()
+        } else {
+            const topLeft = await registryRef.current.findTopLeft()
+            if (topLeft) {
+                focusOn(topLeft)
+            }
         }
     }, [focusedHash])
 
