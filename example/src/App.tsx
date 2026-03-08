@@ -1,3 +1,5 @@
+import React from 'react'
+
 import pkg from "../package.json";
 import Snow from 'expo-snowui';
 import { routes, pages } from './routing'
@@ -6,6 +8,9 @@ function AppPage() {
   const { CurrentPage, navPush, currentRoute } = Snow.useSnowContext()
 
   const renderKey = Snow.stringifySafe(currentRoute.routeParams)
+
+  const [pressCount, setPressCount] = React.useState(0)
+  const [presser, setPresser] = React.useState('')
 
   let components = [
     ['Break', routes.break],
@@ -27,12 +32,19 @@ function AppPage() {
     ['Toggle', routes.toggle]
   ]
 
+  let focusTitle = `Focus Test`
+  if (pressCount) {
+    focusTitle += ` (${pressCount})`
+    focusTitle += ` [${presser}]`
+  }
+
+
   return (
     <Snow.View focusKey="app" style={{ flexDirection: 'row', flex: 1 }}>
       <Snow.View focusKey="nav" xx={0} yy={0} style={{ width: "25%" }}>
         <Snow.TextButton
           yy={0}
-          title="Focus Test"
+          title={focusTitle}
         />
         <Snow.Label center>Components</Snow.Label>
         <Snow.Grid
@@ -41,7 +53,11 @@ function AppPage() {
           itemsPerRow={2}
           items={components}
           renderItem={(item: any) => {
-            return <Snow.TextButton title={item[0]} onPress={navPush({ path: item[1] })} />
+            return <Snow.TextButton title={item[0]} onPress={() => {
+              setPressCount(pressCount + 1)
+              setPresser(item[0])
+              navPush({ path: item[1], func: false })
+            }} />
           }} />
         <Snow.Label center>App Level entities</Snow.Label>
         <Snow.Text center>App, FillView, SafeArea, useSnowContext.</Snow.Text>
