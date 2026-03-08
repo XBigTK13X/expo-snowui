@@ -136,19 +136,17 @@ export const useFocusContext = (componentName, props) => {
         let tvRemoteProps = {}
         if (Platform.OS.isTV && (onPress || onLongPress)) {
             tvRemoteProps = {
-                focusable: isFocused,
-                hasTVPreferredFocus: isFocused,
-                nextFocusUp: findNodeHandle(focusRef.current),
-                nextFocusDown: findNodeHandle(focusRef.current),
-                nextFocusLeft: findNodeHandle(focusRef.current),
-                nextFocusRight: findNodeHandle(focusRef.current)
+                focusable: true,
+                hasTVPreferredFocus: isFocused
             }
         }
-        if (actionPress) {
-            actions.onPress = actionPress
-        }
-        if (actionLongPress) {
-            actions.onLongPress = actionLongPress
+        if (!Platform.isTV) {
+            if (actionPress) {
+                actions.onPress = actionPress
+            }
+            if (actionLongPress) {
+                actions.onLongPress = actionLongPress
+            }
         }
         return (
             <ParentPathContext.Provider value={focusPath}>
