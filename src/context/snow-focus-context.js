@@ -351,7 +351,7 @@ export const FocusContextProvider = (props) => {
         if (node?.value?.onPress) {
             node.value.onPress()
         }
-    })
+    }, [focusedHash])
 
     const longPressFocused = React.useCallback(() => {
         const node = registryRef.current.find(focusedPathRef.current)
@@ -359,7 +359,7 @@ export const FocusContextProvider = (props) => {
         if (node?.value?.onLongPress) {
             node.value.onLongPress()
         }
-    })
+    }, [focusedHash])
 
     React.useEffect(() => {
         addActionListener('focus-context', {
@@ -367,7 +367,7 @@ export const FocusContextProvider = (props) => {
             onDown: moveFocusDown,
             onRight: moveFocusRight,
             onLeft: moveFocusLeft,
-            onPress: pressFocused,
+            onPress: pressFocused, // This now stays fresh
             onLongPress: longPressFocused
         })
         return () => {
