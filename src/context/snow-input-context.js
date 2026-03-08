@@ -236,6 +236,12 @@ export function InputContextProvider(props) {
                             }
                             listener.onLeft?.()
                             break
+                        case 'Enter':
+                            if (DEBUG) {
+                                prettyLog({ context: 'input', action: 'webActionEnter', ownerKey, keyPress: event.key })
+                            }
+                            listener.onPress?.()
+                            break
                         default:
                             break
                     }

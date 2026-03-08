@@ -173,6 +173,7 @@ export default function ModalPage(props: any) {
       <Snow.Label>Component: Modal</Snow.Label>
       <Snow.TextButton
         focusKey="tab-entry"
+        focusStart
         title="Show Modal"
         onPress={() => { setModal('regular') }} />
       <Snow.TextButton

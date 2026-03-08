@@ -208,7 +208,7 @@ export const FocusContextProvider = (props) => {
 
     const focusStartRef = React.useRef(null)
     const setFocusStart = (focusStart) => {
-        if (focusPathRef.current != currentRoute?.routePath || boundaryNameRef.current != currentRoute?.routeParams?.boundaryName) {
+        if (focusPathRef.current !== currentRoute?.routePath || !focusedHash) {
             focusPathRef.current = currentRoute?.routePath
             focusStartRef.current = focusStart
             boundaryNameRef.current = currentRoute?.routeParams?.boundaryName
@@ -217,12 +217,14 @@ export const FocusContextProvider = (props) => {
 
     const updateAdjacencies = React.useCallback(useDebouncedCallback(() => {
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
-        const currentFocusInUrl = registryRef.current.findHash(focusedHash)?.value?.path
+        const currentEntry = registryRef.current.findHash(focusedHash)?.value
+        if (currentEntry) {
+            focusedPathRef.current = currentEntry.focusPath
+        }
 
-        if (focusStartRef.current && !currentFocusInUrl) {
+        if (focusStartRef.current && !currentEntry) {
             const target = focusStartRef.current
             focusStartRef.current = null
-
             navUpdate({ focusedHash: target })
         }
         if (debug || props.DEBUG_FOCUS_TREE) {
@@ -334,13 +336,17 @@ export const FocusContextProvider = (props) => {
     const moveFocusRight = React.useCallback(() => { moveFocus('right') })
     const moveFocusUp = React.useCallback(() => { moveFocus('up') })
     const pressFocused = React.useCallback(async () => {
+        if (!focusedPathRef.current && focusedHash) {
+            focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
+        }
         const node = registryRef.current.find(focusedPathRef.current)
+        // Focus has been lost, try to find it again
         if (!focusedPathRef.current || !node) {
-            // Focus has been lost, try to find it again
             let topLeft = await registryRef.current.findTopLeft()
             if (topLeft) {
                 focusOn(topLeft)
             }
+            return
         }
         if (node?.value?.onPress) {
             node.value.onPress()
@@ -370,8 +376,11 @@ export const FocusContextProvider = (props) => {
     }, [])
 
     React.useEffect(() => {
-        focusedPathRef.current = registryRef.current.findHash(focusedHash)?.value?.focusPath
-    }, [currentRoute?.routeParams])
+        const node = registryRef.current.findHash(focusedHash)
+        if (node) {
+            focusedPathRef.current = node.value.focusPath
+        }
+    }, [focusedHash])
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,
