@@ -43,7 +43,9 @@ export const useFocusContext = (componentName, props) => {
         moveFocusDown,
         moveFocusLeft,
         pressFocused,
-        updateFocus
+        updateFocus,
+        scrollViewRef,
+        setScrollViewHeight
     } = React.useContext(FocusContext)
 
     const inheritedParentPath = React.useContext(ParentPathContext)
@@ -120,8 +122,6 @@ export const useFocusContext = (componentName, props) => {
         let actions = {}
         if (Platform.isTV && (actionPress || actionLongPress)) {
             tvRemoteProps = {
-                focusable: true,
-                hasTVPreferredFocus: isFocused
             }
         }
         if (!Platform.isTV) {
@@ -136,7 +136,22 @@ export const useFocusContext = (componentName, props) => {
                     isFocused,
                     focusPath,
                     ref: focusRef,
-                    testID: focusPath
+                    testID: focusPath,
+                    onLayout: (event) => {
+                        const scrollNode = scrollViewRef.current
+                        if (focusRef.current && scrollNode) {
+                            setTimeout(() => {
+                                const node = findNodeHandle(focusRef.current)
+                                const scrollTag = findNodeHandle(scrollNode)
+                                if (node && scrollTag) {
+                                    UIManager.measureLayout(node, scrollTag, () => { }, (xx, yy, width, height) => {
+                                        updateFocus(focusPath, { staticY: yy, height })
+                                    })
+                                }
+                            }, 0)
+                        }
+                        if (child.props.onLayout) child.props.onLayout(event)
+                    }
                 })}
             </ParentPathContext.Provider>
         )
@@ -153,7 +168,8 @@ export const useFocusContext = (componentName, props) => {
         moveFocusUp,
         moveFocusDown,
         moveFocusLeft,
-        pressFocused
+        pressFocused,
+        setScrollViewHeight
     }
 }
 
@@ -174,6 +190,8 @@ export const FocusContextProvider = (props) => {
     const focusRouteRef = React.useRef(null)
     const boundaryNameRef = React.useRef(null)
     const scrollViewRef = React.useRef(null)
+    const scrollOffsetRef = React.useRef(0)
+    const [scrollViewHeight, setScrollViewHeight] = React.useState(0);
     const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
 
     const setBoundary = (name, path) => {
@@ -219,35 +237,36 @@ export const FocusContextProvider = (props) => {
         scrollViewRef.current = ref
     }
 
-    const scrollIntoView = (focusPath) => {
-        if (Platform.OS === 'web') return
-        const node = registryRef.current.find(focusPath)
-        const targetRef = node?.value?.focusRef?.current
-        const scrollRef = scrollViewRef?.current
-        if (!targetRef || !scrollRef) return
-
-        const nodeTag = findNodeHandle(targetRef)
-        const scrollTag = findNodeHandle(scrollRef)
-
-        requestAnimationFrame(() => {
-            UIManager.measure(scrollTag, (sx, sy, sWidth, sHeight, sPageX, sPageY) => {
-                UIManager.measureLayout(
-                    nodeTag,
-                    scrollTag,
-                    (err) => console.error('Measure Layout Failed', err),
-                    (xx, yy, width, height) => {
-                        const lead = 300
-                        const bottomThreshold = sHeight - 200
-                        if (yy > bottomThreshold) {
-                            scrollRef.scrollTo({ y: Math.max(0, yy - lead), animated: true })
-                        } else if (yy < lead) {
-                            scrollRef.scrollTo({ y: 0, animated: true })
-                        }
-                    }
-                )
-            })
-        })
+    const setScrollOffset = (offset) => {
+        scrollOffsetRef.current = offset
     }
+
+    const scrollIntoView = (focusPath) => {
+        const node = registryRef.current.find(focusPath)
+        const item = node?.value
+        const actualScrollRef = scrollViewRef.current
+
+        if (!item?.staticY || !actualScrollRef || !scrollViewHeight) return
+
+        const currentOffset = scrollOffsetRef.current
+        const viewportTop = item.staticY - currentOffset
+        const viewportBottom = viewportTop + item.height
+
+        const bottomMargin = scrollViewHeight * 0.40
+        const topMargin = scrollViewHeight * 0.20
+
+        if (viewportTop < topMargin || viewportBottom > scrollViewHeight - bottomMargin) {
+            const centeredY = item.staticY - (scrollViewHeight / 2) + (item.height / 2)
+
+            const delta = Math.abs(centeredY - currentOffset)
+            if (delta < 10) return
+
+            actualScrollRef.scrollTo({
+                y: Math.max(0, centeredY),
+                animated: true
+            });
+        }
+    };
 
     const registerFocus = async (payload) => {
         await registryRef.current.insert(payload.focusPath, payload)
@@ -275,7 +294,9 @@ export const FocusContextProvider = (props) => {
         if (focusBoundaryPath && !destinationFocusPath.startsWith(focusBoundaryPath)) return
 
         navUpdate({ focusedHash: registryRef.current.find(destinationFocusPath)?.hash })
-        scrollIntoView(destinationFocusPath)
+        requestAnimationFrame(() => {
+            scrollIntoView(destinationFocusPath)
+        })
     }
 
     const focusOn = (target) => {
@@ -363,9 +384,11 @@ export const FocusContextProvider = (props) => {
         setFocusStart,
         setBoundary,
         setScrollViewRef,
+        setScrollViewHeight,
+        setScrollOffset,
         scrollViewRef,
         updateFocus
-    }), [focusedHash, focusedPathRef.current, focusBoundaryPath])
+    }), [focusedHash, focusedPathRef.current, focusBoundaryPath, scrollViewHeight])
 
     return <FocusContext.Provider value={value}>{props.children}</FocusContext.Provider>
 }

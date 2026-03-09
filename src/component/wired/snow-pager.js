@@ -60,26 +60,17 @@ export const SnowPager = (props) => {
     return (
         <SnowView parentPath={focusPath} style={SnowStyle.component.grid.pager}>
             <SnowTextButton
-                focusKey={'first-page-button'}
+                focusKey={'next-page-button'}
                 xx={0}
                 yy={0}
-                title="<<<"
+                title=">"
                 short
-                onPress={firstPage}
-            />
-
-            <SnowTextButton
-                focusKey={'first-half-button'}
-                xx={1}
-                yy={0}
-                title="<<"
-                short
-                onPress={previousHalf}
+                onPress={nextPage}
             />
 
             <SnowTextButton
                 focusKey={'previous-page-button'}
-                xx={2}
+                xx={1}
                 yy={0}
                 title="<"
                 short
@@ -88,31 +79,41 @@ export const SnowPager = (props) => {
 
             <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
 
-            <SnowTextButton
-                focusKey={'next-page-button'}
-                xx={3}
-                yy={0}
-                title=">"
-                short
-                onPress={nextPage}
-            />
 
             <SnowTextButton
-                focusKey={'next-half-button'}
-                xx={4}
+                focusKey={'first-page-button'}
+                xx={2}
                 yy={0}
-                title=">>"
+                title="<<<"
                 short
-                onPress={nextHalf}
+                onPress={firstPage}
             />
 
             <SnowTextButton
                 focusKey={'final-page-button'}
-                xx={5}
+                xx={3}
                 yy={0}
                 title=">>>"
                 short
                 onPress={finalPage}
+            />
+
+            <SnowTextButton
+                focusKey={'first-half-button'}
+                xx={4}
+                yy={0}
+                title="<<"
+                short
+                onPress={previousHalf}
+            />
+
+            <SnowTextButton
+                focusKey={'next-half-button'}
+                xx={5}
+                yy={0}
+                title=">>"
+                short
+                onPress={nextHalf}
             />
         </SnowView>
     )

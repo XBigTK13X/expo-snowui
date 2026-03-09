@@ -11,7 +11,7 @@ import { SnowOverlay } from './wired/snow-overlay'
 export function SnowSafeArea(props) {
     const { SnowStyle } = useStyleContext(props)
     const { modalPayloads, overlayPayload, DEBUG_LAYERS } = useLayerContext()
-    const { setScrollViewRef } = useFocusAppContext()
+    const { setScrollViewRef, setScrollOffset, setScrollViewHeight } = useFocusAppContext()
     const scrollViewRef = React.useRef(null)
 
     // This allows modals and overlays to draw on top of the regular app
@@ -52,9 +52,18 @@ export function SnowSafeArea(props) {
         <>
             <ScrollView
                 ref={(ref) => {
-                    scrollViewRef.current = ref;
-                    setScrollViewRef(ref);
+                    if (ref) {
+                        scrollViewRef.current = ref;
+                        setScrollViewRef(ref);
+                    }
                 }}
+                onLayout={(e) => {
+                    setScrollViewHeight(e.nativeEvent.layout.height);
+                }}
+                onScroll={(event) => {
+                    setScrollOffset(event.nativeEvent.contentOffset.y);
+                }}
+                scrollEventThrottle={16}
                 style={SnowStyle.component.safeArea}
                 snowStyle={SnowStyle}
                 showsVerticalScrollIndicator={!modals} >
