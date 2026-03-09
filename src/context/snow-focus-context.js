@@ -309,8 +309,10 @@ export const FocusContextProvider = (props) => {
     const moveFocusUp = () => moveFocus('up')
 
     const getFocusedNode = () => {
-        return registryRef.current.findHash(focusedHashRef.current)
+        const node = registryRef.current.findHash(focusedHashRef.current)
             || registryRef.current.find(focusedPathRef.current)
+        if (node) focusedPathRef.current = node.value.focusPath
+        return node
     }
 
     const pressFocused = async () => {
