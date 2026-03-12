@@ -140,19 +140,25 @@ export const useFocusContext = (componentName, props) => {
                     ref: focusRef,
                     testID: focusPath,
                     onLayout: (event) => {
-                        const scrollNode = scrollViewRef.current
+                        const scrollNode = scrollViewRef.current;
                         if (focusRef.current && scrollNode) {
-                            setTimeout(() => {
-                                const node = findNodeHandle(focusRef.current)
-                                const scrollTag = findNodeHandle(scrollNode)
+                            if (Platform.OS === 'android') {
+                                const node = findNodeHandle(focusRef.current);
+                                const scrollTag = findNodeHandle(scrollNode);
+
                                 if (node && scrollTag) {
-                                    UIManager.measureLayout(node, scrollTag, () => { }, (xx, yy, width, height) => {
-                                        updateFocus(focusPath, { staticY: yy, height })
-                                    })
+                                    UIManager.measureLayout(
+                                        node,
+                                        scrollTag,
+                                        () => { },
+                                        (xx, yy, width, height) => {
+                                            updateFocus(focusPath, { staticY: yy, height });
+                                        }
+                                    );
                                 }
-                            }, 0)
+                            }
                         }
-                        if (child.props.onLayout) child.props.onLayout(event)
+                        if (child.props.onLayout) child.props.onLayout(event);
                     }
                 })}
             </ParentPathContext.Provider>

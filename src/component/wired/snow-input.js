@@ -5,7 +5,7 @@ import { useFocusContext } from '../../context/snow-focus-context'
 
 export const SnowInput = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusWrap, isFocused, focusHash } = useFocusContext('text-input', {
+    const { focusWrap, isFocused, focusRef } = useFocusContext('text-input', {
         ...props,
         canFocus: true,
         onPress: () => inputRef.current?.focus()
@@ -52,6 +52,7 @@ export const SnowInput = (props) => {
 
     return focusWrap(
         <Pressable
+            ref={focusRef}
             onPress={() => inputRef.current?.focus()}
             style={textStyle} >
             <TextInput
