@@ -1,12 +1,15 @@
 import React from 'react'
 import { TextInput, Pressable, Keyboard } from 'react-native'
-import { useDebouncedCallback } from 'use-debounce'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 
 export const SnowInput = (props) => {
-    const { SnowStyle, SnowConfig } = useStyleContext(props)
-    const { focusWrap, isFocused } = useFocusContext('text-input', { ...props, canFocus: true })
+    const { SnowStyle } = useStyleContext(props)
+    const { focusWrap, isFocused, focusHash } = useFocusContext('text-input', {
+        ...props,
+        canFocus: true,
+        onPress: () => inputRef.current?.focus()
+    })
     const inputRef = React.useRef(null)
 
     let textStyle = [SnowStyle.component.input.text]
@@ -16,6 +19,24 @@ export const SnowInput = (props) => {
     if (isFocused) {
         textStyle.push(SnowStyle.component.input.focused)
     }
+
+    const onSubmit = (textValue) => {
+        const text = textValue || props.value
+        if (props.onSubmit) {
+            props.onSubmit(text)
+        }
+        inputRef.current?.blur()
+    }
+
+    React.useEffect(() => {
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            if (isFocused) {
+                onSubmit(props.value)
+            }
+        })
+
+        return () => hideSubscription.remove()
+    }, [isFocused, props.value])
 
     React.useEffect(() => {
         if (isFocused && inputRef.current) {
@@ -27,14 +48,6 @@ export const SnowInput = (props) => {
         if (props.onValueChange) {
             props.onValueChange(val)
         }
-    }
-
-    const onSubmit = (evt) => {
-        const text = evt?.nativeEvent?.text || props.value
-        if (props.onSubmit) {
-            props.onSubmit(text)
-        }
-        inputRef.current?.blur()
     }
 
     return focusWrap(
@@ -55,8 +68,8 @@ export const SnowInput = (props) => {
                 editable={true}
                 focusable={false}
                 onChangeText={onChangeText}
-                onSubmitEditing={onSubmit}
-                onEndEditing={onSubmit}
+                onSubmitEditing={(evt) => onSubmit(evt.nativeEvent.text)}
+                onEndEditing={(evt) => onSubmit(evt.nativeEvent.text)}
                 value={props.value}
             />
         </Pressable>
