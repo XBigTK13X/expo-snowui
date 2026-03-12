@@ -17,52 +17,29 @@ export const SnowInput = (props) => {
         textStyle.push(SnowStyle.component.input.focused)
     }
 
-    let onDebounce = null
-    if (props.onDebounce) {
-        onDebounce = useDebouncedCallback(props.onDebounce, SnowConfig.inputDebounceMilliseconds)
-    }
+    React.useEffect(() => {
+        if (isFocused && inputRef.current) {
+            inputRef.current.focus()
+        }
+    }, [isFocused])
 
     const onChangeText = (val) => {
         if (props.onValueChange) {
             props.onValueChange(val)
         }
-        if (onDebounce) {
-            onDebounce(val)
-        }
     }
 
     const onSubmit = (evt) => {
+        const text = evt?.nativeEvent?.text || props.value
         if (props.onSubmit) {
-            props.onSubmit(evt.nativeEvent.text)
-        }
-        if (onDebounce) {
-            onDebounce.cancel()
+            props.onSubmit(text)
         }
         inputRef.current?.blur()
     }
 
-    const onContainerPress = () => {
-        inputRef.current?.focus()
-    }
-
-    React.useEffect(() => {
-        const keyboardDidHideListener = Keyboard.addListener(
-            'keyboardDidHide',
-            () => {
-                if (isFocused(props.focusKey)) {
-                    onSubmit({ nativeEvent: { text: props.value } })
-                }
-            }
-        )
-
-        return () => {
-            keyboardDidHideListener.remove()
-        }
-    }, [props, isFocused])
-
     return focusWrap(
         <Pressable
-            onPress={onContainerPress}
+            onPress={() => inputRef.current?.focus()}
             style={textStyle} >
             <TextInput
                 ref={inputRef}
