@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform, useTVEventHandler } from 'react-native'
+import { BackHandler, Platform, useTVEventHandler, Pressable } from 'react-native'
 
 import { prettyLog, getUuid } from '../util'
 
@@ -20,7 +20,7 @@ export function InputContextProvider(props) {
     const actionListenersRef = React.useRef(actionListeners)
     const [backListeners, setBackListeners] = React.useState({})
     const backListenersRef = React.useRef(backListeners)
-
+    const [isInitialMount, setIsInitialMount] = React.useState(true)
 
     const addBackListener = (ownerKey, onListen) => {
         if (typeof ownerKey === 'function') {
@@ -254,6 +254,12 @@ export function InputContextProvider(props) {
         }, [])
     }
 
+    // Without this, the app never claims focus on TV
+    React.useEffect(() => {
+        const timer = setTimeout(() => setIsInitialMount(false), 1000)
+        return () => clearTimeout(timer)
+    }, [])
+
     const context = {
         DEBUG_INPUT: DEBUG,
         addBackListener,
@@ -263,6 +269,12 @@ export function InputContextProvider(props) {
     }
     return (
         <InputContext.Provider style={{ flex: 1 }} value={context}>
+            {isInitialMount && (
+                <Pressable
+                    hasTVPreferredFocus={true}
+                    style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }}
+                />
+            )}
             {props.children}
         </InputContext.Provider>
     )

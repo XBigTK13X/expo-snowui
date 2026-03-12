@@ -133,6 +133,8 @@ export const useFocusContext = (componentName, props) => {
                 {React.cloneElement(child, {
                     ...tvRemoteProps,
                     ...actions,
+                    focusable: canFocus,
+                    accessible: canFocus,
                     isFocused,
                     focusPath,
                     ref: focusRef,
@@ -300,7 +302,11 @@ export const FocusContextProvider = (props) => {
     }
 
     const focusOn = (target) => {
-        navUpdate({ focusedHash: registryRef.current.find(target)?.hash })
+        const node = registryRef.current.find(target)
+        if (node) {
+            node.focusRef?.current?.focus()
+            navUpdate({ focusedHash: node.hash })
+        }
     }
 
     const moveFocusDown = () => moveFocus('down')
@@ -316,10 +322,13 @@ export const FocusContextProvider = (props) => {
     }
 
     const pressFocused = async () => {
-        const targetNode = getFocusedNode()
-        if (targetNode) focusedPathRef.current = targetNode.value.focusPath
-        if (targetNode?.value?.onPress) {
-            targetNode.value.onPress()
+        const node = getFocusedNode()
+        if (node) {
+            focusedPathRef.current = node.value.focusPath
+
+            if (node.value.onPress) {
+                node.value.onPress()
+            }
         } else {
             const topLeft = await registryRef.current.findTopLeft()
             if (topLeft) focusOn(topLeft)
@@ -327,10 +336,13 @@ export const FocusContextProvider = (props) => {
     }
 
     const longPressFocused = async () => {
-        const targetNode = getFocusedNode()
-        if (targetNode) focusedPathRef.current = targetNode.value.focusPath
-        if (targetNode?.value?.onLongPress) {
-            targetNode.value.onLongPress()
+        const node = getFocusedNode()
+        if (node) {
+            focusedPathRef.current = node.value.focusPath
+
+            if (node.value.onLongPress) {
+                node.value.onLongPress()
+            }
         } else {
             const topLeft = await registryRef.current.findTopLeft()
             if (topLeft) focusOn(topLeft)
