@@ -66,7 +66,7 @@ export const SnowTabs = (props) => {
     }).filter(child => child !== null)
 
     return (
-        <SnowView>
+        <SnowView {...props}>
             <SnowDropdown
                 fade
                 parentPath={focusPath}
