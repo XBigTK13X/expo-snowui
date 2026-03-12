@@ -142,21 +142,28 @@ export const useFocusContext = (componentName, props) => {
                     onLayout: (event) => {
                         const scrollNode = scrollViewRef.current;
                         if (focusRef.current && scrollNode) {
-                            if (Platform.OS === 'android') {
-                                const node = findNodeHandle(focusRef.current);
-                                const scrollTag = findNodeHandle(scrollNode);
+                            requestAnimationFrame(() => {
+                                if (!focusRef.current) return;
 
-                                if (node && scrollTag) {
-                                    UIManager.measureLayout(
-                                        node,
-                                        scrollTag,
-                                        () => { },
-                                        (xx, yy, width, height) => {
-                                            updateFocus(focusPath, { staticY: yy, height });
+                                if (Platform.OS === 'android') {
+                                    try {
+                                        const node = findNodeHandle(focusRef.current);
+                                        const scrollTag = findNodeHandle(scrollNode);
+
+                                        if (node && scrollTag) {
+                                            UIManager.measureLayout(
+                                                node,
+                                                scrollTag,
+                                                () => { }, // err
+                                                (xx, yy, width, height) => {
+                                                    updateFocus(focusPath, { staticY: yy, height });
+                                                }
+                                            );
                                         }
-                                    );
+                                    } catch (swallow) {
+                                    }
                                 }
-                            }
+                            });
                         }
                         if (child.props.onLayout) child.props.onLayout(event);
                     }
