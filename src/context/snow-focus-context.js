@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 import { useDebouncedCallback } from 'use-debounce'
 
-import util from '../util'
+import util, { prettyLog } from '../util'
 import { useInputContext } from './snow-input-context'
 import { useNavigationContext } from './snow-navigation-context'
 
@@ -177,7 +177,9 @@ export const useFocusContext = (componentName, props) => {
 
 export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
-    const [debug, setDebug] = React.useState(false)
+    const DEBUG = props.DEBUG_FOCUS
+
+    const [firstDebug, setFirstDebug] = React.useState(false)
     const { currentRoute, navUpdate, navRemove } = useNavigationContext()
     const { addActionListener, removeActionListener } = useInputContext(props)
     const actionsRef = React.useRef({})
@@ -209,6 +211,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const setFocusStart = (focusStart) => {
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'setFocusStart', focusStart })
+        }
         const isNewRoute = focusRouteRef.current !== currentRoute?.routePath
         if (isNewRoute || !focusedHash) {
             focusRouteRef.current = currentRoute?.routePath
@@ -218,6 +223,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const updateAdjacencies = useDebouncedCallback(() => {
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'updateAdjacencies' })
+        }
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
         const currentEntry = registryRef.current.findHash(focusedHash)?.value
         if (currentEntry) {
@@ -228,10 +236,10 @@ export const FocusContextProvider = (props) => {
             focusStartRef.current = null
             navUpdate({ focusedHash: target })
         }
-        if (debug || props.DEBUG_FOCUS_TREE) {
+        if (firstDebug || props.DEBUG_FOCUS_TREE) {
             registryRef.current.debug()
             util.prettyLog({ neighbors: adjacenciesRef.current })
-            setDebug(false)
+            setFirstDebug(false)
         }
     }, RebuildDebounceMilliseconds)
 
@@ -244,6 +252,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const scrollIntoView = (focusPath) => {
+        if (DEBUG === 'verbose') {
+            prettyLog({ context: 'focus', action: 'scrollIntoView', focusPath })
+        }
         const node = registryRef.current.find(focusPath)
         const item = node?.value
         const actualScrollRef = scrollViewRef.current
@@ -271,6 +282,9 @@ export const FocusContextProvider = (props) => {
     };
 
     const registerFocus = async (payload) => {
+        if (DEBUG === 'verbose') {
+            prettyLog({ context: 'focus', action: 'registerFocus', payload })
+        }
         await registryRef.current.insert(payload.focusPath, payload)
         if (payload.focusStart && focusStartRef.current && !registryRef.current.findHash(focusedHashRef.current)) {
             const target = focusStartRef.current
@@ -286,6 +300,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const moveFocus = (direction) => {
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'moveFocus', direction })
+        }
         const sourceEntry = registryRef.current.find(focusedPathRef.current)?.value || {}
         if (direction === 'left' && sourceEntry.trapFocusLeft) return
         if (direction === 'right' && sourceEntry.trapFocusRight) return
@@ -302,6 +319,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const focusOn = (target) => {
+        if (DEBUG === 'verbose') {
+            prettyLog({ context: 'focus', action: 'focusOn', target })
+        }
         const node = registryRef.current.find(target)
         if (node) {
             node.focusRef?.current?.focus()
@@ -322,6 +342,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const pressFocused = async () => {
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'pressFocused' })
+        }
         const node = getFocusedNode()
         if (node) {
             focusedPathRef.current = node.value.focusPath
@@ -336,6 +359,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const longPressFocused = async () => {
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'longPressFocused' })
+        }
         const node = getFocusedNode()
         if (node) {
             focusedPathRef.current = node.value.focusPath
