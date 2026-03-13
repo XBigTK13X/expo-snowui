@@ -64,9 +64,12 @@ export function SnowSafeArea(props) {
                     setScrollOffset(event.nativeEvent.contentOffset.y);
                 }}
                 scrollEventThrottle={16}
-                style={SnowStyle.component.safeArea}
+                showsVerticalScrollIndicator={!modals}
+                descendantFocusability="beforeDescendants"
+                smoothScrollingEnabled={false}
                 snowStyle={SnowStyle}
-                showsVerticalScrollIndicator={!modals} >
+                style={SnowStyle.component.safeArea}
+            >
                 {props.children}
             </ScrollView>
             {modals}

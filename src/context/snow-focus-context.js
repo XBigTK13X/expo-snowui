@@ -289,7 +289,7 @@ export const FocusContextProvider = (props) => {
 
             actualScrollRef.scrollTo({
                 y: Math.max(0, centeredY),
-                animated: true
+                animated: false
             });
         }
     };
