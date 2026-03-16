@@ -154,7 +154,7 @@ export const useFocusContext = (componentName, props) => {
                                             UIManager.measureLayout(
                                                 node,
                                                 scrollTag,
-                                                () => { }, // err
+                                                () => { },
                                                 (xx, yy, width, height) => {
                                                     updateFocus(focusPath, { staticY: yy, height });
                                                 }
@@ -208,7 +208,8 @@ export const FocusContextProvider = (props) => {
     const boundaryNameRef = React.useRef(null)
     const scrollViewRef = React.useRef(null)
     const scrollOffsetRef = React.useRef(0)
-    const [scrollViewHeight, setScrollViewHeight] = React.useState(0);
+    const scrollViewHeightRef = React.useRef(0)
+    const [scrollViewHeight, setScrollViewHeight] = React.useState(0)
     const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
 
     const setBoundary = (name, path) => {
@@ -264,6 +265,11 @@ export const FocusContextProvider = (props) => {
         scrollOffsetRef.current = offset
     }
 
+    const handleSetScrollViewHeight = (h) => {
+        scrollViewHeightRef.current = h
+        setScrollViewHeight(h)
+    }
+
     const scrollIntoView = (focusPath) => {
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'scrollIntoView', focusPath })
@@ -272,27 +278,27 @@ export const FocusContextProvider = (props) => {
         const item = node?.value
         const actualScrollRef = scrollViewRef.current
 
-        if (!item?.staticY || !actualScrollRef || !scrollViewHeight) return
+        if (item?.staticY == null || !actualScrollRef || !scrollViewHeightRef.current) return
 
         const currentOffset = scrollOffsetRef.current
         const viewportTop = item.staticY - currentOffset
         const viewportBottom = viewportTop + item.height
 
-        const bottomMargin = scrollViewHeight * 0.40
-        const topMargin = scrollViewHeight * 0.20
+        const bottomMargin = scrollViewHeightRef.current * 0.60
+        const topMargin = scrollViewHeightRef.current * 0.40
 
-        if (viewportTop < topMargin || viewportBottom > scrollViewHeight - bottomMargin) {
-            const centeredY = item.staticY - (scrollViewHeight / 2) + (item.height / 2)
-
+        if (viewportTop < topMargin || viewportBottom > scrollViewHeightRef.current - bottomMargin) {
+            const centeredY = item.staticY - (scrollViewHeightRef.current / 2) + (item.height / 2)
             const delta = Math.abs(centeredY - currentOffset)
             if (delta < 10) return
 
+            scrollOffsetRef.current = Math.max(0, centeredY)
             actualScrollRef.scrollTo({
                 y: Math.max(0, centeredY),
                 animated: false
-            });
+            })
         }
-    };
+    }
 
     const registerFocus = async (payload) => {
         if (DEBUG === 'verbose') {
@@ -326,9 +332,6 @@ export const FocusContextProvider = (props) => {
         if (focusBoundaryPath && !destinationFocusPath.startsWith(focusBoundaryPath)) return
 
         navUpdate({ focusedHash: registryRef.current.find(destinationFocusPath)?.hash })
-        requestAnimationFrame(() => {
-            scrollIntoView(destinationFocusPath)
-        })
     }
 
     const focusOn = (target) => {
@@ -418,8 +421,14 @@ export const FocusContextProvider = (props) => {
     }, [])
 
     React.useEffect(() => {
+        if (!focusedHash) return
         const node = registryRef.current.findHash(focusedHash)
-        if (node) focusedPathRef.current = node.value.focusPath
+        if (node) {
+            focusedPathRef.current = node.value.focusPath
+            requestAnimationFrame(() => scrollIntoView(node.value.focusPath))
+            const retry = setTimeout(() => scrollIntoView(node.value.focusPath), 100)
+            return () => clearTimeout(retry)
+        }
     }, [focusedHash])
 
     const value = React.useMemo(() => ({
@@ -437,7 +446,7 @@ export const FocusContextProvider = (props) => {
         setFocusStart,
         setBoundary,
         setScrollViewRef,
-        setScrollViewHeight,
+        setScrollViewHeight: handleSetScrollViewHeight,
         setScrollOffset,
         scrollViewRef,
         updateFocus
