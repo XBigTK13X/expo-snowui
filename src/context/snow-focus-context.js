@@ -209,6 +209,7 @@ export const FocusContextProvider = (props) => {
     const scrollViewRef = React.useRef(null)
     const scrollOffsetRef = React.useRef(0)
     const scrollViewHeightRef = React.useRef(0)
+    const lastFocusedStaticYRef = React.useRef(null)
     const [scrollViewHeight, setScrollViewHeight] = React.useState(0)
     const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
 
