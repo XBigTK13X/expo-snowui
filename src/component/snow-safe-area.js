@@ -67,6 +67,7 @@ export function SnowSafeArea(props) {
                 showsVerticalScrollIndicator={!modals}
                 descendantFocusability="beforeDescendants"
                 showsHorizontalScrollIndicator={false}
+                smoothScrollingEnabled={false}
                 snowStyle={SnowStyle}
                 style={SnowStyle.component.safeArea}
             >
