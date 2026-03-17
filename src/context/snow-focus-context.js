@@ -246,6 +246,7 @@ export const FocusContextProvider = (props) => {
         const currentEntry = registryRef.current.findHash(focusedHash)?.value
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
+            scrollIntoView(currentEntry.focusPath)
         }
         if (focusStartRef.current && !currentEntry) {
             const target = focusStartRef.current
@@ -430,16 +431,6 @@ export const FocusContextProvider = (props) => {
             scrollIntoView(node.value.focusPath)
         }
     }, [focusedHash])
-
-    React.useEffect(() => {
-        if (!focusedHash) return
-        lastFocusedStaticYRef.current = null
-        const node = registryRef.current.findHash(focusedHash)
-        if (node) {
-            focusedPathRef.current = node.value.focusPath
-            scrollIntoView(node.value.focusPath)
-        }
-    }, [currentRoute?.routePath])
 
     const value = React.useMemo(() => ({
         FOCUS_ENABLED,
