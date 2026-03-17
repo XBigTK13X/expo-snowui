@@ -1,24 +1,24 @@
-import React from 'react'
-import { View, Pressable } from 'react-native';
+import React, { useState } from 'react'
+import { View, Pressable, Platform } from 'react-native';
 import { Image } from 'expo-image'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import SnowText from '../snow-text'
-
 export const SnowImageButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { focusWrap, isFocused } = useFocusContext('image-button', { ...props, canFocus: true })
+
+    const [androidPressed, setAndroidPressed] = useState(false)
+    const dull = props.dull || (Platform.OS === 'android' && androidPressed)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
     if (title && title.length > 60) {
         fontStyle.push(SnowStyle.component.imageButton.smallText)
     }
-
     if (title && title.length > 120) {
         title = title.substring(0, 120) + '...'
     }
-
     const wrapperStyle = [SnowStyle.component.imageButton.wrapper]
     const imageStyle = [SnowStyle.component.imageButton.image]
     if (props.wide) {
@@ -29,10 +29,8 @@ export const SnowImageButton = (props) => {
         wrapperStyle.push(SnowStyle.component.imageButton.wrapperSquare)
         imageStyle.push(SnowStyle.component.imageButton.imageSquare)
     }
-
     let textWrapperStyle = [SnowStyle.component.imageButton.textWrapper]
-
-    if (props.dull) {
+    if (dull) {
         textWrapperStyle.push(SnowStyle.component.imageButton.dull)
     }
     if (props.selected) {
@@ -43,7 +41,6 @@ export const SnowImageButton = (props) => {
         wrapperStyle.push(SnowStyle.component.imageButton.focused)
         textWrapperStyle.push(SnowStyle.component.imageButton.focused)
     }
-
     let imageSource = null
     if (props.imageUrl) {
         imageSource = { uri: props.imageUrl }
@@ -53,10 +50,11 @@ export const SnowImageButton = (props) => {
             imageSource = props.imageSource
         }
     }
-
     return focusWrap(
         <Pressable
             style={wrapperStyle}
+            onPressIn={() => { if (Platform.OS === 'android') setAndroidPressed(true) }}
+            onPressOut={() => { if (Platform.OS === 'android') setAndroidPressed(false) }}
         >
             <Image
                 style={imageStyle}
@@ -67,9 +65,7 @@ export const SnowImageButton = (props) => {
             <View style={textWrapperStyle}>
                 <SnowText style={fontStyle}>{title}</SnowText>
             </View>
-
         </Pressable>
     )
 }
-
 export default SnowImageButton
