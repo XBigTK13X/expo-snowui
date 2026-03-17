@@ -269,11 +269,9 @@ export const FocusContextProvider = (props) => {
         scrollViewHeightRef.current = h
         setScrollViewHeight(h)
     }
+    const lastScrollYRef = React.useRef(0)
 
     const scrollIntoView = (focusPath) => {
-        if (DEBUG === 'verbose') {
-            prettyLog({ context: 'focus', action: 'scrollIntoView', focusPath })
-        }
         const node = registryRef.current.find(focusPath)
         const item = node?.value
         const actualScrollRef = scrollViewRef.current
@@ -291,12 +289,11 @@ export const FocusContextProvider = (props) => {
             const centeredY = item.staticY - (scrollViewHeightRef.current / 2) + (item.height / 2)
             const delta = Math.abs(centeredY - currentOffset)
             if (delta < 10) return
+            if (Math.abs(centeredY - lastScrollYRef.current) < 10) return
 
+            lastScrollYRef.current = Math.max(0, centeredY)
             scrollOffsetRef.current = Math.max(0, centeredY)
-            actualScrollRef.scrollTo({
-                y: Math.max(0, centeredY),
-                animated: false
-            })
+            actualScrollRef.scrollTo({ y: Math.max(0, centeredY), animated: false })
         }
     }
 
