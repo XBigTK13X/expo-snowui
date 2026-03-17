@@ -425,8 +425,7 @@ export const FocusContextProvider = (props) => {
         const node = registryRef.current.findHash(focusedHash)
         if (node) {
             focusedPathRef.current = node.value.focusPath
-            requestAnimationFrame(() => scrollIntoView(node.value.focusPath))
-            const retry = setTimeout(() => scrollIntoView(node.value.focusPath), 100)
+            const retry = setTimeout(() => scrollIntoView(node.value.focusPath), 500)
             return () => clearTimeout(retry)
         }
     }, [focusedHash])

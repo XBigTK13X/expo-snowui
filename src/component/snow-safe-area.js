@@ -65,6 +65,7 @@ export function SnowSafeArea(props) {
                 }}
                 scrollEventThrottle={16}
                 showsVerticalScrollIndicator={!modals}
+                descendantFocusability="beforeDescendants"
                 scrollEnabled={false}
                 nestedScrollEnabled={false}
                 keyboardShouldPersistTaps="always"
