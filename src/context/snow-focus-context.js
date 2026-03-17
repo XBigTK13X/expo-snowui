@@ -234,6 +234,7 @@ export const FocusContextProvider = (props) => {
             focusRouteRef.current = currentRoute?.routePath
             focusStartRef.current = focusStart
             boundaryNameRef.current = currentRoute?.routeParams?.boundaryName
+            lastFocusedStaticYRef.current = null
         }
     }
 
