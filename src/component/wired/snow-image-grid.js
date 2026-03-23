@@ -88,7 +88,11 @@ export const SnowImageGrid = (props) => {
         gridProps.itemsPerPage = props.itemsPerPage
     }
     return (
-        <SnowView>
+        <SnowView
+            parentPath={props.parentPath}
+            xx={props.xx}
+            yy={props.yy}
+        >
             {props.title ?
                 <SnowLabel>
                     {props.title} ({props.items.length})
@@ -96,6 +100,7 @@ export const SnowImageGrid = (props) => {
                 : null}
             <SnowGrid
                 {...gridProps}
+                focusStart={props.focusStart}
                 parentPath={focusPath}
                 items={props.items}
                 renderItem={renderItem}
