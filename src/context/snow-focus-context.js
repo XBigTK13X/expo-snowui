@@ -232,6 +232,10 @@ export const FocusContextProvider = (props) => {
         const isNewRoute = focusRouteRef.current !== currentRoute?.routePath
         if (isNewRoute || !focusedHash) {
             focusStartRef.current = focusStart
+            if (isNewRoute) {
+                lastFocusedStaticYRef.current = null
+                navRemove('focusedHash')
+            }
         }
     }
 
