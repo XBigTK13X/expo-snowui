@@ -240,7 +240,9 @@ export const FocusContextProvider = (props) => {
             prettyLog({ context: 'focus', action: 'updateAdjacencies' })
         }
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
-        focusRouteRef.current = currentRoute?.routePath
+        if (focusStartRef.current) {
+            focusRouteRef.current = currentRoute?.routePath
+        }
         const currentEntry = registryRef.current.findHash(focusedHash)?.value
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
