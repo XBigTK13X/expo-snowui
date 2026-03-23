@@ -91,6 +91,7 @@ export default function App() {
     <SnowApp
       DEBUG_SNOW={false}
       ENABLE_FOCUS={true}
+      DEBUG_FOCUS_TREE={false}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}

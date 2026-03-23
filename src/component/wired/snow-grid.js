@@ -98,7 +98,7 @@ export const SnowGrid = (props) => {
                 focusKey: 'cell',
                 xx: column,
                 yy: gridYOffset + renderRowIndex,
-                focusStart: props.focusStart && column == 0 && row == 0
+                focusStart: (props.focusStart && column == 0 && row == 0) || child.props?.focusStart
             })
         }
 

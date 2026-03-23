@@ -28,6 +28,7 @@ export const SnowDropdown = (props) => {
         const entryFocusKey = props.focusKey + '-' + itemIndex
         return <SnowTextButton
             snowStyle={props.snowStyle}
+            focusStart={props.focusStart && itemIndex === 0}
             focusKey={entryFocusKey}
             fade={selected && props.fade}
             selected={selected}
@@ -48,6 +49,7 @@ export const SnowDropdown = (props) => {
     }
     return (
         <SnowGrid
+
             parentPath={focusPath}
             itemsPerRow={props.itemsPerRow}
             items={props.options}

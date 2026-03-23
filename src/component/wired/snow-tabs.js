@@ -65,11 +65,15 @@ export const SnowTabs = (props) => {
         return child
     }).filter(child => child !== null)
 
+    let wrapperProps = { ...props }
+    delete wrapperProps.focusStart
+
     return (
-        <SnowView {...props}>
+        <SnowView {...wrapperProps}>
             <SnowDropdown
                 fade
                 parentPath={focusPath}
+                focusStart={props.focusStart}
                 focusKey={tabKey}
                 xx={0}
                 yy={0}

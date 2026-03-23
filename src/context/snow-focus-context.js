@@ -189,7 +189,7 @@ export const useFocusContext = (componentName, props) => {
 }
 
 export const FocusContextProvider = (props) => {
-    const FOCUS_ENABLED = props.FOCUS_ENABLED !== false
+    const FOCUS_ENABLED = props.ENABLE_FOCUS !== false
     const DEBUG = props.DEBUG_FOCUS
 
     const [firstDebug, setFirstDebug] = React.useState(false)
@@ -226,15 +226,12 @@ export const FocusContextProvider = (props) => {
     }
 
     const setFocusStart = (focusStart) => {
-        if (DEBUG) {
+        if (DEBUG || props.DEBUG_FOCUS_TREE) {
             prettyLog({ context: 'focus', action: 'setFocusStart', focusStart })
         }
         const isNewRoute = focusRouteRef.current !== currentRoute?.routePath
         if (isNewRoute || !focusedHash) {
-            focusRouteRef.current = currentRoute?.routePath
             focusStartRef.current = focusStart
-            boundaryNameRef.current = currentRoute?.routeParams?.boundaryName
-            lastFocusedStaticYRef.current = null
         }
     }
 
@@ -243,6 +240,7 @@ export const FocusContextProvider = (props) => {
             prettyLog({ context: 'focus', action: 'updateAdjacencies' })
         }
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
+        focusRouteRef.current = currentRoute?.routePath
         const currentEntry = registryRef.current.findHash(focusedHash)?.value
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
