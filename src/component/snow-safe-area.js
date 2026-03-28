@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, View } from 'react-native'
+import { ScrollView, View, Platform } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 import { useFocusAppContext } from '../context/snow-focus-context'
 import { useLayerContext } from '../context/snow-layer-context'
@@ -57,6 +57,8 @@ export function SnowSafeArea(props) {
                         setScrollViewRef(ref);
                     }
                 }}
+                scrollEnabled={!Platform.isTV}
+                focusable={!Platform.isTV}
                 onLayout={(e) => {
                     setScrollViewHeight(e.nativeEvent.layout.height);
                 }}
