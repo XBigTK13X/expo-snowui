@@ -56,6 +56,8 @@ export function NavigationContextProvider(props) {
     const [navigationHistory, setNavigationHistory] = React.useState(null)
     const navigationHistoryRef = React.useRef(null)
 
+    const popInProgressRef = React.useRef(false)
+
     // Debounce the history so children only see the "settled" state (e.g. after multiple unmounts)
     const [debouncedHistory] = useDebounce(navigationHistory, 100)
 
@@ -164,6 +166,7 @@ export function NavigationContextProvider(props) {
 
     const navPop = (isFunc) => {
         const func = () => {
+            popInProgressRef.current = true
             setNavigationHistory((prev) => {
                 let result = [...prev]
                 if (result.length > 1) {
@@ -174,6 +177,7 @@ export function NavigationContextProvider(props) {
                 }
                 return result
             })
+            setTimeout(() => { popInProgressRef.current = false }, 0)
         }
         if (isFunc) {
             return func
@@ -236,6 +240,7 @@ export function NavigationContextProvider(props) {
     }
 
     const navUpdate = ((delta) => {
+        if (popInProgressRef.current) return
         const latestParams = navigationHistoryRef.current?.at(-1)?.routeParams || {}
         navPush({
             params: { ...latestParams, ...delta },
@@ -245,6 +250,7 @@ export function NavigationContextProvider(props) {
     })
 
     const navRemove = ((urlParam) => {
+        if (popInProgressRef.current) return
         const latestParams = { ...(navigationHistoryRef.current?.at(-1)?.routeParams || {}) }
         delete latestParams[urlParam]
         navPush({
