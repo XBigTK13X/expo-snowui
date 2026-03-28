@@ -242,6 +242,9 @@ export const FocusContextProvider = (props) => {
                 lastFocusedStaticYRef.current = null
                 navRemove('focusedHash')
             }
+        } else if (!focusStartRef.current) {
+            // Queue it even if blocked — will be picked up when hash goes stale
+            focusStartRef.current = focusStart
         }
     }
 
