@@ -13,6 +13,17 @@ export const SnowTextButton = (props) => {
 
     const [androidPressed, setAndroidPressed] = useState(false)
     const fade = props.fade || (Platform.OS === 'android' && androidPressed)
+    const handlePressIn = useCallback(() => {
+        if (Platform.OS === 'android') {
+            setAndroidPressed(true)
+        }
+    }, [])
+
+    const handlePressOut = useCallback(() => {
+        if (Platform.OS === 'android') {
+            setAndroidPressed(false)
+        }
+    }, [])
 
     let wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.short) {
@@ -66,8 +77,8 @@ export const SnowTextButton = (props) => {
         <Pressable
             style={wrapperStyle}
             disabled={props.disabled}
-            onPressIn={() => { if (Platform.OS === 'android') setAndroidPressed(true) }}
-            onPressOut={() => { if (Platform.OS === 'android') setAndroidPressed(false) }}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
         >
             <View style={containerStyle}>
                 <SnowText noSelect style={textStyle}>{title}</SnowText>
