@@ -248,14 +248,14 @@ export const FocusContextProvider = (props) => {
     }
 
     const updateAdjacencies = useDebouncedCallback(() => {
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'updateAdjacencies' })
-        }
         adjacenciesRef.current = NeighborMap.build(registryRef.current)
         if (focusStartRef.current) {
             focusRouteRef.current = currentRoute?.routePath
         }
         const currentEntry = registryRef.current.findHash(focusedHashRef.current)?.value
+        if (DEBUG) {
+            prettyLog({ context: 'focus', action: 'updateAdjacencies', focusedHash, focusedHashRef, currentEntry, focusStartRef })
+        }
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
             scrollIntoView(currentEntry.focusPath)
