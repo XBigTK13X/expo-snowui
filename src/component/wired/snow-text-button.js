@@ -1,5 +1,5 @@
+import React from 'react'
 import { Pressable, View, Platform } from 'react-native';
-import { useState } from 'react';
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 import SnowText from '../snow-text'
@@ -11,15 +11,15 @@ export const SnowTextButton = (props) => {
         canFocus: props.canFocus ?? true
     })
 
-    const [androidPressed, setAndroidPressed] = useState(false)
+    const [androidPressed, setAndroidPressed] = React.useState(false)
     const fade = props.fade || (Platform.OS === 'android' && androidPressed)
-    const handlePressIn = useCallback(() => {
+    const handlePressIn = React.useCallback(() => {
         if (Platform.OS === 'android') {
             setAndroidPressed(true)
         }
     }, [])
 
-    const handlePressOut = useCallback(() => {
+    const handlePressOut = React.useCallback(() => {
         if (Platform.OS === 'android') {
             setAndroidPressed(false)
         }
