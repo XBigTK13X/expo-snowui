@@ -255,7 +255,7 @@ export const FocusContextProvider = (props) => {
         if (focusStartRef.current) {
             focusRouteRef.current = currentRoute?.routePath
         }
-        const currentEntry = registryRef.current.findHash(focusedHash)?.value
+        const currentEntry = registryRef.current.findHash(focusedHashRef.current)?.value
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
             scrollIntoView(currentEntry.focusPath)
