@@ -1,7 +1,6 @@
 import { Platform } from 'react-native'
 import * as SecureStore from 'expo-secure-store';
 import uuid from 'react-native-uuid'
-const packageInfo = require('../package.json')
 
 export const getCircularReplacer = () => {
     const seen = new WeakMap();
@@ -114,13 +113,8 @@ export const getUuid = () => {
     return uuid.v4()
 }
 
-export const getSnowuiVersion = () => {
-    return packageInfo.version
-}
-
 export default {
     getCircularReplacer,
-    getSnowuiVersion,
     getUuid,
     prettyLog,
     stringifySafe,
