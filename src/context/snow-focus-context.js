@@ -205,7 +205,10 @@ export const FocusContextProvider = (props) => {
     const focusedPathRef = React.useRef(null)
     const focusStartRef = React.useRef(null)
     const focusRouteRef = React.useRef(null)
+
     const boundaryNameRef = React.useRef(null)
+    const boundaryChangedRef = React.useRef(false)
+
     const scrollViewRef = React.useRef(null)
     const scrollOffsetRef = React.useRef(0)
     const scrollViewHeightRef = React.useRef(0)
@@ -214,6 +217,7 @@ export const FocusContextProvider = (props) => {
     const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
 
     const setBoundary = (name, path) => {
+        boundaryChangedRef.current = true
         if (name) {
             boundaryNameRef.current = name
             setBoundaryPath(path)
@@ -230,8 +234,9 @@ export const FocusContextProvider = (props) => {
             prettyLog({ context: 'focus', action: 'setFocusStart', focusStart })
         }
         const isNewRoute = focusRouteRef.current !== currentRoute?.routePath
-        if (isNewRoute || !focusedHash) {
+        if (isNewRoute || !focusedHash || boundaryChangedRef.current) {
             focusStartRef.current = focusStart
+            boundaryChangedRef.current = false
             if (isNewRoute) {
                 lastFocusedStaticYRef.current = null
                 navRemove('focusedHash')
