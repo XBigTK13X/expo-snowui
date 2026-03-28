@@ -408,6 +408,15 @@ export const FocusContextProvider = (props) => {
         if (node) node.value = { ...node.value, ...payload }
     }
 
+    const resetFocusStart = () => {
+        focusStartRef.current = null
+    }
+
+    const getActiveFocusedHash = () => {
+        const node = registryRef.current.find(focusedPathRef.current)
+        return node?.hash ?? focusedHashRef.current ?? null
+    }
+
     actionsRef.current = {
         onUp: moveFocusUp,
         onDown: moveFocusDown,
@@ -448,6 +457,7 @@ export const FocusContextProvider = (props) => {
         FOCUS_ENABLED,
         focusedHash,
         focusOn,
+        getActiveFocusedHash,
         longPressFocused,
         moveFocusDown,
         moveFocusLeft,
@@ -462,6 +472,7 @@ export const FocusContextProvider = (props) => {
         setScrollViewHeight: handleSetScrollViewHeight,
         setScrollOffset,
         scrollViewRef,
+        resetFocusStart,
         updateFocus
     }), [focusedHash, focusedPathRef.current, focusBoundaryPath, scrollViewHeight])
 

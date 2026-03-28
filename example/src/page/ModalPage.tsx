@@ -117,7 +117,8 @@ export default function ModalPage(props: any) {
   const setModal = (modalName: any) => {
     if (modalName) {
       navUpdate({
-        activeModal: modalName
+        activeModal: modalName,
+        focusedHash: null
       })
     }
     else {
@@ -166,7 +167,7 @@ export default function ModalPage(props: any) {
       }
     }
 
-  }, [currentRoute?.routeParams])
+  }, [currentRoute?.routeParams?.activeModal])
 
   return (
     <Snow.View {...props}>

@@ -16,13 +16,22 @@ export function useLayerContext() {
 }
 
 export function LayerContextProvider(props) {
-    const { focusOn } = useFocusAppContext()
-    const { blockBackAction } = useNavigationContext()
+    const {
+        focusOn,
+        resetFocusStart,
+        getActiveFocusedHash
+    } = useFocusAppContext()
+    const {
+        blockBackAction,
+        navRemove,
+        navUpdate
+    } = useNavigationContext()
 
     const DEBUG = props.DEBUG_LAYERS
 
     const [modalPayloads, setModalPayloads] = React.useState([])
     const [overlayPayload, setOverlayPayload] = React.useState(null)
+    const premodalHashRef = React.useRef(null)
 
     React.useEffect(() => {
         blockBackAction(!!modalPayloads?.length)
@@ -43,17 +52,12 @@ export function LayerContextProvider(props) {
     }
 
     const pushModal = (payload) => {
-        if (payload?.focusPath) {
-            focusOn(payload?.focusPath)
-        }
         if (DEBUG) {
             prettyLog({ context: 'layer', action: 'pushModal', modalPayloads, payload })
         }
-        setModalPayloads((prev) => { return [...prev, payload] })
-    }
-
-    const clearModals = () => {
-        setModalPayloads([])
+        premodalHashRef.current = getActiveFocusedHash()
+        if (payload?.focusPath) focusOn(payload?.focusPath)
+        setModalPayloads((prev) => [...prev, payload])
     }
 
     const popModal = () => {
@@ -62,11 +66,20 @@ export function LayerContextProvider(props) {
         }
         setModalPayloads((prev) => {
             let result = [...prev]
-            if (result.length) {
-                result.pop()
-            }
+            if (result.length) result.pop()
             return result
         })
+        const target = premodalHashRef.current
+        premodalHashRef.current = null
+        resetFocusStart()
+        if (target) {
+            navUpdate({ focusedHash: target })
+        } else {
+            navRemove('focusedHash')
+        }
+    }
+    const clearModals = () => {
+        setModalPayloads([])
     }
 
     if (DEBUG === 'verbose') {

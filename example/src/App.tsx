@@ -7,13 +7,12 @@ import { routes, pages } from './routing'
 function AppPage() {
   const { CurrentPage, navPush, currentRoute } = Snow.useSnowContext()
 
-  const renderKey = Snow.stringifySafe(currentRoute.routeParams)
-
   const [pressCount, setPressCount] = React.useState(0)
   const [presser, setPresser] = React.useState('')
 
   let components = [
     ['Break', routes.break],
+    ['Modal', routes.modal],
     ['Dropdown', routes.dropdown],
     ['Grid', routes.grid],
     ['Grid More', routes.gridMore],
@@ -22,7 +21,6 @@ function AppPage() {
     ['ImageGrid', routes.imageGrid],
     ['Input', routes.input],
     ['Label', routes.label],
-    ['Modal', routes.modal],
     ['Overlay', routes.overlay],
     ['Range Slider', routes.rangeSlider],
     ['Tabs', routes.tabs],
@@ -64,7 +62,7 @@ function AppPage() {
       </Snow.View>
       <Snow.Break style={{ width: "5%" }} vertical />
       <Snow.View focusKey="page" xx={1} yy={0} style={{ width: "70%" }}>
-        <CurrentPage key={renderKey} />
+        <CurrentPage />
       </Snow.View>
     </Snow.View>
   )
@@ -91,7 +89,8 @@ export default function App() {
     <SnowApp
       DEBUG_SNOW={false}
       ENABLE_FOCUS={true}
-      DEBUG_FOCUS_TREE={false}
+      DEBUG_FOCUS={true}
+      DEBUG_FOCUS_TREE={true}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}
