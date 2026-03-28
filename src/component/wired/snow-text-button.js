@@ -77,8 +77,6 @@ export const SnowTextButton = (props) => {
         <Pressable
             style={wrapperStyle}
             disabled={props.disabled}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
         >
             <View style={containerStyle}>
                 <SnowText noSelect style={textStyle}>{title}</SnowText>
