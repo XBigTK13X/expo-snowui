@@ -234,7 +234,8 @@ export const FocusContextProvider = (props) => {
             prettyLog({ context: 'focus', action: 'setFocusStart', focusStart })
         }
         const isNewRoute = focusRouteRef.current !== currentRoute?.routePath
-        if (isNewRoute || !focusedHash || boundaryChangedRef.current) {
+        const isStaleHash = !registryRef.current.findHash(focusedHashRef.current)
+        if (isNewRoute || !focusedHash || isStaleHash || boundaryChangedRef.current) {
             focusStartRef.current = focusStart
             boundaryChangedRef.current = false
             if (isNewRoute) {
