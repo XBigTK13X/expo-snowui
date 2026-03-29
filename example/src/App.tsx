@@ -46,12 +46,11 @@ function AppPage() {
         />
         <Snow.Label center>Components</Snow.Label>
         <Snow.Grid
-          focusStart
           yy={1}
           itemsPerRow={2}
           items={components}
-          renderItem={(item: any) => {
-            return <Snow.TextButton title={item[0]} onPress={() => {
+          renderItem={(item: any, itemIndex: any) => {
+            return <Snow.TextButton title={item[0]} focusStart={itemIndex === 3} onPress={() => {
               setPressCount(pressCount + 1)
               setPresser(item[0])
               navPush({ path: item[1], func: false })

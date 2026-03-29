@@ -192,7 +192,6 @@ export const FocusContextProvider = (props) => {
     const FOCUS_ENABLED = props.ENABLE_FOCUS !== false
     const DEBUG = props.DEBUG_FOCUS
 
-    const [firstDebug, setFirstDebug] = React.useState(false)
     const { currentRoute, navUpdate, navRemove } = useNavigationContext()
     const { addActionListener, removeActionListener } = useInputContext(props)
     const actionsRef = React.useRef({})
@@ -246,29 +245,30 @@ export const FocusContextProvider = (props) => {
             focusStartRef.current = focusStart
         }
     }
-
     const updateAdjacencies = useDebouncedCallback(() => {
-        adjacenciesRef.current = NeighborMap.build(registryRef.current)
-        if (focusStartRef.current) {
-            focusRouteRef.current = currentRoute?.routePath
-        }
+        // Without this local state, the neighbor map always prints as empty when it actually has data
+        const newMap = NeighborMap.build(registryRef.current)
+
+        adjacenciesRef.current = newMap
+
         const currentEntry = registryRef.current.findHash(focusedHashRef.current)?.value
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'updateAdjacencies', focusedHash, focusedHashRef, currentEntry, focusStartRef })
-        }
         if (currentEntry) {
             focusedPathRef.current = currentEntry.focusPath
             scrollIntoView(currentEntry.focusPath)
         }
+
         if (focusStartRef.current && !currentEntry) {
             const target = focusStartRef.current
             focusStartRef.current = null
             navUpdate({ focusedHash: target })
         }
-        if (firstDebug || props.DEBUG_FOCUS_TREE) {
+
+        if (props.DEBUG_FOCUS_TREE) {
             registryRef.current.debug()
-            util.prettyLog({ neighbors: adjacenciesRef.current })
-            setFirstDebug(false)
+            util.prettyLog({
+                neighbors: Object.fromEntries(newMap),
+                count: newMap.size
+            })
         }
     }, RebuildDebounceMilliseconds)
 
@@ -331,6 +331,7 @@ export const FocusContextProvider = (props) => {
     }
 
     const moveFocus = (direction) => {
+        console.log({ checking: adjacenciesRef.current })
         if (DEBUG) {
             prettyLog({ context: 'focus', action: 'moveFocus', direction })
         }
