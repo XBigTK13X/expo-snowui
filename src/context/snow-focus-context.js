@@ -369,48 +369,34 @@ export const FocusContextProvider = (props) => {
         return node
     }
 
-    const pressFocused = async () => {
+    const focusedNodeAction = async (action, handlerKey) => {
         const node = getFocusedNode()
         if (node) {
             focusedPathRef.current = node.value.focusPath
             if (DEBUG) {
-                prettyLog({ context: 'focus', action: 'pressFocused', node, onPress: node.value.onPress, hash: node.value.focusHash, path: node.value.focusPath })
+                prettyLog({ context: 'focus', action, node, [handlerKey]: node.value[handlerKey], hash: node.value.focusHash, path: node.value.focusPath })
             }
-            if (node.value.onPress) {
-                node.value.onPress()
-            }
-            else {
-                prettyLog({ context: 'focus', action: 'pressFocused', message: 'focused node has no onPress', nove, hash: node.value.focusHash, path: node.value.focusPath })
+            if (node.value[handlerKey]) {
+                node.value[handlerKey]()
+            } else {
+                prettyLog({ context: 'focus', action, message: `focused node has no ${handlerKey}`, node, hash: node.value.focusHash, path: node.value.focusPath })
             }
         } else {
             const topLeft = await registryRef.current.findTopLeft()
             if (topLeft) {
                 if (DEBUG) {
-                    prettyLog({ context: 'focus', action: 'pressFocused', topLeft, onPress: topLeft.value.onPress, hash: topLeft.value.focusHash, path: topLeft.value.focusPath })
+                    prettyLog({ context: 'focus', action, topLeft, [handlerKey]: topLeft.value[handlerKey], hash: topLeft.value.focusHash, path: topLeft.value.focusPath })
                 }
                 focusOn(topLeft)
             } else {
-                prettyLog({ context: 'focus', action: 'pressFocused', message: 'No focused node, no node found in the topLeft' })
+                prettyLog({ context: 'focus', action, message: 'No focused node, no node found in the topLeft' })
             }
         }
     }
 
-    const longPressFocused = async () => {
-        if (DEBUG) {
-            prettyLog({ context: 'focus', action: 'longPressFocused' })
-        }
-        const node = getFocusedNode()
-        if (node) {
-            focusedPathRef.current = node.value.focusPath
+    const pressFocused = () => focusedNodeAction('pressFocused', 'onPress')
 
-            if (node.value.onLongPress) {
-                node.value.onLongPress()
-            }
-        } else {
-            const topLeft = await registryRef.current.findTopLeft()
-            if (topLeft) focusOn(topLeft)
-        }
-    }
+    const longPressFocused = () => focusedNodeAction('longPressFocused', 'onLongPress')
 
     const updateFocus = (focusPath, payload) => {
         const node = registryRef.current.find(focusPath)
