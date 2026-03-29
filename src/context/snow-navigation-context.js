@@ -97,11 +97,12 @@ export function NavigationContextProvider(props) {
 
         let initialRoute = props.initialRoutePath
         let initialParams = {}
-        // Handle refreshing the browser
+
         if (Platform.OS === 'web') {
             initialRoute = window.location.pathname;
             initialParams = util.queryToObject(window.location.search)
         }
+
         setNavigationHistory([{
             routePath: initialRoute,
             routeParams: initialParams
