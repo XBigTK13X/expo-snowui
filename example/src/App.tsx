@@ -10,6 +10,8 @@ function AppPage() {
   const [pressCount, setPressCount] = React.useState(0)
   const [presser, setPresser] = React.useState('')
 
+  const [longPressCount, setLongPressCount] = React.useState(0)
+
   let components = [
     ['Break', routes.break],
     ['Modal', routes.modal],
@@ -30,10 +32,17 @@ function AppPage() {
     ['Toggle', routes.toggle]
   ]
 
-  let focusTitle = `Focus Test`
+  let focusTitle = ``
   if (pressCount) {
     focusTitle += ` (${pressCount})`
     focusTitle += ` [${presser}]`
+  }
+  else if (longPressCount) {
+    focusTitle += ` (${longPressCount})`
+    focusTitle += ` [${presser}]`
+  }
+  else {
+    focusTitle = 'Focus Test'
   }
 
 
@@ -50,11 +59,20 @@ function AppPage() {
           itemsPerRow={2}
           items={components}
           renderItem={(item: any, itemIndex: any) => {
-            return <Snow.TextButton title={item[0]} focusStart={itemIndex === 3} onPress={() => {
-              setPressCount(pressCount + 1)
-              setPresser(item[0])
-              navPush({ path: item[1], func: false })
-            }} />
+            return <Snow.TextButton
+              title={item[0]}
+              focusStart={itemIndex === 3}
+              onPress={() => {
+                setPressCount(pressCount + 1)
+                setPresser(item[0])
+                navPush({ path: item[1], func: false })
+              }}
+              onLongPress={() => {
+                setLongPressCount(longPressCount + 1)
+                setPresser(item[0])
+                navPush({ path: item[1], func: false })
+              }}
+            />
           }} />
         <Snow.Label center>App Level entities</Snow.Label>
         <Snow.Text center>App, FillView, SafeArea, useSnowContext.</Snow.Text>
