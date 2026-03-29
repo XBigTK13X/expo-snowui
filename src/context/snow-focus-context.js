@@ -331,7 +331,6 @@ export const FocusContextProvider = (props) => {
     }
 
     const moveFocus = (direction) => {
-        console.log({ checking: adjacenciesRef.current })
         if (DEBUG) {
             prettyLog({ context: 'focus', action: 'moveFocus', direction })
         }
