@@ -10,8 +10,6 @@ import { useInputContext } from '../../context/snow-input-context'
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
 
-import SnowView from './snow-view'
-
 const min = 0.0
 const max = 1.0
 const step = 0.01
@@ -33,10 +31,14 @@ const step = 0.01
 // It completely breaks in Android or Web, depending on the version of react I override it to use
 
 // After a handful of other libraries still had problems, I rolled my own
-const SnowRangeSliderW = (props) => {
+export const SnowRangeSlider = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { addActionListener, removeActionListener } = useInputContext()
-    const { focusWrap, focusPath, isFocused } = useFocusContext('slider', {
+    const {
+        focusWrap,
+        focusPath,
+        isFocused
+    } = useFocusContext('slider', {
         ...props,
         canFocus: true,
         trapFocusLeft: true,
@@ -44,6 +46,8 @@ const SnowRangeSliderW = (props) => {
     })
 
     const isDraggingRef = React.useRef(false)
+    const isFocusedRef = React.useRef(isFocused)
+    React.useEffect(() => { isFocusedRef.current = isFocused }, [isFocused])
     const [percent, setPercent] = React.useState(() => typeof props.percent === 'number' ? props.percent : 0)
     const percentRef = React.useRef(typeof props.percent === 'number' ? props.percent : 0)
     const [applyStepInterval, setApplyStepInterval] = React.useState(null)
@@ -129,17 +133,16 @@ const SnowRangeSliderW = (props) => {
         applyStep(amount)
         setApplyStepInterval(setInterval(() => applyStep(amount), 100))
     }
-
     React.useEffect(() => {
-        const actionListenerKey = addActionListener({
+        const actionListenerKey = addActionListener(props.focusKey ?? 'range-slider', {
             onRight: () => {
-                if (isFocused) {
+                if (isFocusedRef.current) {
                     applyStep(step)
                     clearInterval(applyIntervalRef.current)
                 }
             },
             onLongRightStart: () => {
-                if (isFocused) {
+                if (isFocusedRef.current) {
                     longPress(step * 2)
                 }
             },
@@ -147,13 +150,13 @@ const SnowRangeSliderW = (props) => {
                 clearInterval(applyIntervalRef.current)
             },
             onLeft: () => {
-                if (isFocused) {
+                if (isFocusedRef.current) {
                     applyStep(-step)
                     clearInterval(applyIntervalRef.current)
                 }
             },
             onLongLeftStart: () => {
-                if (isFocused) {
+                if (isFocusedRef.current) {
                     longPress(-step * 2)
                 }
             },
@@ -189,10 +192,9 @@ const SnowRangeSliderW = (props) => {
     }
 
     return (
-        <SnowView style={SnowStyle.component.rangeSlider.wrapper}>
-            <SnowView
+        <View style={SnowStyle.component.rangeSlider.wrapper}>
+            <View
                 ref={trackRef}
-                parentPath={focusPath}
                 onLayout={() => {
                     trackRef.current?.measureInWindow((x) => {
                         trackXRef.current = x
@@ -206,13 +208,11 @@ const SnowRangeSliderW = (props) => {
                 {focusWrap(<Pressable
                     style={thumbStyle}
                     focusKey={'thumb'}
+                    parentPath={focusPath}
                 />)}
-            </SnowView>
-        </SnowView>
+            </View>
+        </View>
     )
 }
 
-SnowRangeSliderW.isSnowFocusWired = true
-
-export const SnowRangeSlider = SnowRangeSliderW
 export default SnowRangeSlider
