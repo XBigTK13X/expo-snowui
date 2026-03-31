@@ -3,6 +3,8 @@ import { Platform, Dimensions } from 'react-native';
 const isTV = Platform.isTV
 const isAndroid = Platform.OS === 'android'
 const isWeb = Platform.OS === 'web'
+const isHandheld = isAndroid && !isTV
+
 import _ from 'lodash'
 
 const getScaleMultiplier = () => {
@@ -66,6 +68,9 @@ export function createStyle(overrides) {
         fontSize: {
             header: 40,
             label: 26
+        },
+        pressing: {
+            opacity: 0.75
         },
         surface: {
             uhd: {
@@ -531,6 +536,7 @@ export function createStyle(overrides) {
     AppStyle.isAndroid = isAndroid
     AppStyle.isPortrait = mult.isPortrait
     AppStyle.isTablet = mult.isTablet
+    AppStyle.isHandheld = isHandheld
 
     if (overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)

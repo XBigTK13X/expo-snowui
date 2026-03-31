@@ -35,7 +35,7 @@ function SnowApp(props) {
         setAppKey(prev => { return prev + 1 })
     }
 
-    if (Platform.OS !== 'web' && !Platform.isTV) {
+    if (Platform.OS === 'android' && !Platform.isTV) {
         // Hide the system UI on app load
         React.useEffect(() => {
             try {
@@ -73,7 +73,7 @@ function SnowApp(props) {
                         <FocusContextProvider
                             DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
                             DEBUG_FOCUS_TREE={props?.DEBUG_FOCUS_TREE ?? false}
-                            ENABLE_FOCUS={props?.ENABLE_FOCUS}
+                            ENABLE_FOCUS={props?.ENABLE_FOCUS ?? Platform.isTV}
                             focusVerticalOffset={props.focusVerticalOffset}
                         >
 

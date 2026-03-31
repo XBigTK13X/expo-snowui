@@ -1,4 +1,5 @@
-import { View, Pressable, Platform } from 'react-native';
+import React from 'react'
+import { View, Pressable } from 'react-native';
 
 import { Image } from 'expo-image'
 
@@ -9,7 +10,12 @@ import SnowText from '../snow-text'
 
 export const SnowImageButton = (props) => {
     const { SnowStyle } = useStyleContext(props)
-    const { focusWrap, isFocused } = useFocusContext('image-button', { ...props, canFocus: true })
+    const {
+        focusWrap,
+        isFocused
+    } = useFocusContext('image-button', { ...props, canFocus: true })
+
+    const [pressing, setPressing] = React.useState(false)
 
     let fontStyle = [SnowStyle.component.imageButton.text]
     let title = props.title
@@ -50,9 +56,16 @@ export const SnowImageButton = (props) => {
             imageSource = props.imageSource
         }
     }
+
+    if (pressing && SnowStyle.isHandheld) {
+        wrapperStyle.push(SnowStyle.pressing)
+    }
+
     return focusWrap(
         <Pressable
             style={wrapperStyle}
+            onPressIn={() => { setPressing(true) }}
+            onPressOut={() => { setPressing(false) }}
         >
             <Image
                 style={imageStyle}

@@ -105,7 +105,6 @@ export default function App() {
   return (
     <SnowApp
       DEBUG_SNOW={false}
-      ENABLE_FOCUS={true}
       DEBUG_FOCUS={true}
       DEBUG_FOCUS_TREE={true}
       snowStyle={styleOverrides}

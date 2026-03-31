@@ -32,6 +32,7 @@ export const useFocusAppContext = () => {
 
 export const useFocusContext = (componentName, props) => {
     const {
+        FOCUS_ENABLED,
         registerFocus,
         unregisterFocus,
         focusedHash,
@@ -69,32 +70,34 @@ export const useFocusContext = (componentName, props) => {
     let actionPress = props?.onPress
     let actionLongPress = props?.onLongPress
 
-    React.useEffect(() => {
-        registerFocus({
-            canFocus,
-            focusPath,
-            focusHash,
-            focusRef,
-            focusStart,
-            xx,
-            yy,
-            onPress: actionPress,
-            onLongPress: actionLongPress,
-            trapFocusLeft,
-            trapFocusRight
-        })
-        if (focusStart) setFocusStart(focusHash)
-        if (boundaryName) setBoundary(boundaryName, focusPath)
-        return () => {
-            unregisterFocus(focusPath)
-            if (boundaryName) setBoundary(null)
-        }
-    }, [])
-
     const isFocused = focusedHash == focusHash
 
     React.useEffect(() => {
-        if (Platform.OS === 'android' && isFocused && focusRef.current) {
+        if (FOCUS_ENABLED) {
+            registerFocus({
+                canFocus,
+                focusPath,
+                focusHash,
+                focusRef,
+                focusStart,
+                xx,
+                yy,
+                onPress: actionPress,
+                onLongPress: actionLongPress,
+                trapFocusLeft,
+                trapFocusRight
+            })
+            if (focusStart) setFocusStart(focusHash)
+            if (boundaryName) setBoundary(boundaryName, focusPath)
+            return () => {
+                unregisterFocus(focusPath)
+                if (boundaryName) setBoundary(null)
+            }
+        }
+    }, [])
+
+    React.useEffect(() => {
+        if (FOCUS_ENABLED && Platform.isTV && isFocused && focusRef.current) {
             if (focusRef.current.focus) {
                 focusRef.current.focus()
             } else {
@@ -111,13 +114,25 @@ export const useFocusContext = (componentName, props) => {
     }, [isFocused])
 
     React.useEffect(() => {
-        updateFocus(focusPath, {
-            onPress: actionPress,
-            onLongPress: actionLongPress
-        })
+        if (FOCUS_ENABLED) {
+            updateFocus(focusPath, {
+                onPress: actionPress,
+                onLongPress: actionLongPress
+            })
+        }
     })
 
     const focusWrap = (child) => {
+        if (!FOCUS_ENABLED) {
+            return React.cloneElement(child, {
+                focusable: canFocus,
+                accessible: canFocus,
+                ref: focusRef,
+                testID: focusPath,
+                onPress: props.onPress,
+                onLongPress: props.onLongPress
+            })
+        }
         let tvRemoteProps = {}
         let actions = {}
         if (Platform.isTV && (actionPress || actionLongPress)) {
@@ -145,7 +160,7 @@ export const useFocusContext = (componentName, props) => {
                             requestAnimationFrame(() => {
                                 if (!focusRef.current) return;
 
-                                if (Platform.OS === 'android') {
+                                if (Platform.isTV) {
                                     try {
                                         const node = findNodeHandle(focusRef.current);
                                         const scrollTag = findNodeHandle(scrollNode);
@@ -189,7 +204,13 @@ export const useFocusContext = (componentName, props) => {
 }
 
 export const FocusContextProvider = (props) => {
-    const FOCUS_ENABLED = props.ENABLE_FOCUS !== false
+    let FOCUS_ENABLED = true
+    if (props.ENABLE_FOCUS === false) {
+        FOCUS_ENABLED = false
+    }
+    if (props.ENABLE_FOCUS === undefined && !Platform.isTV) {
+        FOCUS_ENABLED = false
+    }
     const DEBUG = props.DEBUG_FOCUS
 
     const { currentRoute, navUpdate, navRemove } = useNavigationContext()
@@ -210,12 +231,16 @@ export const FocusContextProvider = (props) => {
 
     const scrollViewRef = React.useRef(null)
     const scrollOffsetRef = React.useRef(0)
+    const lastScrollYRef = React.useRef(0)
     const scrollViewHeightRef = React.useRef(0)
     const lastFocusedStaticYRef = React.useRef(null)
     const [scrollViewHeight, setScrollViewHeight] = React.useState(0)
     const [focusBoundaryPath, setBoundaryPath] = React.useState(null)
 
     const setBoundary = (name, path) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         boundaryChangedRef.current = true
         if (name) {
             boundaryNameRef.current = name
@@ -229,6 +254,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const setFocusStart = (focusStart) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         if (DEBUG || props.DEBUG_FOCUS_TREE) {
             prettyLog({ context: 'focus', action: 'setFocusStart', focusStart })
         }
@@ -246,6 +274,9 @@ export const FocusContextProvider = (props) => {
         }
     }
     const updateAdjacencies = useDebouncedCallback(() => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         // Without this local state, the neighbor map always prints as empty when it actually has data
         const newMap = NeighborMap.build(registryRef.current)
 
@@ -281,12 +312,17 @@ export const FocusContextProvider = (props) => {
     }
 
     const handleSetScrollViewHeight = (h) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         scrollViewHeightRef.current = h
         setScrollViewHeight(h)
     }
-    const lastScrollYRef = React.useRef(0)
 
     const scrollIntoView = (focusPath) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         const node = registryRef.current.find(focusPath)
         const item = node?.value
         const actualScrollRef = scrollViewRef.current
@@ -313,6 +349,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const registerFocus = async (payload) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'registerFocus', payload })
         }
@@ -326,11 +365,17 @@ export const FocusContextProvider = (props) => {
     }
 
     const unregisterFocus = async (focusPath) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         await registryRef.current.prune(focusPath)
         updateAdjacencies()
     }
 
     const moveFocus = (direction) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         if (DEBUG) {
             prettyLog({ context: 'focus', action: 'moveFocus', direction })
         }
@@ -347,6 +392,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const focusOn = (target) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         if (DEBUG === 'verbose') {
             prettyLog({ context: 'focus', action: 'focusOn', target })
         }
@@ -363,6 +411,9 @@ export const FocusContextProvider = (props) => {
     const moveFocusUp = () => moveFocus('up')
 
     const getFocusedNode = () => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         const node = registryRef.current.findHash(focusedHashRef.current)
             || registryRef.current.find(focusedPathRef.current)
         if (node) focusedPathRef.current = node.value.focusPath
@@ -370,6 +421,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const focusedNodeAction = async (action, handlerKey) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         const node = getFocusedNode()
         if (node) {
             focusedPathRef.current = node.value.focusPath
@@ -399,6 +453,9 @@ export const FocusContextProvider = (props) => {
     const longPressFocused = () => focusedNodeAction('longPressFocused', 'onLongPress')
 
     const updateFocus = (focusPath, payload) => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         const node = registryRef.current.find(focusPath)
         if (node) node.value = { ...node.value, ...payload }
     }
@@ -408,6 +465,9 @@ export const FocusContextProvider = (props) => {
     }
 
     const getActiveFocusedHash = () => {
+        if (!FOCUS_ENABLED) {
+            return
+        }
         const node = registryRef.current.find(focusedPathRef.current)
         return node?.hash ?? focusedHashRef.current ?? null
     }
@@ -422,29 +482,34 @@ export const FocusContextProvider = (props) => {
     }
 
     React.useEffect(() => {
-        const executeAction = (key) => (...args) => actionsRef.current[key]?.(...args)
+        if (FOCUS_ENABLED) {
 
-        addActionListener('focus-context', {
-            onUp: executeAction('onUp'),
-            onDown: executeAction('onDown'),
-            onRight: executeAction('onRight'),
-            onLeft: executeAction('onLeft'),
-            onPress: executeAction('onPress'),
-            onLongPress: executeAction('onLongPress')
-        })
+            const executeAction = (key) => (...args) => actionsRef.current[key]?.(...args)
 
-        return () => removeActionListener('focus-context')
+            addActionListener('focus-context', {
+                onUp: executeAction('onUp'),
+                onDown: executeAction('onDown'),
+                onRight: executeAction('onRight'),
+                onLeft: executeAction('onLeft'),
+                onPress: executeAction('onPress'),
+                onLongPress: executeAction('onLongPress')
+            })
+
+            return () => removeActionListener('focus-context')
+        }
     }, [])
 
     React.useEffect(() => {
-        if (!focusedHash) return
-        const node = registryRef.current.findHash(focusedHash)
-        if (node) {
-            focusedPathRef.current = node.value.focusPath
-            const staticY = node.value.staticY
-            if (staticY === lastFocusedStaticYRef.current) return
-            lastFocusedStaticYRef.current = staticY
-            scrollIntoView(node.value.focusPath)
+        if (FOCUS_ENABLED) {
+            if (!focusedHash) return
+            const node = registryRef.current.findHash(focusedHash)
+            if (node) {
+                focusedPathRef.current = node.value.focusPath
+                const staticY = node.value.staticY
+                if (staticY === lastFocusedStaticYRef.current) return
+                lastFocusedStaticYRef.current = staticY
+                scrollIntoView(node.value.focusPath)
+            }
         }
     }, [focusedHash])
 

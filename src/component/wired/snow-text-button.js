@@ -1,7 +1,9 @@
 import React from 'react'
-import { Pressable, View, Platform } from 'react-native';
+import { Pressable, View } from 'react-native';
+
 import { useFocusContext } from '../../context/snow-focus-context'
 import { useStyleContext } from '../../context/snow-style-context'
+
 import SnowText from '../snow-text'
 
 export const SnowTextButton = (props) => {
@@ -11,19 +13,7 @@ export const SnowTextButton = (props) => {
         canFocus: props.canFocus ?? true
     })
 
-    const [androidPressed, setAndroidPressed] = React.useState(false)
-    const fade = props.fade || (Platform.OS === 'android' && androidPressed)
-    const handlePressIn = React.useCallback(() => {
-        if (Platform.OS === 'android') {
-            setAndroidPressed(true)
-        }
-    }, [])
-
-    const handlePressOut = React.useCallback(() => {
-        if (Platform.OS === 'android') {
-            setAndroidPressed(false)
-        }
-    }, [])
+    const [pressing, setPressing] = React.useState(false)
 
     let wrapperStyle = [SnowStyle.component.textButton.wrapper]
     if (props.short) {
@@ -40,7 +30,7 @@ export const SnowTextButton = (props) => {
             wrapperStyle.push(SnowStyle.component.textButton.focused)
         }
     }
-    if (fade) {
+    if (props.fade) {
         wrapperStyle.push(SnowStyle.component.textButton.fade)
     }
     if (props.tall && SnowStyle.isWeb) {
@@ -64,7 +54,7 @@ export const SnowTextButton = (props) => {
     if (props.short) {
         textStyle.push(SnowStyle.component.textButton.shortText)
     }
-    if (fade) {
+    if (props.fade) {
         textStyle.push(SnowStyle.component.textButton.fadeText)
     }
 
@@ -73,10 +63,16 @@ export const SnowTextButton = (props) => {
         containerStyle = [SnowStyle.component.textButton.shortContainer]
     }
 
+    if (pressing && SnowStyle.isHandheld) {
+        wrapperStyle.push(SnowStyle.pressing)
+    }
+
     return focusWrap(
         <Pressable
             style={wrapperStyle}
             disabled={props.disabled}
+            onPressIn={() => { setPressing(true) }}
+            onPressOut={() => { setPressing(false) }}
         >
             <View style={containerStyle}>
                 <SnowText noSelect style={textStyle}>{title}</SnowText>
