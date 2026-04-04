@@ -25,9 +25,9 @@ export const SnowTarget = (props) => {
     }
 
     return focusWrap(
-        <SnowView style={outerStyle}>
+        <View style={outerStyle}>
             <View style={innerStyle} />
-        </SnowView>
+        </View>
     )
 }
 
