@@ -443,7 +443,9 @@ export const FocusContextProvider = (props) => {
                 }
                 focusOn(topLeft)
             } else {
-                prettyLog({ context: 'focus', action, message: 'No focused node, no node found in the topLeft' })
+                if (DEBUG) {
+                    prettyLog({ context: 'focus', action, message: 'No focused node, no node found in the topLeft' })
+                }
             }
         }
     }
