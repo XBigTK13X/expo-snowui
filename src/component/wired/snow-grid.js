@@ -10,6 +10,10 @@ import SnowPager from './snow-pager'
 
 
 export const SnowGrid = (props) => {
+    const { SnowStyle } = useStyleContext(props)
+    const { currentRoute } = useNavigationContext(props)
+    const { focusPath, focusWrap } = useFocusContext('grid', { ...props, canFocus: false })
+
     if (!props.items && !props.children) {
         return null
     }
@@ -21,10 +25,6 @@ export const SnowGrid = (props) => {
     if (!items || !items.length) {
         return null
     }
-
-    const { SnowStyle } = useStyleContext(props)
-    const { currentRoute } = useNavigationContext(props)
-    const { focusPath, focusWrap } = useFocusContext('grid', { ...props, canFocus: false })
 
     let itemsPerRow = 5
     if (props.itemsPerRow) {
