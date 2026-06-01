@@ -72,14 +72,23 @@ export const SnowGrid = (props) => {
     }
 
     let gridYOffset = 0
-    let pageControls = null
+    let topPager = null
+    let bottomPager = null
     if (hasPageControls) {
-        pageControls =
+        topPager = (
             <SnowPager
                 focusKey={props.focusKey + '-pager'}
                 maxPage={maxPage}
                 page={page}
             />
+        )
+        bottomPager = (
+            <SnowPager
+                focusKey={props.focusKey + '-pager'}
+                maxPage={maxPage}
+                page={page}
+            />
+        )
         gridYOffset = 1
     }
 
@@ -128,7 +137,7 @@ export const SnowGrid = (props) => {
 
     return (
         <SnowView parentPath={focusPath} testID={props.testID} style={gridStyle} key={focusPath}>
-            {pageControls}
+            {topPager}
             <SnowView xx={0} yy={gridYOffset}>
                 {rows.map((row, rowIndex) => {
                     return (
@@ -138,6 +147,7 @@ export const SnowGrid = (props) => {
                     )
                 })}
             </SnowView>
+            {bottomPager}
         </SnowView >
     )
 }
