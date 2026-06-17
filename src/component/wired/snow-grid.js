@@ -46,7 +46,10 @@ export const SnowGrid = (props) => {
     if (props.short) {
         gridStyle.push(SnowStyle.component.grid.short)
     }
-    let rowStyle = SnowStyle.component.grid.row
+    let rowStyle = [SnowStyle.component.grid.row]
+    if (props.leftAlignRows) {
+        rowStyle.push({ justifyContent: 'flex-start' })
+    }
 
     let renderItem = (item) => {
         return item
