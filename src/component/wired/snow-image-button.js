@@ -83,6 +83,13 @@ export const SnowImageButton = (props) => {
         </View>)
     }
 
+    if (props.wrapperStyle) {
+        wrapperStyle.push(props.wrapperStyle)
+    }
+    if (props.imageStyle) {
+        imageStyle.push(props.imageStyle)
+    }
+
     return focusWrap(
         <Pressable
             style={wrapperStyle}
