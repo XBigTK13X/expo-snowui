@@ -114,6 +114,17 @@ export function createStyle(overrides) {
                     width: scaled(250)
                 }
             },
+            noTitle: {
+                normal: {
+                    height: scaled(520 - 315),
+                },
+                wide: {
+                    height: scaled(370 - 165),
+                },
+                square: {
+                    height: scaled(430 - 250),
+                }
+            },
             fontSize: {
                 normal: scaled(25),
                 small: scaled(20)

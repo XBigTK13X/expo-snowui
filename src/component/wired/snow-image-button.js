@@ -26,14 +26,29 @@ export const SnowImageButton = (props) => {
         title = title.substring(0, 120) + '...'
     }
     const wrapperStyle = [SnowStyle.component.imageButton.wrapper]
+    if (!title) {
+        wrapperStyle.push(SnowStyle.imageButton.noTitle.normal)
+    }
     const imageStyle = [SnowStyle.component.imageButton.image]
     if (props.wide) {
-        wrapperStyle.push(SnowStyle.component.imageButton.wrapperWide)
         imageStyle.push(SnowStyle.component.imageButton.imageWide)
+        if (title) {
+            wrapperStyle.push(SnowStyle.component.imageButton.wrapperWide)
+        }
+        else {
+            wrapperStyle.push(SnowStyle.imageButton.noTitle.wide)
+        }
+
     }
     if (props.square) {
-        wrapperStyle.push(SnowStyle.component.imageButton.wrapperSquare)
         imageStyle.push(SnowStyle.component.imageButton.imageSquare)
+        if (title) {
+            wrapperStyle.push(SnowStyle.component.imageButton.wrapperSquare)
+        } else {
+            wrapperStyle.push(SnowStyle.imageButton.noTitle.square)
+        }
+
+
     }
     let textWrapperStyle = [SnowStyle.component.imageButton.textWrapper]
     if (props.dull) {
@@ -61,6 +76,13 @@ export const SnowImageButton = (props) => {
         wrapperStyle.push(SnowStyle.pressing)
     }
 
+    let textElement = null
+    if (title) {
+        textElement = (<View style={textWrapperStyle}>
+            <SnowText style={fontStyle}>{title}</SnowText>
+        </View>)
+    }
+
     return focusWrap(
         <Pressable
             style={wrapperStyle}
@@ -73,9 +95,7 @@ export const SnowImageButton = (props) => {
                 source={imageSource}
                 placeholder={props.placeholder}
             />
-            <View style={textWrapperStyle}>
-                <SnowText style={fontStyle}>{title}</SnowText>
-            </View>
+            {textElement}
         </Pressable>
     )
 }
