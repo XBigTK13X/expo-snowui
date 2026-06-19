@@ -28,7 +28,7 @@ const getScaleMultiplier = () => {
     }
 
     if (isPortrait) {
-        scaleMultiplier = .5
+        scaleMultiplier = .4
     }
     return {
         scaleMultiplier,
