@@ -27,6 +27,9 @@ export const SnowGrid = (props) => {
     }
 
     let itemsPerRow = 5
+    if (SnowStyle.isPortrait) {
+        itemsPerRow = 2
+    }
     if (props.itemsPerRow) {
         itemsPerRow = props.itemsPerRow
     }
