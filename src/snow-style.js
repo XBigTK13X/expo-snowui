@@ -146,9 +146,9 @@ export function createStyle(overrides) {
             }
         },
         rangeSlider: {
-            borderRadius: 16,
-            thumbSize: 60,
-            trackSize: 30
+            borderRadius: scaled(16),
+            thumbSize: scaled(60),
+            trackSize: scaled(30)
         },
         depth: {
             app: 10000,
