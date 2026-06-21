@@ -12,6 +12,7 @@ export function SnowLabel(props) {
 
     return (
         <SnowText
+            marquee={props.marquee}
             skipDefault
             center={props.center}
             noSelect={props.noSelect}

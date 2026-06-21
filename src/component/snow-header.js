@@ -10,6 +10,7 @@ export function SnowHeader(props) {
     }
     return (
         <SnowText
+            marquee={props.marquee}
             skipDefault
             center={props.center}
             noSelect={props.noSelect}
