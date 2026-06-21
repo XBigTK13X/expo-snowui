@@ -1,13 +1,14 @@
+import React from 'react'
 import { View, Text, Animated, Easing } from 'react-native'
 import { useStyleContext } from '../context/snow-style-context'
 
 export function SnowText(props) {
     const { SnowStyle } = useStyleContext(props)
-    const animatedValue = C.React.useRef(new Animated.Value(0)).current
-    const [textWidth, setTextWidth] = C.React.useState(0)
-    const [containerWidth, setContainerWidth] = C.React.useState(0)
+    const animatedValue = React.useRef(new Animated.Value(0)).current
+    const [textWidth, setTextWidth] = React.useState(0)
+    const [containerWidth, setContainerWidth] = React.useState(0)
 
-    C.React.useEffect(() => {
+    React.useEffect(() => {
         if (props.marquee && textWidth > containerWidth && containerWidth > 0) {
             animatedValue.setValue(0)
 
