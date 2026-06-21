@@ -71,8 +71,8 @@ export function SnowText(props) {
                 testID={props.testID}
                 style={style}
                 selectable={!props.noSelect}
-                numberOfLines={props.numberOfLines ?? 1}
-                ellipsizeMode="tail"
+                numberOfLines={props.numberOfLines}
+                ellipsizeMode={props.numberOfLines ? "tail" : undefined}
                 children={props.children} />
         </View>
     )
