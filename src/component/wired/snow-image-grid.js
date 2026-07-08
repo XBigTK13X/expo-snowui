@@ -52,6 +52,7 @@ export const SnowImageGrid = (props) => {
 
         return <SnowImageButton
             {...sourceProps}
+            overlayTitle={props.overlayTitle}
             snowStyle={props.snowStyle}
             wide={props.wideImage}
             square={props.squareImage}
