@@ -277,7 +277,8 @@ export function createStyle(overrides) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: 2
-            }
+            },
+            textOverlayWrapper: { position: 'absolute', bottom: 0, left: 0, right: 0 }
         },
         input: {
             text: {

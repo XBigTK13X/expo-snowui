@@ -14,13 +14,13 @@ function AppPage() {
 
   let components = [
     ['Break', routes.break],
+    ['ImageButton', routes.imageButton],
     ['Modal', routes.modal],
     ['Dropdown', routes.dropdown],
     ['Range Slider', routes.rangeSlider],
     ['Grid', routes.grid],
     ['Grid More', routes.gridMore],
     ['Header', routes.header],
-    ['ImageButton', routes.imageButton],
     ['ImageGrid', routes.imageGrid],
     ['Input', routes.input],
     ['Label', routes.label],

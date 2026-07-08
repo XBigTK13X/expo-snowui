@@ -7,9 +7,11 @@ export default function ImageButtonPage(props: any) {
   return (
     <Snow.View {...props}>
       <Snow.Label>Component: Image Button</Snow.Label>
-      <Snow.ImageButton focusKey="tall" imageUrl={tallImageUrl} title="Movie Poster" />
-      <Snow.ImageButton focusKey="wide" imageUrl={wideImageUrl} title="Rainbow" />
-      <Snow.ImageButton focusKey="wide" imageUrl={wideImageUrl} title="" />
+      <Snow.ImageButton tall imageUrl={tallImageUrl} title="Movie Poster" />
+      <Snow.ImageButton wide imageUrl={wideImageUrl} title="Rainbow" />
+      <Snow.ImageButton wide imageUrl={wideImageUrl} title="" />
+      <Snow.ImageButton tall overlayTitle imageUrl={tallImageUrl} title="Super Tall Baby" />
+      <Snow.ImageButton wide overlayTitle imageUrl={wideImageUrl} title="Super Wide Baby With Too Much Text" />
     </Snow.View>
   )
 }

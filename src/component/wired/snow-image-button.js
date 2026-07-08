@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native'
 
 import { Image } from 'expo-image'
 
@@ -25,31 +25,46 @@ export const SnowImageButton = (props) => {
     if (title && title.length > 120) {
         title = title.substring(0, 120) + '...'
     }
+
     const wrapperStyle = [SnowStyle.component.imageButton.wrapper]
-    if (!title) {
-        wrapperStyle.push(SnowStyle.imageButton.noTitle.normal)
-    }
     const imageStyle = [SnowStyle.component.imageButton.image]
-    if (props.wide) {
-        imageStyle.push(SnowStyle.component.imageButton.imageWide)
-        if (title) {
-            wrapperStyle.push(SnowStyle.component.imageButton.wrapperWide)
-        }
-        else {
+
+    if (props.overlayTitle) {
+        if (props.wide) {
+            imageStyle.push(SnowStyle.component.imageButton.imageWide)
             wrapperStyle.push(SnowStyle.imageButton.noTitle.wide)
-        }
-
-    }
-    if (props.square) {
-        imageStyle.push(SnowStyle.component.imageButton.imageSquare)
-        if (title) {
-            wrapperStyle.push(SnowStyle.component.imageButton.wrapperSquare)
-        } else {
+        } else if (props.square) {
+            imageStyle.push(SnowStyle.component.imageButton.imageSquare)
             wrapperStyle.push(SnowStyle.imageButton.noTitle.square)
+        } else {
+            wrapperStyle.push({
+                width: SnowStyle.imageButton.wrapper.normal.width,
+                height: SnowStyle.imageButton.image.normal.height + 10
+            })
+            imageStyle.push({ marginTop: 0, justifyContent: 'center', alignSelf: 'center' })
         }
-
-
+    } else {
+        if (!title) {
+            wrapperStyle.push(SnowStyle.imageButton.noTitle.normal)
+        }
+        if (props.wide) {
+            imageStyle.push(SnowStyle.component.imageButton.imageWide)
+            if (title) {
+                wrapperStyle.push(SnowStyle.component.imageButton.wrapperWide)
+            } else {
+                wrapperStyle.push(SnowStyle.imageButton.noTitle.wide)
+            }
+        }
+        if (props.square) {
+            imageStyle.push(SnowStyle.component.imageButton.imageSquare)
+            if (title) {
+                wrapperStyle.push(SnowStyle.component.imageButton.wrapperSquare)
+            } else {
+                wrapperStyle.push(SnowStyle.imageButton.noTitle.square)
+            }
+        }
     }
+
     let textWrapperStyle = [SnowStyle.component.imageButton.textWrapper]
     if (props.dull) {
         textWrapperStyle.push(SnowStyle.component.imageButton.dull)
@@ -78,9 +93,37 @@ export const SnowImageButton = (props) => {
 
     let textElement = null
     if (title) {
-        textElement = (<View style={textWrapperStyle}>
-            <SnowText style={fontStyle}>{title}</SnowText>
-        </View>)
+        if (props.overlayTitle) {
+            if (isFocused) {
+                const exactOverlayStyle = {
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: SnowStyle.color.hover,
+                    opacity: 0.85,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: 10,
+                    borderRadius: SnowStyle.button.borderRadius
+                }
+                const customOverlayTextStyle = {
+                    color: 'black'
+                }
+                textElement = (
+                    <View style={exactOverlayStyle}>
+                        <SnowText style={[fontStyle, customOverlayTextStyle]}>{title}</SnowText>
+                    </View>
+                )
+            }
+        } else {
+            textElement = (
+                <View style={textWrapperStyle}>
+                    <SnowText style={fontStyle}>{title}</SnowText>
+                </View>
+            )
+        }
     }
 
     if (props.wrapperStyle) {
@@ -96,13 +139,15 @@ export const SnowImageButton = (props) => {
             onPressIn={() => { setPressing(true) }}
             onPressOut={() => { setPressing(false) }}
         >
-            <Image
-                style={imageStyle}
-                contentFit="contain"
-                source={imageSource}
-                placeholder={props.placeholder}
-            />
-            {textElement}
+            <View style={imageStyle}>
+                <Image
+                    style={{ width: '100%', height: '100%' }}
+                    contentFit="contain"
+                    source={imageSource}
+                    placeholder={props.placeholder}
+                />
+                {textElement}
+            </View>
         </Pressable>
     )
 }
