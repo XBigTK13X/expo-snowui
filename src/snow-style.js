@@ -361,7 +361,7 @@ export function createStyle(overrides) {
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: "transparent",
-                width: Math.min(getWindowWidth() - 40, 400)
+                width: scaled(800)
             },
             leftTrack: {
                 height: "100%",
