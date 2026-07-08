@@ -92,38 +92,48 @@ export const SnowImageButton = (props) => {
     }
 
     let textElement = null
-    if (title) {
-        if (props.overlayTitle) {
-            if (isFocused) {
-                const exactOverlayStyle = {
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    backgroundColor: SnowStyle.color.hover,
-                    opacity: 0.85,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: 10,
-                    borderRadius: SnowStyle.button.borderRadius
-                }
-                const customOverlayTextStyle = {
-                    color: 'black'
-                }
-                textElement = (
-                    <View style={exactOverlayStyle}>
-                        <SnowText style={[fontStyle, customOverlayTextStyle]}>{title}</SnowText>
-                    </View>
-                )
+    let dullOverlayElement = null
+
+    if (props.overlayTitle) {
+        if (isFocused && title) {
+            const exactOverlayStyle = {
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(235, 235, 235, 1)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: SnowStyle.button.borderRadius
             }
-        } else {
+            const customOverlayTextStyle = {
+                color: 'black'
+            }
             textElement = (
-                <View style={textWrapperStyle}>
-                    <SnowText style={fontStyle}>{title}</SnowText>
+                <View style={exactOverlayStyle}>
+                    <SnowText style={[fontStyle, customOverlayTextStyle]}>{title}</SnowText>
                 </View>
             )
+        } else if (!isFocused && props.dull) {
+            const dullOverlayStyle = {
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                borderRadius: SnowStyle.button.borderRadius
+            }
+            dullOverlayElement = <View style={dullOverlayStyle} />
         }
+    } else if (title) {
+        textElement = (
+            <View style={textWrapperStyle}>
+                <SnowText style={fontStyle}>{title}</SnowText>
+            </View>
+        )
     }
 
     if (props.wrapperStyle) {
@@ -146,6 +156,7 @@ export const SnowImageButton = (props) => {
                     source={imageSource}
                     placeholder={props.placeholder}
                 />
+                {dullOverlayElement}
                 {textElement}
             </View>
         </Pressable>
