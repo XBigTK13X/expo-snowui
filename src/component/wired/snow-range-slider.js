@@ -1,10 +1,10 @@
-import React from "react";
+import React from "react"
 import {
     PanResponder,
     Platform,
     Pressable,
     View
-} from "react-native";
+} from "react-native"
 import { useDebouncedCallback } from 'use-debounce'
 import { useInputContext } from '../../context/snow-input-context'
 import { useFocusContext } from '../../context/snow-focus-context'
@@ -31,6 +31,7 @@ const step = 0.01
 // It completely breaks in Android or Web, depending on the version of react I override it to use
 
 // After a handful of other libraries still had problems, I rolled my own
+
 export const SnowRangeSlider = (props) => {
     const { SnowStyle, SnowConfig } = useStyleContext(props)
     const { addActionListener, removeActionListener } = useInputContext()
@@ -45,7 +46,9 @@ export const SnowRangeSlider = (props) => {
         trapFocusRight: true
     })
 
-    const isDraggingRef = React.useRef(false)
+    const isInteractingRef = React.useRef(false)
+    const blockNextPropUpdateRef = React.useRef(false)
+
     const isFocusedRef = React.useRef(isFocused)
     React.useEffect(() => { isFocusedRef.current = isFocused }, [isFocused])
     const [percent, setPercent] = React.useState(() => typeof props.percent === 'number' ? props.percent : 0)
@@ -77,38 +80,49 @@ export const SnowRangeSlider = (props) => {
         setPercent(next)
     }
 
+    const endInteraction = () => {
+        isInteractingRef.current = false
+        blockNextPropUpdateRef.current = true
+        onValueChange(percentRef.current)
+    }
+
     const panRef = React.useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
 
             onPanResponderGrant: (event) => {
-                isDraggingRef.current = true
+                isInteractingRef.current = true
                 updateFromPageX(event.nativeEvent.pageX)
             },
 
             onPanResponderMove: (event) => {
-                if (!isDraggingRef.current) return
+                if (!isInteractingRef.current) return
                 updateFromPageX(event.nativeEvent.pageX)
             },
 
             onPanResponderRelease: () => {
-                isDraggingRef.current = false
-                onValueChange(percentRef.current)
+                endInteraction()
             },
 
             onPanResponderEnd: () => {
-                isDraggingRef.current = false
-                onValueChange(percentRef.current)
+                endInteraction()
             }
         })
     )
 
     React.useEffect(() => {
-        if (!isDraggingRef.current) {
-            percentRef.current = props.percent
-            setPercent(props.percent)
+        if (isInteractingRef.current) {
+            return
         }
+
+        if (blockNextPropUpdateRef.current) {
+            blockNextPropUpdateRef.current = false
+            return
+        }
+
+        percentRef.current = props.percent
+        setPercent(props.percent)
     }, [props.percent])
 
     React.useEffect(() => {
@@ -125,7 +139,6 @@ export const SnowRangeSlider = (props) => {
         if (result > max) result = max
         percentRef.current = result
         setPercent(result)
-        onValueChange(result)
     }
 
     const longPress = (amount) => {
@@ -133,35 +146,44 @@ export const SnowRangeSlider = (props) => {
         applyStep(amount)
         setApplyStepInterval(setInterval(() => applyStep(amount), 100))
     }
+
     React.useEffect(() => {
         const actionListenerKey = addActionListener(props.focusKey ?? 'range-slider', {
             onRight: () => {
                 if (isFocusedRef.current) {
+                    isInteractingRef.current = true
                     applyStep(step)
                     clearInterval(applyIntervalRef.current)
+                    endInteraction()
                 }
             },
             onLongRightStart: () => {
                 if (isFocusedRef.current) {
+                    isInteractingRef.current = true
                     longPress(step * 2)
                 }
             },
             onLongRightEnd: () => {
                 clearInterval(applyIntervalRef.current)
+                endInteraction()
             },
             onLeft: () => {
                 if (isFocusedRef.current) {
+                    isInteractingRef.current = true
                     applyStep(-step)
                     clearInterval(applyIntervalRef.current)
+                    endInteraction()
                 }
             },
             onLongLeftStart: () => {
                 if (isFocusedRef.current) {
+                    isInteractingRef.current = true
                     longPress(-step * 2)
                 }
             },
             onLongLeftEnd: () => {
                 clearInterval(applyIntervalRef.current)
+                endInteraction()
             },
         })
         return () => removeActionListener(actionListenerKey)
