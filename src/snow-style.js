@@ -146,9 +146,9 @@ export function createStyle(overrides) {
             }
         },
         rangeSlider: {
-            borderRadius: scaled(16),
-            thumbSize: scaled(60),
-            trackSize: scaled(30)
+            borderRadius: 16,
+            thumbSize: 60,
+            trackSize: 30
         },
         depth: {
             app: 10000,
@@ -161,6 +161,7 @@ export function createStyle(overrides) {
         AppStyle = _.merge({}, AppStyle, overrides)
     }
 
+    const mult = getScaleMultiplier()
 
     AppStyle.component = {
         break: {
@@ -361,7 +362,7 @@ export function createStyle(overrides) {
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: "transparent",
-                width: scaled(800)
+                width: mult.isPortrait ? 300 : 400
             },
             leftTrack: {
                 height: "100%",
@@ -540,8 +541,6 @@ export function createStyle(overrides) {
             }
         }
     }
-
-    const mult = getScaleMultiplier()
 
     AppStyle.isTV = isTV
     AppStyle.isWeb = isWeb
