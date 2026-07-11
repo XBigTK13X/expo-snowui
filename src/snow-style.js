@@ -286,11 +286,11 @@ export function createStyle(overrides) {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: SnowStyle.color.hover + '80',
+                backgroundColor: AppStyle.color.hover + '80',
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: 10,
-                borderRadius: SnowStyle.button.borderRadius
+                borderRadius: AppStyle.button.borderRadius
             },
             overlayFront: {
                 color: 'black'
