@@ -96,24 +96,9 @@ export const SnowImageButton = (props) => {
 
     if (props.overlayTitle) {
         if (isFocused && title) {
-            const exactOverlayStyle = {
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(235, 235, 235, 1)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 10,
-                borderRadius: SnowStyle.button.borderRadius
-            }
-            const customOverlayTextStyle = {
-                color: 'black'
-            }
             textElement = (
-                <View style={exactOverlayStyle}>
-                    <SnowText style={[fontStyle, customOverlayTextStyle]}>{title}</SnowText>
+                <View style={SnowStyle.component.imageButton.overlayBack}>
+                    <SnowText style={[fontStyle, SnowStyle.component.imageButton.overlayFront]}>{title}</SnowText>
                 </View>
             )
         } else if (!isFocused && props.dull) {

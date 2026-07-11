@@ -52,18 +52,18 @@ export function getWindowWidth() {
 export function createStyle(overrides) {
     let AppStyle = {
         color: {
-            background: 'black',
-            text: 'rgb(235, 235, 235)',
-            textDark: 'rgb(22, 22, 22)',
-            active: 'rgb(150, 150, 150)',
-            hover: 'rgb(119, 139, 255)',
-            hoverDark: 'rgba(81, 94, 168, 1)',
-            core: 'rgb(219, 158, 44)',
-            coreDark: 'rgb(136, 98, 27)',
-            outlineDark: 'rgb(63, 63, 63)',
-            fade: 'rgb(23, 23, 23)',
-            transparentDark: 'rgba(0,0,0,0.6)',
-            panel: 'rgb(50, 50, 50)',
+            background: '#000000',
+            text: '#ebebeb',
+            textDark: '#161616',
+            active: '#969696',
+            hover: '#778bff',
+            hoverDark: '#515ea8',
+            core: '#db9e2c',
+            coreDark: '#88621b',
+            outlineDark: '#3f3f3f',
+            fade: '#171717',
+            transparentDark: '#00000099',
+            panel: '#323232',
         },
         fontSize: {
             header: 40,
@@ -279,7 +279,22 @@ export function createStyle(overrides) {
                 alignItems: 'center',
                 padding: 2
             },
-            textOverlayWrapper: { position: 'absolute', bottom: 0, left: 0, right: 0 }
+            textOverlayWrapper: { position: 'absolute', bottom: 0, left: 0, right: 0 },
+            overlayBack: {
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: SnowStyle.color.hover + '80',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: SnowStyle.button.borderRadius
+            },
+            overlayFront: {
+                color: 'black'
+            }
         },
         input: {
             text: {
