@@ -293,7 +293,10 @@ export function createStyle(overrides) {
                 borderRadius: AppStyle.button.borderRadius
             },
             overlayFront: {
-                color: 'black'
+                color: '#000000',
+                textShadowColor: '#ebebeb',
+                textShadowOffset: { width: 1, height: 1 },
+                textShadowRadius: 2
             }
         },
         input: {

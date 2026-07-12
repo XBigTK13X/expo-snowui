@@ -87,7 +87,7 @@ function AppPage() {
 
 export const styleOverrides = {
   color: {
-    hover: '#2cdbat',
+    hover: '#2cdbac',
     hoverDark: '#17745c',
     core: '#5b22b8',
     coreDark: '#3e206e',
