@@ -286,7 +286,7 @@ export function createStyle(overrides) {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: AppStyle.color.hover + '80',
+                backgroundColor: AppStyle.color.hover + 'A6',
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: 10,
