@@ -72,19 +72,21 @@ export const saveData = (key, value) => {
                 localStorage.removeItem(key);
                 return resolve(true)
             } else {
-                localStorage.setItem(key, value);
+                localStorage.setItem(key, String(value));
                 return resolve(true)
             }
         } else {
             if (value == null) {
-                SecureStore.deleteItemAsync(key);
-                return resolve(true)
+                SecureStore.deleteItemAsync(key).then(() => {
+                    resolve(true)
+                })
             } else {
                 if (value === false) {
                     value = 'false'
-                }
-                if (value === true) {
+                } else if (value === true) {
                     value = 'true'
+                } else {
+                    value = String(value)
                 }
                 SecureStore.setItem(key, value);
                 return resolve(true)
@@ -105,6 +107,12 @@ export const loadData = (key) => {
     }
     if (value === 'false') {
         return false
+    }
+    if (value !== null && value.trim() !== '') {
+        const parsedNumber = Number(value)
+        if (!isNaN(parsedNumber)) {
+            return parsedNumber
+        }
     }
     return value
 }
