@@ -39,8 +39,10 @@ function SnowApp(props) {
         // Hide the system UI on app load
         React.useEffect(() => {
             try {
-                NavigationBar.setVisibilityAsync('hidden');
-                StatusBar.setHidden(true, 'none');
+                if (props?.fullscreen !== false) {
+                    NavigationBar.setVisibilityAsync('hidden');
+                    StatusBar.setHidden(true, 'none');
+                }
             } catch { }
         }, []);
     }
