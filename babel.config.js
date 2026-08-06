@@ -8,7 +8,7 @@ module.exports = function (api) {
     ...(!isTest && {
       overrides: [
         {
-          exclude: /\/node_modules\//,
+          exclude: (filename) => Boolean(filename && filename.includes('node_modules')),
           presets: ['module:react-native-builder-bob/babel-preset'],
         },
       ],
