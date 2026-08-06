@@ -1,13 +1,14 @@
-import React from 'react';
+import React from 'react'
+import { useWindowDimensions } from 'react-native'
 import _ from 'lodash'
 import { createStyle, getWindowHeight, getWindowWidth } from '../snow-style'
 
-const StyleContext = React.createContext({});
+const StyleContext = React.createContext({})
 
 export function useStyleContext(componentProps) {
-    let value = React.useContext(StyleContext);
+    let value = React.useContext(StyleContext)
     if (!value) {
-        throw new Error('useStyleContext must be wrapped in a <StyleContextProvider />');
+        throw new Error('useStyleContext must be wrapped in a <StyleContextProvider />')
     }
     if (componentProps?.snowStyle) {
         value = { ...value }
@@ -17,7 +18,7 @@ export function useStyleContext(componentProps) {
         value = { ...value }
         value.SnowConfig = _.merge({}, value.SnowConfig, componentProps.snowConfig)
     }
-    return value;
+    return value
 }
 
 const AppConfig = {
@@ -25,20 +26,29 @@ const AppConfig = {
 }
 
 export function StyleContextProvider(props) {
-    let style = createStyle(props.snowStyle)
+    const { width, height } = useWindowDimensions()
+
+    const style = React.useMemo(() => {
+        return createStyle(props.snowStyle)
+    }, [width, height, props.snowStyle])
+
     let config = AppConfig
     if (props.snowConfig) {
         config = { ...config, ...props.snowConfig }
     }
-    const context = {
+
+    const context = React.useMemo(() => ({
         SnowStyle: style,
         SnowConfig: config,
         getWindowHeight,
         getWindowWidth,
-    }
+    }), [style, config])
+
     return (
-        <StyleContext.Provider style={{ flex: 1 }} value={context}>
-            {props.children}
+        <StyleContext.Provider value={context}>
+            <React.Fragment key={`${width}-${height}`}>
+                {props.children}
+            </React.Fragment>
         </StyleContext.Provider>
     )
 }
