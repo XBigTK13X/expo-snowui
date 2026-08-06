@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -59,7 +59,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@sentry/react-native": "^8.22.0",
+    "@sentry/react-native": "^7.11.0",
     "expo": "57.0.11",
     "expo-constants": "^57.0.9",
     "expo-image": "^57.0.2",
@@ -74,7 +74,7 @@
     "use-debounce": "^10.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
+    "@babel/core": "^7.29.0",
     "@commitlint/config-conventional": "^21.2.0",
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.6",
@@ -85,7 +85,7 @@
     "@react-native/eslint-config": "^0.86.2",
     "@release-it/conventional-changelog": "^12.0.0",
     "@testing-library/react-native": "^14.0.1",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "^29.5.14",
     "@types/react": "19.2.18",
     "babel-preset-expo": "^57.0.6",
     "commitlint": "^21.2.1",
@@ -93,13 +93,13 @@
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
-    "jest": "^30.4.2",
+    "jest": "^29.7.0",
     "jest-expo": "^57.0.3",
     "prettier": "^3.9.6",
     "react-native-builder-bob": "^0.43.0",
     "react-test-renderer": "19.2.8",
     "release-it": "^21.0.1",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "react": "*",
