@@ -51,10 +51,10 @@ export function queryToObject(query) {
 }
 
 export function toBase64(input) {
-    if (typeof input === 'object') {
-        return btoa(JSON.stringify(input))
-    }
-    return btoa(input)
+    const rawString = typeof input === 'object' ? JSON.stringify(input) : String(input)
+    const encodedBytes = new TextEncoder().encode(rawString)
+    const binaryString = Array.from(encodedBytes, (byteValue) => String.fromCharCode(byteValue)).join('')
+    return btoa(binaryString)
 }
 
 export function fromBase64(input) {
