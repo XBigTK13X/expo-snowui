@@ -54,9 +54,8 @@ export function toBase64(input) {
     const rawString = typeof input === 'object' ? JSON.stringify(input) : String(input)
     const encodedBytes = new TextEncoder().encode(rawString)
     const binaryString = Array.from(encodedBytes, (byteValue) => String.fromCharCode(byteValue)).join('')
-    return btoa(binaryString)
+    return encodeURIComponent(btoa(binaryString))
 }
-
 export function fromBase64(input) {
     let result = atob(input)
     try {
