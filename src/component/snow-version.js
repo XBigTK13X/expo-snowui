@@ -1,4 +1,6 @@
-const SNOWUI_VERSION = "1.8.5"
+const SNOWUI_VERSION = "1.8.6"
+
+import { useStyleContext } from '../context/snow-style-context'
 
 export function SnowVersion(props) {
     const { SnowStyle } = useStyleContext(props)
