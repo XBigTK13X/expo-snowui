@@ -52,6 +52,8 @@ export const SnowImageGrid = (props) => {
 
         return <SnowImageButton
             {...sourceProps}
+            resizeMode="contain"
+            contain
             overlayTitle={props.overlayTitle}
             snowStyle={props.snowStyle}
             wide={props.wideImage}
@@ -63,16 +65,16 @@ export const SnowImageGrid = (props) => {
                     props.onLongPress(item)
                 }
                 if (props.longPressToggle) {
-                    setToggledItems((prev) => {
-                        let result = { ...prev }
+                    setToggledItems((previousState) => {
+                        let resultState = { ...previousState }
                         if (toggled) {
-                            delete result[item.id]
+                            delete resultState[item.id]
                         }
                         else {
-                            result[item.id] = true
+                            resultState[item.id] = true
                         }
 
-                        return result
+                        return resultState
                     })
                 }
             }}
@@ -80,7 +82,7 @@ export const SnowImageGrid = (props) => {
         />
     }
     let gridProps = {
-        itemsPerRow,
+        itemsPerRow
     }
     if (props.itemsPerRow) {
         gridProps.itemsPerRow = props.itemsPerRow
