@@ -36,22 +36,27 @@ def update_info(
 ):
     print(f"Updating {input_path}")
     file_content = ""
+    version_found = False
     with open(input_path, "r") as read_handle:
         for line in read_handle.readlines():
-            if version_needle and version_needle in line:
-                file_content += version_replacement
-            elif build_needle and build_needle in line:
-                file_content += build_replacement
+            if not version_found:
+                if version_needle and version_needle in line:
+                    file_content += version_replacement
+                    version_found = True
+                elif build_needle and build_needle in line:
+                    file_content += build_replacement
             else:
                 file_content += line
     with open(input_path, "w") as write_handle:
         write_handle.write(file_content)
 
 
+slip = "{"
+
 update_info(
     input_path=PACKAGE_JSON_PATH,
     version_needle='  "version": "',
-    version_replacement=f'    "version": "{build_version}",\n',
+    version_replacement=f'{slip}\n  "name": "expo-snowui",\n  "version": "{build_version}",\n',
 )
 
 update_info(

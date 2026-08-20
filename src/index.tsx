@@ -59,6 +59,8 @@ export { SnowText } from './component/snow-text'
 import { SnowText } from './component/snow-text'
 export { SnowToggle } from './component/wired/snow-toggle'
 import { SnowToggle } from './component/wired/snow-toggle'
+export { SnowVersion } from './component/snow-version'
+import { SnowVersion } from './component/snow-version'
 export { SnowView } from './component/wired/snow-view'
 import { SnowView } from './component/wired/snow-view'
 
@@ -117,5 +119,6 @@ export default {
   TextButton: SnowTextButton,
   Text: SnowText,
   Toggle: SnowToggle,
+  Version: SnowVersion,
   View: SnowView
 }
