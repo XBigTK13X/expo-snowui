@@ -1,17 +1,15 @@
-import { Platform, Dimensions } from 'react-native';
+import { Platform, Dimensions } from 'react-native'
+import _ from 'lodash'
 
 const isTV = Platform.isTV
 const isAndroid = Platform.OS === 'android'
 const isWeb = Platform.OS === 'web'
 const isHandheld = isAndroid && !isTV
 
-import _ from 'lodash'
-
 const getScaleMultiplier = () => {
     const isPortrait = Dimensions.get('window').width < Dimensions.get('window').height + 100
 
     let scaleMultiplier = 0.75
-
     let isTablet = false
 
     if (isTV) {
@@ -19,7 +17,7 @@ const getScaleMultiplier = () => {
     } else {
         if (isAndroid) {
             scaleMultiplier = 0.5
-            const { width, height } = Dimensions.get('window');
+            const { width, height } = Dimensions.get('window')
             if (Math.min(width, height) >= 600) {
                 isTablet = true
                 scaleMultiplier = 0.75
@@ -28,7 +26,7 @@ const getScaleMultiplier = () => {
     }
 
     if (isPortrait) {
-        scaleMultiplier = .4
+        scaleMultiplier = .5
     }
     return {
         scaleMultiplier,
@@ -50,6 +48,10 @@ export function getWindowWidth() {
 }
 
 export function createStyle(overrides) {
+    const mult = getScaleMultiplier()
+    const fontMultiplier = mult.isPortrait ? 1.2 : 1.0
+    const textTransformRule = mult.isPortrait ? 'uppercase' : 'none'
+
     let AppStyle = {
         color: {
             background: '#000000',
@@ -66,8 +68,8 @@ export function createStyle(overrides) {
             panel: '#323232',
         },
         fontSize: {
-            header: 40,
-            label: 26
+            header: Math.round(40 * fontMultiplier),
+            label: Math.round(26 * fontMultiplier)
         },
         pressing: {
             opacity: 0.75
@@ -126,8 +128,8 @@ export function createStyle(overrides) {
                 }
             },
             fontSize: {
-                normal: scaled(25),
-                small: scaled(20)
+                normal: Math.round(scaled(25) * fontMultiplier),
+                small: Math.round(scaled(20) * fontMultiplier)
             },
             textBox: {
                 marginTop: isAndroid ? -10 : 0
@@ -141,8 +143,8 @@ export function createStyle(overrides) {
                 }
             },
             fontSize: {
-                normal: scaled(25),
-                small: scaled(20)
+                normal: Math.round(scaled(25) * fontMultiplier),
+                small: Math.round(scaled(20) * fontMultiplier)
             }
         },
         rangeSlider: {
@@ -157,11 +159,8 @@ export function createStyle(overrides) {
         }
     }
     if (overrides) {
-        // Apply color overrides before generating the rest of the style
         AppStyle = _.merge({}, AppStyle, overrides)
     }
-
-    const mult = getScaleMultiplier()
 
     AppStyle.component = {
         break: {
@@ -173,7 +172,6 @@ export function createStyle(overrides) {
                 borderRightColor: AppStyle.color.coreDark,
                 borderRightWidth: 2,
             }
-
         },
         fillView: {
             default: {
@@ -185,9 +183,7 @@ export function createStyle(overrides) {
             }
         },
         grid: {
-            grid: {
-
-            },
+            grid: {},
             row: {
                 flexDirection: 'row',
                 justifyContent: 'center',
@@ -203,6 +199,7 @@ export function createStyle(overrides) {
         header: {
             fontSize: AppStyle.fontSize.header,
             color: AppStyle.color.text,
+            textTransform: textTransformRule,
             margin: 10,
             padding: 10
         },
@@ -215,8 +212,8 @@ export function createStyle(overrides) {
                 marginRight: 'auto',
                 borderColor: AppStyle.color.background,
                 borderWidth: AppStyle.button.borderRadius,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
             },
             wrapperWide: {
                 height: AppStyle.imageButton.wrapper.wide.height,
@@ -256,6 +253,7 @@ export function createStyle(overrides) {
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.imageButton.fontSize.normal,
                 lineHeight: AppStyle.imageButton.fontSize.normal,
+                textTransform: textTransformRule,
                 fontWeight: 'bold',
                 padding: 0,
                 margin: 0,
@@ -264,7 +262,8 @@ export function createStyle(overrides) {
             },
             smallText: {
                 fontSize: AppStyle.imageButton.fontSize.small,
-                lineHeight: AppStyle.imageButton.fontSize.small
+                lineHeight: AppStyle.imageButton.fontSize.small,
+                textTransform: textTransformRule
             },
             textWrapper: {
                 marginLeft: 'auto',
@@ -294,6 +293,7 @@ export function createStyle(overrides) {
             },
             overlayFront: {
                 color: '#000000',
+                textTransform: textTransformRule,
                 textShadowColor: '#ebebeb',
                 textShadowOffset: { width: 1, height: 1 },
                 textShadowRadius: 2
@@ -308,8 +308,8 @@ export function createStyle(overrides) {
                 color: AppStyle.color.text,
                 margin: 10,
                 padding: 10,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
             },
             small: {
                 margin: 1,
@@ -323,6 +323,7 @@ export function createStyle(overrides) {
         label: {
             fontSize: AppStyle.fontSize.label,
             color: AppStyle.color.text,
+            textTransform: textTransformRule,
             margin: 10,
             padding: 10
         },
@@ -357,13 +358,13 @@ export function createStyle(overrides) {
                 right: 0,
                 alignItems: 'center',
                 justifyContent: 'center',
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
                 zIndex: AppStyle.depth.overlay,
                 elevation: AppStyle.depth.overlay
             },
             black: {
-                backgroundColor: 'black' // Without this color, letterbox will be white by default
+                backgroundColor: 'black'
             },
             transparent: {
                 backgroundColor: 'transparent'
@@ -403,8 +404,8 @@ export function createStyle(overrides) {
                 borderWidth: 4,
                 backgroundColor: AppStyle.color.core,
                 borderColor: AppStyle.color.coreDark,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
             }
         },
         safeArea: {
@@ -438,8 +439,8 @@ export function createStyle(overrides) {
                 backgroundColor: AppStyle.color.core,
                 borderColor: AppStyle.color.core,
                 borderRadius: AppStyle.button.borderRadius,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
             },
             focused: {
                 borderColor: AppStyle.color.hover,
@@ -447,8 +448,7 @@ export function createStyle(overrides) {
             }
         },
         textButton: {
-            fadeText: {
-            },
+            fadeText: {},
             selected: {
                 borderColor: AppStyle.color.active
             },
@@ -501,6 +501,7 @@ export function createStyle(overrides) {
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.normal,
                 lineHeight: AppStyle.textButton.fontSize.normal,
+                textTransform: textTransformRule,
             },
             shortText: {
                 paddingTop: -10,
@@ -510,24 +511,24 @@ export function createStyle(overrides) {
                 color: AppStyle.color.textDark,
                 fontSize: AppStyle.textButton.fontSize.small,
                 lineHeight: AppStyle.textButton.fontSize.small,
+                textTransform: textTransformRule,
             },
             smallText: {
                 paddingTop: -5,
                 fontSize: AppStyle.textButton.fontSize.small,
-                lineHeight: AppStyle.textButton.fontSize.small
+                lineHeight: AppStyle.textButton.fontSize.small,
+                textTransform: textTransformRule
             }
         },
         text: {
             text: {
-                color: AppStyle.color.text
+                color: AppStyle.color.text,
+                textTransform: textTransformRule
             },
             normal: {
                 margin: 10,
-                padding: 10
-            },
-            normal: {
-                margin: 10,
-                padding: 10
+                padding: 10,
+                textTransform: textTransformRule
             },
             center: {
                 width: '100%',
@@ -549,8 +550,8 @@ export function createStyle(overrides) {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 marginBottom: 30,
-                outlineStyle: 'none', // Disable web default white outline on focused element
-                outline: 'none', // Disable web default white outline on focused element
+                outlineStyle: 'none',
+                outline: 'none',
             },
             color: {
                 true: AppStyle.color.coreDark,
