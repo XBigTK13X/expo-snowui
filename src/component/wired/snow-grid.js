@@ -1,5 +1,4 @@
 import React from 'react'
-import { View } from 'react-native'
 
 import { useStyleContext } from '../../context/snow-style-context'
 import { useFocusContext } from '../../context/snow-focus-context'
@@ -12,7 +11,7 @@ import SnowPager from './snow-pager'
 export const SnowGrid = (props) => {
     const { SnowStyle } = useStyleContext(props)
     const { currentRoute } = useNavigationContext(props)
-    const { focusPath, focusWrap } = useFocusContext('grid', { ...props, canFocus: false })
+    const { focusPath } = useFocusContext('grid', { ...props, canFocus: false })
 
     if (!props.items && !props.children) {
         return null
@@ -70,12 +69,6 @@ export const SnowGrid = (props) => {
     if (hasPageControls) {
         items = items.slice(page * itemsPerPage, page * itemsPerPage + itemsPerPage)
     }
-    const maxColumn = Math.min(items.length, itemsPerRow)
-    let maxRow = Math.max(1, Math.ceil(items.length / itemsPerRow))
-    let lastElementColumn = items.length % itemsPerRow
-    if (lastElementColumn === 0) {
-        lastElementColumn = itemsPerRow
-    }
 
     let gridYOffset = 0
     let topPager = null
@@ -98,63 +91,57 @@ export const SnowGrid = (props) => {
         gridYOffset = 1
     }
 
-
-    const renderCell = (item, itemIndex, renderRowIndex) => {
+    const renderCell = (item, itemIndex) => {
         let child = renderItem(item, itemIndex)
-
-        let row = Math.floor((itemIndex) / itemsPerRow)
+        let row = Math.floor(itemIndex / itemsPerRow)
         let column = itemIndex % itemsPerRow
-
-        // TODO pass in the focusStart xx and yy
-        // To support rehydrating last select element in grid
 
         if (props?.assignFocus !== false) {
             child = React.cloneElement(child, {
-                focusKey: 'cell',
+                focusKey: child.props?.focusKey ?? 'cell',
                 xx: column,
-                yy: gridYOffset + renderRowIndex,
+                yy: 0,
                 focusStart: (props.focusStart && column == 0 && row == 0) || child.props?.focusStart
             })
         }
 
-        return (
-            <View key={`cell-${row}-${column}`}>
-                {child}
-            </View>
-        )
+        return child
     }
 
-    let rows = null
-    let row = null
-    if (items.length) {
-        rows = []
-        row = []
-        for (let ii = 0; ii < items.length; ii++) {
-            row.push(renderCell(items[ii], ii, rows.length))
-            if (row.length >= itemsPerRow) {
-                rows.push(row)
-                row = []
-            }
-        }
-        if (row?.length) {
+    let rows = []
+    let row = []
+    for (let ii = 0; ii < items.length; ii++) {
+        row.push(renderCell(items[ii], ii))
+        if (row.length >= itemsPerRow) {
             rows.push(row)
+            row = []
         }
+    }
+    if (row?.length) {
+        rows.push(row)
     }
 
     return (
         <SnowView parentPath={focusPath} testID={props.testID} style={gridStyle} key={focusPath}>
             {topPager}
             <SnowView xx={0} yy={gridYOffset}>
-                {rows.map((row, rowIndex) => {
+                {rows.map((rowItems, rowIndex) => {
                     return (
-                        <View key={`row-${focusPath}-${rowIndex}`} style={rowStyle}>
-                            {row.map(cell => { return cell })}
-                        </View>
+                        <SnowView
+                            key={`row-${focusPath}-${rowIndex}`}
+                            focusKey={`row-${rowIndex}`}
+                            xx={0}
+                            yy={rowIndex}
+                            focusWrap={true}
+                            style={rowStyle}
+                        >
+                            {rowItems.map(cell => cell)}
+                        </SnowView>
                     )
                 })}
             </SnowView>
             {bottomPager}
-        </SnowView >
+        </SnowView>
     )
 }
 

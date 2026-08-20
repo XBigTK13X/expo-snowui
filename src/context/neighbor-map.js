@@ -35,7 +35,7 @@ function findSpatialNeighbor(tree, startPath, direction) {
             if (sibling.value?.canFocus) {
                 return sibling.path
             }
-            const entryLeaf = findEntryNodeInBranch(sibling, direction)
+            const entryLeaf = findEntryNodeInBranch(sibling, direction, originNode.value.xx, originNode.value.yy)
             if (entryLeaf) {
                 return entryLeaf.path
             }
@@ -44,7 +44,34 @@ function findSpatialNeighbor(tree, startPath, direction) {
         currentSearchNode = currentSearchNode.parent
     }
 
+    if (direction === 'left' || direction === 'right') {
+        return findRowLoopNeighbor(originNode, direction)
+    }
+
     return null
+}
+
+function findRowLoopNeighbor(originNode, direction) {
+    if (!originNode.parent) return null
+
+    const originY = originNode.value.yy
+
+    const rowSiblings = Array.from(originNode.parent.children.values())
+        .filter(node => node.value && node.value.yy === originY)
+
+    if (rowSiblings.length <= 1) return null
+
+    const sortedRow = rowSiblings.slice().sort((aa, bb) => aa.value.xx - bb.value.xx)
+    const targetNode = direction === 'right' ? sortedRow[0] : sortedRow[sortedRow.length - 1]
+
+    if (targetNode === originNode) return null
+
+    if (targetNode.value?.canFocus) {
+        return targetNode.path
+    }
+
+    const entryLeaf = findEntryNodeInBranch(targetNode, direction, originNode.value.xx, originNode.value.yy)
+    return entryLeaf ? entryLeaf.path : null
 }
 
 function getSortedCandidates(origin, siblings, direction) {
@@ -66,13 +93,30 @@ function getSortedCandidates(origin, siblings, direction) {
             }
         })
         .sort((aa, bb) => {
-            const distA = Math.abs(aa.value.xx - ox) + Math.abs(aa.value.yy - oy)
-            const distB = Math.abs(bb.value.xx - ox) + Math.abs(bb.value.yy - oy)
-            return distA - distB
+            const ax = aa.value.xx
+            const ay = aa.value.yy
+            const bx = bb.value.xx
+            const by = bb.value.yy
+
+            if (direction === 'up' || direction === 'down') {
+                const rowDistA = Math.abs(ay - oy)
+                const rowDistB = Math.abs(by - oy)
+                if (rowDistA !== rowDistB) {
+                    return rowDistA - rowDistB
+                }
+                return Math.abs(ax - ox) - Math.abs(bx - ox)
+            } else {
+                const colDistA = Math.abs(ax - ox)
+                const colDistB = Math.abs(bx - ox)
+                if (colDistA !== colDistB) {
+                    return colDistA - colDistB
+                }
+                return Math.abs(ay - oy) - Math.abs(by - oy)
+            }
         })
 }
 
-function findEntryNodeInBranch(parentNode, direction) {
+function findEntryNodeInBranch(parentNode, direction, targetX, targetY) {
     if (!parentNode.children || parentNode.children.size === 0) return null
 
     const candidates = Array.from(parentNode.children.values())
@@ -98,14 +142,18 @@ function findEntryNodeInBranch(parentNode, direction) {
     }
 
     edgeNodes.sort((aa, bb) => {
-        const valA = (direction === 'up' || direction === 'down') ? aa.value.xx : aa.value.yy
-        const valB = (direction === 'up' || direction === 'down') ? bb.value.xx : bb.value.yy
-        return valA - valB
+        if (direction === 'up' || direction === 'down') {
+            const preferredX = targetX ?? 0
+            return Math.abs(aa.value.xx - preferredX) - Math.abs(bb.value.xx - preferredX)
+        } else {
+            const preferredY = targetY ?? 0
+            return Math.abs(aa.value.yy - preferredY) - Math.abs(bb.value.yy - preferredY)
+        }
     })
 
     for (const node of edgeNodes) {
         if (node.value?.canFocus) return node
-        const deeper = findEntryNodeInBranch(node, direction)
+        const deeper = findEntryNodeInBranch(node, direction, targetX, targetY)
         if (deeper) return deeper
     }
 
