@@ -1,4 +1,3 @@
-import { View } from 'react-native'
 import { useStyleContext } from '../../context/snow-style-context'
 import { useNavigationContext } from '../../context/snow-navigation-context'
 import { useFocusContext } from '../../context/snow-focus-context'
@@ -11,13 +10,15 @@ export const SnowPager = (props) => {
     const { navUpdate, currentRoute } = useNavigationContext(props)
     const { focusPath } = useFocusContext('pager', props)
 
+    const isPortrait = Boolean(SnowStyle?.isPortrait ?? (SnowStyle?.orientation === 'portrait'))
+
     const pageKey = `${props.focusKey}-grid-page`
     const pageTrigger = `${props.focusKey}-page-trigger`
     const pageCountTestId = `${props.focusKey}-page-count`
 
-    const gotoPage = (page) => {
+    const gotoPage = (pageNumber) => {
         navUpdate({
-            [pageKey]: page
+            [pageKey]: pageNumber
         })
     }
 
@@ -51,10 +52,82 @@ export const SnowPager = (props) => {
         gotoPage(Math.floor((props.page + props.maxPage) / 2))
     }
 
-
     let buttonFocusStart = null
     if (currentRoute?.routeParams?.hasOwnProperty(pageTrigger)) {
         buttonFocusStart = currentRoute?.routeParams?.[pageTrigger]
+    }
+
+    if (isPortrait) {
+        return (
+            <SnowView
+                parentPath={focusPath}
+                style={[
+                    SnowStyle.component.grid.pager,
+                    { flexDirection: 'column', alignItems: 'center' },
+                    SnowStyle.component.grid.pagerPortrait
+                ]}
+            >
+                <SnowView style={[SnowStyle.component.grid.pager, SnowStyle.component.grid.pagerRow]}>
+                    <SnowTextButton
+                        focusKey={'next-page-button'}
+                        xx={0}
+                        yy={0}
+                        title=">"
+                        short
+                        onPress={nextPage}
+                    />
+
+                    <SnowTextButton
+                        focusKey={'previous-page-button'}
+                        xx={1}
+                        yy={0}
+                        title="<"
+                        short
+                        onPress={previousPage}
+                    />
+
+                    <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
+                </SnowView>
+
+                <SnowView style={[SnowStyle.component.grid.pager, SnowStyle.component.grid.pagerRow]}>
+                    <SnowTextButton
+                        focusKey={'first-page-button'}
+                        xx={0}
+                        yy={1}
+                        title="<<<"
+                        short
+                        onPress={firstPage}
+                    />
+
+                    <SnowTextButton
+                        focusKey={'final-page-button'}
+                        xx={1}
+                        yy={1}
+                        title=">>>"
+                        short
+                        onPress={finalPage}
+                    />
+
+                    <SnowTextButton
+                        focusKey={'first-half-button'}
+                        xx={2}
+                        yy={1}
+                        title="<<"
+                        short
+                        onPress={previousHalf}
+                    />
+
+                    <SnowTextButton
+                        focusKey={'next-half-button'}
+                        xx={3}
+                        yy={1}
+                        title=">>"
+                        short
+                        onPress={nextHalf}
+                    />
+                </SnowView>
+            </SnowView>
+        )
     }
 
     return (
@@ -78,7 +151,6 @@ export const SnowPager = (props) => {
             />
 
             <SnowText testID={pageCountTestId} noSelect>{props.page + 1} / {props.maxPage}</SnowText>
-
 
             <SnowTextButton
                 focusKey={'first-page-button'}
