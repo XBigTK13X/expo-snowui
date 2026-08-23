@@ -46,9 +46,7 @@ export function StyleContextProvider(props) {
 
     return (
         <StyleContext.Provider value={context}>
-            <React.Fragment key={`${width}-${height}`}>
-                {props.children}
-            </React.Fragment>
+            {props.children}
         </StyleContext.Provider>
     )
 }
