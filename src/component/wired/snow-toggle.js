@@ -27,10 +27,10 @@ export const SnowToggle = (props) => {
 
     return focusWrap(
         <Pressable
-            style={SnowStyle.component.toggle.center}
+            style={[SnowStyle.component.toggle.center, { alignItems: 'center' }]}
             onPress={toggleValue}
         >
-            <SnowLabel>{props.title}</SnowLabel>
+            <SnowLabel style={{ textAlign: 'center' }}>{props.title}</SnowLabel>
             <Switch
                 thumbColor={thumbColor}
                 trackColor={
@@ -38,7 +38,7 @@ export const SnowToggle = (props) => {
                         true: SnowStyle.component.toggle.color.true,
                         false: SnowStyle.component.toggle.color.false
                     }}
-                style={{ marginLeft: 'auto', marginRight: 'auto' }}
+                style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }}
                 value={props.value}
                 onValueChange={toggleValue} />
         </Pressable>
