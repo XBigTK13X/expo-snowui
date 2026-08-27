@@ -35,89 +35,112 @@ class DownloadOptions : Record {
     @Field var openAfterDownload: Boolean = false
 }
 
-class OpenDirContract : AppContextActivityResultContract<String, Uri?> {
-    override fun createIntent(context: Context, input: String): Intent {
-        return Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-            // Optional: grant read/writeable persistable flags directly to the intent
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        }
-    }
-    override fun parseResult(input: String, resultCode: Int, intent: Intent?): Uri? {
-        android.util.Log.d("SnowDownload", "OpenDirContract parseResult: resultCode=$resultCode, data=${intent?.data}")
-        return if (resultCode == Activity.RESULT_OK) intent?.data else null
-    }
-}
-
 class DownloadModule : Module() {
     private val moduleScope = CoroutineScope(Dispatchers.IO)
-    private lateinit var directoryPickerLauncher: AppContextActivityResultLauncher<String, Uri?>
     private var pendingDirectoryPickerPromise: Promise? = null
     private val TAG = "SnowDownload"
 
-    private fun sendLog(message: String) {
+    // Add a unique request code for the picker
+    private val REQUEST_CODE_PICK_DIRECTORY = 9912
+
+    private val logBuffer = mutableListOf<String>()
+
+private fun sendLog(message: String) {
         Log.d(TAG, message)
+        synchronized(logBuffer) {
+            logBuffer.add("[${System.currentTimeMillis()}] $message")
+            if (logBuffer.size > 500) logBuffer.removeAt(0)
+        }
         try {
             sendEvent("downloadLog", mapOf("message" to message))
         } catch (e: Exception) {
-            // EventEmitter might not be active if frontend isn't listening yet
+            Log.e(TAG, "sendEvent failed: ${e.message}")
         }
     }
 
     override fun definition() = ModuleDefinition {
         Name("SnowDownload")
-
         Events("downloadProgress", "downloadLog")
 
-        RegisterActivityContracts {
-            directoryPickerLauncher = registerForActivityResult(
-                OpenDirContract()
-            ) { _: String, selectedUri: Uri? ->
-                sendLog("Directory picker result received. Uri: $selectedUri")
+        // 1. Listen for the raw Activity Result natively
+        OnActivityResult { _, payload ->
+            if (payload.requestCode == REQUEST_CODE_PICK_DIRECTORY) {
                 val promise = pendingDirectoryPickerPromise
                 pendingDirectoryPickerPromise = null
 
-                if (promise == null) {
-                    sendLog("No pending directory picker promise found!")
-                    return@registerForActivityResult
-                }
+                if (promise == null) return@OnActivityResult
 
-                val context = appContext.reactContext
-                if (selectedUri != null && context != null) {
-                    try {
-                        val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                        context.contentResolver.takePersistableUriPermission(selectedUri, takeFlags)
-                        sendLog("Persistable URI permission granted successfully for: $selectedUri")
-                        promise.resolve(selectedUri.toString())
-                    } catch (e: Exception) {
-                        sendLog("Failed to take persistable URI permission: ${e.message}")
-                        promise.reject("ERR_PERSIST_PERMISSION", e.message, e)
+                if (payload.resultCode == Activity.RESULT_OK) {
+                    val uri = payload.data?.data
+                    if (uri != null) {
+                        try {
+                            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            appContext.reactContext?.contentResolver?.takePersistableUriPermission(uri, takeFlags)
+                            sendLog("Persistable URI permission granted successfully for: $uri")
+                            promise.resolve(uri.toString())
+                        } catch (e: Exception) {
+                            sendLog("Failed to take persistable URI permission: ${e.message}")
+                            promise.reject("ERR_PERSIST_PERMISSION", e.message, e)
+                        }
+                    } else {
+                        sendLog("Directory selection cancelled (No URI).")
+                        promise.resolve(null)
                     }
                 } else {
-                    sendLog("Directory selection cancelled or context is null")
+                    sendLog("Directory selection cancelled.")
                     promise.resolve(null)
                 }
             }
         }
 
-AsyncFunction("pickDirectory") { promise: Promise ->
+        // 2. Launch using standard startActivityForResult on the current Activity
+        AsyncFunction("pickDirectory") { promise: Promise ->
             if (pendingDirectoryPickerPromise != null) {
                 promise.reject("ERR_PICKER_BUSY", "Directory picker is already open", null)
                 return@AsyncFunction
             }
             pendingDirectoryPickerPromise = promise
 
-            // Switch to Main thread to safely launch the Android Activity Result Launcher
-            kotlinx.coroutines.CoroutineScope(Dispatchers.Main).launch {
-                try {
-                    sendLog("Launching directory picker intent on Main thread...")
-                    directoryPickerLauncher.launch("")
-                } catch (exception: Exception) {
-                    sendLog("Failed to launch directory picker: ${exception.message}")
-                    pendingDirectoryPickerPromise = null
-                    promise.reject("ERR_PICKER_FAILED", exception.message, exception)
+            val activity = appContext.currentActivity
+            if (activity == null) {
+                pendingDirectoryPickerPromise = null
+                promise.reject("ERR_NO_ACTIVITY", "Current activity is null", null)
+                return@AsyncFunction
+            }
+
+            try {
+                sendLog("Launching directory picker intent on Main thread...")
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                    addFlags(
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    )
                 }
+                activity.startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY)
+            } catch (exception: Exception) {
+                sendLog("Failed to launch directory picker: ${exception.message}")
+                pendingDirectoryPickerPromise = null
+                promise.reject("ERR_PICKER_FAILED", exception.message, exception)
             }
         }
+
+        // ... Keep your existing download, installApk, and openFile functions here ...
+
+
+
+    AsyncFunction("getLogs") { promise: Promise ->
+    synchronized(logBuffer) {
+        promise.resolve(logBuffer.toList())
+    }
+}
+
+AsyncFunction("clearLogs") { promise: Promise ->
+    synchronized(logBuffer) {
+        logBuffer.clear()
+    }
+    promise.resolve(true)
+}
 
         AsyncFunction("download") { options: DownloadOptions, promise: Promise ->
             sendLog("Download started: url=${options.url}, isTemp=${options.isTemp}, treeUri=${options.treeUri}, subDir=${options.subDir}")
@@ -280,10 +303,14 @@ AsyncFunction("pickDirectory") { promise: Promise ->
                     )
                     promise.resolve(resultMap)
                 } catch (exception: Exception) {
-                    sendLog("Download failed: ${exception.message}")
-                    sendEvent("downloadProgress", mapOf("progress" to -1))
-                    promise.reject("ERR_DOWNLOAD_FAILED", exception.message, exception)
-                } finally {
+    sendLog("Download failed: ${exception.message}")
+    try {
+        sendEvent("downloadProgress", mapOf("progress" to -1))
+    } catch (e: Exception) {
+        // Suppress bridge crash so promise.reject still fires
+    }
+    promise.reject("ERR_DOWNLOAD_FAILED", exception.message, exception)
+} finally {
                     try { outputStream?.close() } catch (ignored: Exception) {}
                     try { inputStream?.close() } catch (ignored: Exception) {}
                     try { connection?.disconnect() } catch (ignored: Exception) {}

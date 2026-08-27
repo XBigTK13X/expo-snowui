@@ -103,6 +103,11 @@ export default function DownloadPage() {
                 <Snow.TextButton title="Download Perm and Open" onPress={handleDownloadPermAndOpen} />
                 <Snow.TextButton title="Download Temp" onPress={handleDownloadTemp} />
                 <Snow.TextButton title="Download Temp and Open" onPress={handleDownloadTempAndOpen} />
+                <Snow.TextButton title="Grab Native Logs" onPress={() => {
+                    Snow.Download.getLogs().then((logs: any) => {
+                        setLogs(logs)
+                    })
+                }} />
             </Snow.Grid>
             <Snow.Text style={{ fontWeight: 'bold' }}>Native Logs:</Snow.Text>
             {logs.map((log, index) => (

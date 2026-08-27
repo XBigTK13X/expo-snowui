@@ -69,6 +69,11 @@ export const SnowDownload = {
     async openFile(fileUriOrPath: string, mimeType?: string): Promise<boolean> {
         if (!NativeDownload) return false
         return await NativeDownload.openFile(fileUriOrPath, mimeType)
+    },
+
+    async getLogs(): Promise<string[]> {
+        if (!NativeDownload) return []
+        return await NativeDownload.getLogs()
     }
 }
 
