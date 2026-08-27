@@ -1,0 +1,11 @@
+{
+    "name": "expo-snowui",
+    "platforms": [
+        "android"
+    ],
+    "android": {
+        "modules": [
+            "com.simplepathstudios.snowui.DownloadModule"
+        ]
+    }
+}

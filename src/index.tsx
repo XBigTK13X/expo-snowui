@@ -64,6 +64,9 @@ import { SnowVersion } from './component/snow-version'
 export { SnowView } from './component/wired/snow-view'
 import { SnowView } from './component/wired/snow-view'
 
+export { SnowDownload as Download } from './snow-download'
+import { SnowDownload as Download } from './snow-download'
+
 const useFocusLayerFunc = (name: string, uncloned: boolean = false) => {
   return useFocusContext().useFocusLayer(name, uncloned)
 }
@@ -74,12 +77,12 @@ import util from './util'
 export * as util from './util'
 
 import { StatusBar } from 'react-native'
-import * as NavigationBar from 'expo-navigation-bar';
+import * as NavigationBar from 'expo-navigation-bar'
 
 let hideSystemUi = () => {
   try {
-    NavigationBar.setVisibilityAsync('hidden');
-    StatusBar.setHidden(true, 'none');
+    NavigationBar.setVisibilityAsync('hidden')
+    StatusBar.setHidden(true, 'none')
   }
   catch (swallow) { }
 }
@@ -100,6 +103,7 @@ export default {
   useToast,
   ...util,
   hideSystemUi,
+  Download,
   Break: SnowBreak,
   Dropdown: SnowDropdown,
   FillView: SnowFillView,

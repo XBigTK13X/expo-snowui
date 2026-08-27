@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.anonymous.exposnowui"
+  },
+  "ios": {
+    "bundleIdentifier": "com.anonymous.exposnowui"
+  }
+}

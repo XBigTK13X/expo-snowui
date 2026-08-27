@@ -1,6 +1,7 @@
 export const routes = {
     break: '/example/break',
     dropdown: '/example/dropdown',
+    download: '/example/download',
     grid: '/example/grid',
     gridMore: '/example/gridMore',
     header: '/example/header',
@@ -19,6 +20,7 @@ export const routes = {
 }
 
 import BreakPage from './page/BreakPage'
+import DownloadPage from './page/DownloadPage'
 import DropdownPage from './page/DropdownPage'
 import GridPage from './page/GridPage'
 import GridMorePage from './page/GridMorePage'
@@ -38,6 +40,7 @@ import TogglePage from './page/TogglePage'
 
 export const pages = {
     [routes.break]: BreakPage,
+    [routes.download]: DownloadPage,
     [routes.dropdown]: DropdownPage,
     [routes.grid]: GridPage,
     [routes.gridMore]: GridMorePage,

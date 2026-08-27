@@ -13,6 +13,7 @@ function AppPage() {
   const [longPressCount, setLongPressCount] = React.useState(0)
 
   let components = [
+    ['Download', routes.download],
     ['Break', routes.break],
     ['ImageButton', routes.imageButton],
     ['Modal', routes.modal],
