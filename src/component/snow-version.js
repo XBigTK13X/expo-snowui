@@ -1,4 +1,4 @@
-const SNOWUI_VERSION = "1.8.9"
+const SNOWUI_VERSION = "1.8.10"
 
 import { useStyleContext } from '../context/snow-style-context'
 
