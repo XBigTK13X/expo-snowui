@@ -38,6 +38,9 @@ export function SnowText(props) {
     if (props.noSelect) {
         style.push(SnowStyle.component.text.noSelect)
     }
+    if (props.center) {
+        style.push({ textAlign: 'center' })
+    }
     if (props.style) {
         style.push(props.style)
     }
