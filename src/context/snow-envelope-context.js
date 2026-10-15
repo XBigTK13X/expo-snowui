@@ -5,6 +5,7 @@ const EnvelopeStoreContext = React.createContext(null)
 
 export function EnvelopeContextProvider(props) {
     const storeRef = React.useRef(props.initialData || {})
+    const handlersRef = React.useRef({})
     const listenersRef = React.useRef(new Set())
 
     const getEnvelope = React.useCallback(() => {
@@ -21,9 +22,19 @@ export function EnvelopeContextProvider(props) {
 
     const resetEnvelope = React.useCallback(() => {
         storeRef.current = {}
+        handlersRef.current = {}
         listenersRef.current.forEach((listener) => {
             listener()
         })
+    }, [])
+
+    // Imperative handler registration: does NOT trigger store listeners/re-renders
+    const registerHandlers = React.useCallback((handlers) => {
+        handlersRef.current = { ...handlersRef.current, ...handlers }
+    }, [])
+
+    const getHandlers = React.useCallback(() => {
+        return handlersRef.current
     }, [])
 
     const subscribe = React.useCallback((listener) => {
@@ -37,6 +48,8 @@ export function EnvelopeContextProvider(props) {
         getEnvelope,
         updateEnvelope,
         resetEnvelope,
+        registerHandlers,
+        getHandlers,
         subscribe
     }).current
 
@@ -59,24 +72,15 @@ export function useEnvelopeAppContext(props) {
         envelope,
         getEnvelope: store.getEnvelope,
         updateEnvelope: store.updateEnvelope,
-        resetEnvelope: store.resetEnvelope
+        resetEnvelope: store.resetEnvelope,
+        registerHandlers: store.registerHandlers,
+        getHandlers: store.getHandlers
     }), [
         envelope,
         store.getEnvelope,
         store.updateEnvelope,
-        store.resetEnvelope
+        store.resetEnvelope,
+        store.registerHandlers,
+        store.getHandlers
     ])
-}
-
-export function useEnvelopeContext(selector) {
-    const store = React.useContext(EnvelopeStoreContext)
-    if (!store) {
-        throw new Error('useEnvelopeContext must be wrapped in an <EnvelopeContextProvider />')
-    }
-
-    const getSnapshot = React.useCallback(() => {
-        return selector ? selector(store.getEnvelope()) : store.getEnvelope()
-    }, [store, selector])
-
-    return useSyncExternalStore(store.subscribe, getSnapshot)
 }
