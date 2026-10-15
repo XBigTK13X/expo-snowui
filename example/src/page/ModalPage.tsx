@@ -25,35 +25,37 @@ const RegularModal = (props) => {
   )
 }
 
-const EnvelopeModal = (props) => {
-  const { envelope, updateEnvelope } = Snow.useSnowContext()
+const HubModal = (props) => {
+  const { sendHubData, useHubState } = Snow.useSnowContext()
+  const trackIndex = useHubState((state) => state?.trackIndex ?? 0)
+  const streamUrl = useHubState((state) => state?.streamUrl ?? 'None')
 
   const handleNextTrack = () => {
-    updateEnvelope((previousEnvelope) => {
-      const currentTrackIndex = previousEnvelope?.trackIndex ?? 0
+    sendHubData((previousState) => {
+      const currentTrackIndex = previousState?.trackIndex ?? 0
       const nextIndex = currentTrackIndex + 1
       return {
-        ...previousEnvelope,
+        ...previousState,
         trackIndex: nextIndex,
         streamUrl: `https://stream.local/play?track=${nextIndex}`
       }
-    })
+    }, 'trackChanged')
   }
 
   return (
     <Snow.View>
-      <Snow.Label>Envelope Modal (Live State)</Snow.Label>
-      <Snow.Text>Current Track: {envelope?.trackIndex ?? 0}</Snow.Text>
-      <Snow.Text>Active URL: {envelope?.streamUrl ?? 'None'}</Snow.Text>
+      <Snow.Label>Hub Modal (Live State)</Snow.Label>
+      <Snow.Text>Current Track: {trackIndex}</Snow.Text>
+      <Snow.Text>Active URL: {streamUrl}</Snow.Text>
 
       <Snow.TextButton
         focusStart
-        focusKey="envelope-mutate"
+        focusKey="hub-mutate"
         title="Next Track (Mutate Upward)"
         onPress={handleNextTrack} />
 
       <Snow.TextButton
-        focusKey="envelope-close"
+        focusKey="hub-close"
         title="Close"
         onPress={props.closeModal} />
     </Snow.View>
@@ -149,10 +151,12 @@ export default function ModalPage(props) {
     navRemove
   } = Snow.useNavigationContext()
   const {
-    envelope,
-    updateEnvelope,
-    resetEnvelope
+    sendHubData,
+    resetHub,
+    useHubState
   } = Snow.useSnowContext()
+
+  const streamUrl = useHubState((state) => state?.streamUrl)
 
   const setModal = (modalName) => {
     if (modalName) {
@@ -170,12 +174,12 @@ export default function ModalPage(props) {
     setModal(null)
   }
 
-  const openEnvelopeModal = () => {
-    updateEnvelope({
+  const openHubModal = () => {
+    sendHubData({
       trackIndex: 1,
       streamUrl: 'https://stream.local/play?track=1'
-    })
-    setModal('envelope')
+    }, 'trackChanged')
+    setModal('hub')
   }
 
   React.useEffect(() => {
@@ -185,8 +189,8 @@ export default function ModalPage(props) {
     if (activeModal === 'regular') {
       Modal = RegularModal
     }
-    if (activeModal === 'envelope') {
-      Modal = EnvelopeModal
+    if (activeModal === 'hub') {
+      Modal = HubModal
     }
     if (activeModal === 'fullscreen') {
       Modal = FullscreenModal
@@ -214,8 +218,8 @@ export default function ModalPage(props) {
     return () => {
       if (activeModal) {
         popModal()
-        if (activeModal === 'envelope') {
-          resetEnvelope()
+        if (activeModal === 'hub') {
+          resetHub()
         }
       }
     }
@@ -225,8 +229,8 @@ export default function ModalPage(props) {
     <Snow.View {...props}>
       <Snow.Label>Component: Modal</Snow.Label>
 
-      {envelope?.streamUrl && (
-        <Snow.Text>Envelope URL in Screen: {envelope.streamUrl}</Snow.Text>
+      {streamUrl && (
+        <Snow.Text>Hub URL in Screen: {streamUrl}</Snow.Text>
       )}
 
       <Snow.TextButton
@@ -235,9 +239,9 @@ export default function ModalPage(props) {
         title="Show Modal"
         onPress={() => { setModal('regular') }} />
       <Snow.TextButton
-        focusKey="modal-envelope"
-        title="Envelope Modal"
-        onPress={openEnvelopeModal} />
+        focusKey="modal-hub"
+        title="Hub Modal"
+        onPress={openHubModal} />
       <Snow.TextButton
         focusKey="modal-two"
         title="Test Fullscreen"

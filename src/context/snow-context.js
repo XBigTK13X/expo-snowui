@@ -2,12 +2,12 @@ import React from 'react'
 
 import { useToast } from 'expo-toast'
 
-import { useStyleContext } from './snow-style-context'
 import { useFocusAppContext, useFocusContext } from './snow-focus-context'
+import { useHubContext, useHubState, useHubEventListener } from './snow-hub-context'
 import { useInputContext } from './snow-input-context'
-import { useNavigationContext } from './snow-navigation-context'
 import { useLayerContext } from './snow-layer-context'
-import { useEnvelopeAppContext, useEnvelopeContext } from './snow-envelope-context'
+import { useNavigationContext } from './snow-navigation-context'
+import { useStyleContext } from './snow-style-context'
 
 const SnowContext = React.createContext({})
 
@@ -20,8 +20,8 @@ export function useSnowContext() {
 }
 
 export function SnowContextProvider(props) {
-    const EnvelopeContext = useEnvelopeAppContext(props)
     const FocusContext = useFocusAppContext(props)
+    const HubContext = useHubContext(props)
     const InputContext = useInputContext(props)
     const LayerContext = useLayerContext(props)
     const NavigationContext = useNavigationContext(props)
@@ -29,25 +29,25 @@ export function SnowContextProvider(props) {
     const toast = useToast()
 
     const context = React.useMemo(() => ({
-        ...EnvelopeContext,
         ...FocusContext,
+        ...HubContext,
         ...InputContext,
         ...LayerContext,
         ...NavigationContext,
         ...StyleContext,
         toast: { ...toast },
         useFocusContext,
-        useEnvelopeContext
+        useHubContext,
+        useHubState,
+        useHubEventListener
     }), [
-        EnvelopeContext,
         FocusContext,
+        HubContext,
         InputContext,
         LayerContext,
         NavigationContext,
         StyleContext,
-        toast,
-        useFocusContext,
-        useEnvelopeContext
+        toast
     ])
 
     return (

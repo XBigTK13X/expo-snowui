@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui-example",
-    "version": "1.8.16",
+    "version": "1.8.20",
   "main": "index.js",
   "scripts": {
     "start": "expo start",

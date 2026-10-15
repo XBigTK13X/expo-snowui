@@ -8,7 +8,7 @@ import * as Sentry from "@sentry/react-native";
 
 import { ToastProvider } from 'expo-toast'
 
-import { EnvelopeContextProvider } from './context/snow-envelope-context'
+import { HubContextProvider } from './context/snow-hub-context'
 import { FocusContextProvider } from './context/snow-focus-context'
 import { InputContextProvider } from './context/snow-input-context'
 import { LayerContextProvider } from './context/snow-layer-context'
@@ -62,7 +62,8 @@ function SnowApp(props) {
             <StyleContextProvider
                 snowStyle={props.snowStyle}
                 snowConfig={props.snowConfig} >
-                <EnvelopeContextProvider>
+                <HubContextProvider
+                    DEBUG_HUB={props?.DEBUG_HUB ?? props?.DEBUG_SNOW}>
                     <InputContextProvider
                         DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
@@ -97,7 +98,7 @@ function SnowApp(props) {
                             </FocusContextProvider>
                         </NavigationContextProvider>
                     </InputContextProvider>
-                </EnvelopeContextProvider>
+                </HubContextProvider>
             </StyleContextProvider >
         </Sentry.ErrorBoundary >
     )
