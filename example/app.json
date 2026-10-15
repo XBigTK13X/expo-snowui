@@ -3,7 +3,6 @@
     "name": "example",
     "slug": "example",
     "version": "1.0.0",
-    "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -42,7 +41,7 @@
         "@sentry/react-native/expo",
         {
           "url": "https://bugsink.9914.us",
-          "project": "snowstream",
+          "project": "snowui-example",
           "organization": "Arctic"
         }
       ],

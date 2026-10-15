@@ -1,7 +1,5 @@
 import Snow from 'expo-snowui'
 
-console.log({ Version: Snow.Version })
-
 export default function BreakPage() {
     return (
         <>

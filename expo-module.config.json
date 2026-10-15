@@ -5,7 +5,8 @@
     ],
     "android": {
         "modules": [
-            "com.simplepathstudios.snowui.DownloadModule"
+            "com.simplepathstudios.snowui.DownloadModule",
+            "com.simplepathstudios.snowui.InspectModule"
         ]
     }
 }

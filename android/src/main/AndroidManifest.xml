@@ -3,6 +3,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <queries>
+        <package android:name="com.simplepathstudios.snowdash" />
+        <package android:name="com.simplepathstudios.snowgroove" />
+        <package android:name="com.simplepathstudios.snowload" />
+        <package android:name="com.simplepathstudios.snowstream" />
+        <package android:name="com.simplepathstudios.snowtome" />
+    </queries>
+
     <application>
         <provider
             android:name="androidx.core.content.FileProvider"

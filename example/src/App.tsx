@@ -4,8 +4,8 @@ import pkg from "../package.json";
 import Snow from 'expo-snowui';
 import { routes, pages } from './routing'
 
-function AppPage() {
-  const { CurrentPage, navPush, currentRoute } = Snow.useSnowContext()
+function AppPage(props) {
+  const { CurrentPage, navPush, SnowStyle } = Snow.useSnowContext(props)
 
   const [pressCount, setPressCount] = React.useState(0)
   const [presser, setPresser] = React.useState('')
@@ -33,6 +33,11 @@ function AppPage() {
     ['Toggle', routes.toggle]
   ]
 
+  React.useEffect(() => {
+    let appVersion = Snow.Inspect.getInstalledVersion("snowload")
+    console.log({ appVersion })
+  }, [])
+
   let focusTitle = ``
   if (pressCount) {
     focusTitle += ` (${pressCount})`
@@ -57,7 +62,7 @@ function AppPage() {
         <Snow.Label center>Components</Snow.Label>
         <Snow.Grid
           yy={1}
-          itemsPerRow={2}
+          itemsPerRow={SnowStyle.isPortrait ? 1 : 2}
           items={components}
           renderItem={(item: any, itemIndex: any) => {
             return <Snow.TextButton
@@ -107,8 +112,8 @@ export default function App() {
     <SnowApp
       DEBUG_SNOW={false}
       ENABLE_FOCUS={true}
-      DEBUG_FOCUS={true}
-      DEBUG_FOCUS_TREE={true}
+      DEBUG_FOCUS={false}
+      DEBUG_FOCUS_TREE={false}
       snowStyle={styleOverrides}
       routePaths={routes}
       routePages={pages}

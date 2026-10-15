@@ -66,6 +66,8 @@ import { SnowView } from './component/wired/snow-view'
 
 export { SnowDownload as Download } from './snow-download'
 import { SnowDownload as Download } from './snow-download'
+export { SnowInspect as Inspect } from './snow-inspect'
+import { SnowInspect as Inspect } from './snow-inspect'
 
 const useFocusLayerFunc = (name: string, uncloned: boolean = false) => {
   return useFocusContext().useFocusLayer(name, uncloned)
@@ -113,6 +115,7 @@ export default {
   ImageButton: SnowImageButton,
   ImageGrid: SnowImageGrid,
   Input: SnowInput,
+  Inspect,
   Label: SnowLabel,
   Modal: SnowModal,
   Overlay: SnowOverlay,
