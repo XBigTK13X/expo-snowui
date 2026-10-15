@@ -2,7 +2,7 @@ import React from 'react'
 import Snow from 'expo-snowui'
 import { View } from 'react-native'
 
-const RegularModal = (props: any) => {
+const RegularModal = (props) => {
   return (
     <Snow.View>
       <Snow.TextButton
@@ -25,7 +25,42 @@ const RegularModal = (props: any) => {
   )
 }
 
-const FullscreenModal = (props: any) => {
+const EnvelopeModal = (props) => {
+  const { envelope, updateEnvelope } = Snow.useSnowContext()
+
+  const handleNextTrack = () => {
+    updateEnvelope((previousEnvelope) => {
+      const currentTrackIndex = previousEnvelope?.trackIndex ?? 0
+      const nextIndex = currentTrackIndex + 1
+      return {
+        ...previousEnvelope,
+        trackIndex: nextIndex,
+        streamUrl: `https://stream.local/play?track=${nextIndex}`
+      }
+    })
+  }
+
+  return (
+    <Snow.View>
+      <Snow.Label>Envelope Modal (Live State)</Snow.Label>
+      <Snow.Text>Current Track: {envelope?.trackIndex ?? 0}</Snow.Text>
+      <Snow.Text>Active URL: {envelope?.streamUrl ?? 'None'}</Snow.Text>
+
+      <Snow.TextButton
+        focusStart
+        focusKey="envelope-mutate"
+        title="Next Track (Mutate Upward)"
+        onPress={handleNextTrack} />
+
+      <Snow.TextButton
+        focusKey="envelope-close"
+        title="Close"
+        onPress={props.closeModal} />
+    </Snow.View>
+  )
+}
+
+const FullscreenModal = (props) => {
   React.useEffect(() => {
     props.openOverlay({
       props: {
@@ -47,7 +82,7 @@ const FullscreenModal = (props: any) => {
   )
 }
 
-const InputsModal = (props: any) => {
+const InputsModal = (props) => {
   const [textInput, setTextInput] = React.useState('')
   return (
     <>
@@ -66,7 +101,7 @@ const InputsModal = (props: any) => {
   )
 }
 
-const NestedModal = (props: any) => {
+const NestedModal = (props) => {
   React.useEffect(() => {
     props.pushModal({
       render: () => {
@@ -95,12 +130,12 @@ const NestedModal = (props: any) => {
   return (
     <>
       <Snow.Text>This is the first layer of modal. Should be on bottom.</Snow.Text>
-      <Snow.TextButton focusStart focusKey="close-bottom-button" title="Close Bottom" onPress={() => { setShowNested(false); clearModals(); }} />
+      <Snow.TextButton focusStart focusKey="close-bottom-button" title="Close Bottom" onPress={() => { props.closeModal(); props.clearModals(); }} />
     </>
   )
 }
 
-export default function ModalPage(props: any) {
+export default function ModalPage(props) {
   const {
     pushModal,
     popModal,
@@ -113,8 +148,13 @@ export default function ModalPage(props: any) {
     navUpdate,
     navRemove
   } = Snow.useNavigationContext()
+  const {
+    envelope,
+    updateEnvelope,
+    resetEnvelope
+  } = Snow.useSnowContext()
 
-  const setModal = (modalName: any) => {
+  const setModal = (modalName) => {
     if (modalName) {
       navUpdate({
         activeModal: modalName,
@@ -130,12 +170,23 @@ export default function ModalPage(props: any) {
     setModal(null)
   }
 
+  const openEnvelopeModal = () => {
+    updateEnvelope({
+      trackIndex: 1,
+      streamUrl: 'https://stream.local/play?track=1'
+    })
+    setModal('envelope')
+  }
+
   React.useEffect(() => {
     const activeModal = currentRoute?.routeParams?.activeModal
     let Modal = null
 
     if (activeModal === 'regular') {
       Modal = RegularModal
+    }
+    if (activeModal === 'envelope') {
+      Modal = EnvelopeModal
     }
     if (activeModal === 'fullscreen') {
       Modal = FullscreenModal
@@ -148,7 +199,7 @@ export default function ModalPage(props: any) {
     }
     if (Modal) {
       pushModal({
-        render: (props: any) => { return <Modal {...props} /> },
+        render: (modalProps) => { return <Modal {...modalProps} /> },
         props: {
           scroll: true,
           onRequestClose: closeModal,
@@ -159,24 +210,34 @@ export default function ModalPage(props: any) {
           pushModal
         }
       })
-
     }
     return () => {
       if (activeModal) {
         popModal()
+        if (activeModal === 'envelope') {
+          resetEnvelope()
+        }
       }
     }
-
   }, [currentRoute?.routeParams?.activeModal])
 
   return (
     <Snow.View {...props}>
       <Snow.Label>Component: Modal</Snow.Label>
+
+      {envelope?.streamUrl && (
+        <Snow.Text>Envelope URL in Screen: {envelope.streamUrl}</Snow.Text>
+      )}
+
       <Snow.TextButton
         focusKey="tab-entry"
         focusStart
         title="Show Modal"
         onPress={() => { setModal('regular') }} />
+      <Snow.TextButton
+        focusKey="modal-envelope"
+        title="Envelope Modal"
+        onPress={openEnvelopeModal} />
       <Snow.TextButton
         focusKey="modal-two"
         title="Test Fullscreen"

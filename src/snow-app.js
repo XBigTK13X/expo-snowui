@@ -8,12 +8,13 @@ import * as Sentry from "@sentry/react-native";
 
 import { ToastProvider } from 'expo-toast'
 
-import { InputContextProvider } from './context/snow-input-context'
-import { StyleContextProvider } from './context/snow-style-context'
+import { EnvelopeContextProvider } from './context/snow-envelope-context'
 import { FocusContextProvider } from './context/snow-focus-context'
-import { NavigationContextProvider } from './context/snow-navigation-context'
+import { InputContextProvider } from './context/snow-input-context'
 import { LayerContextProvider } from './context/snow-layer-context'
+import { NavigationContextProvider } from './context/snow-navigation-context'
 import { SnowContextProvider } from './context/snow-context'
+import { StyleContextProvider } from './context/snow-style-context'
 
 import { SnowSafeArea } from './component/snow-safe-area'
 
@@ -61,41 +62,42 @@ function SnowApp(props) {
             <StyleContextProvider
                 snowStyle={props.snowStyle}
                 snowConfig={props.snowConfig} >
+                <EnvelopeContextProvider>
+                    <InputContextProvider
+                        DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
 
-                <InputContextProvider
-                    DEBUG_INPUT={props?.DEBUG_INPUT ?? props?.DEBUG_SNOW} >
+                        <NavigationContextProvider
+                            routePaths={props.routePaths}
+                            routePages={props.routePages}
+                            initialRoutePath={props.initialRoutePath}
+                            resetRoutePath={props.resetRoutePath}
+                            DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
 
-                    <NavigationContextProvider
-                        routePaths={props.routePaths}
-                        routePages={props.routePages}
-                        initialRoutePath={props.initialRoutePath}
-                        resetRoutePath={props.resetRoutePath}
-                        DEBUG_NAVIGATION={props?.DEBUG_NAVIGATION ?? props?.DEBUG_SNOW} >
+                            <FocusContextProvider
+                                DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
+                                DEBUG_FOCUS_TREE={props?.DEBUG_FOCUS_TREE ?? false}
+                                ENABLE_FOCUS={props?.ENABLE_FOCUS ?? Platform.isTV}
+                                focusVerticalOffset={props.focusVerticalOffset}
+                            >
 
-                        <FocusContextProvider
-                            DEBUG_FOCUS={props?.DEBUG_FOCUS ?? props?.DEBUG_SNOW}
-                            DEBUG_FOCUS_TREE={props?.DEBUG_FOCUS_TREE ?? false}
-                            ENABLE_FOCUS={props?.ENABLE_FOCUS ?? Platform.isTV}
-                            focusVerticalOffset={props.focusVerticalOffset}
-                        >
+                                <LayerContextProvider
+                                    DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
 
-                            <LayerContextProvider
-                                DEBUG_LAYERS={props?.DEBUG_LAYERS ?? props?.DEBUG_SNOW}>
+                                    <ToastProvider>
 
-                                <ToastProvider>
+                                        <SnowContextProvider >
 
-                                    <SnowContextProvider >
+                                            <SnowSafeArea key={appKey}>
+                                                {props.children}
+                                            </SnowSafeArea>
 
-                                        <SnowSafeArea key={appKey}>
-                                            {props.children}
-                                        </SnowSafeArea>
-
-                                    </SnowContextProvider>
-                                </ToastProvider>
-                            </LayerContextProvider>
-                        </FocusContextProvider>
-                    </NavigationContextProvider>
-                </InputContextProvider>
+                                        </SnowContextProvider>
+                                    </ToastProvider>
+                                </LayerContextProvider>
+                            </FocusContextProvider>
+                        </NavigationContextProvider>
+                    </InputContextProvider>
+                </EnvelopeContextProvider>
             </StyleContextProvider >
         </Sentry.ErrorBoundary >
     )
