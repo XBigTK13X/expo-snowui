@@ -68,15 +68,12 @@ export const SnowTabs = (props) => {
         pushModal({
             render: (modalProps) => (
                 <SnowGrid
-                    parentPath={`${focusPath}-modal`}
+                    itemsPerRow={1}
+                    assignFocus={false}
                 >
                     {props.headers.map((headerTitle, headerIndex) => (
                         <SnowTextButton
                             key={headerIndex}
-                            focusStart={headerIndex === tabIndex}
-                            focusKey={`tab-option-${headerIndex}`}
-                            xx={0}
-                            yy={headerIndex}
                             title={headerTitle}
                             onPress={() => handleSelectTab(headerIndex)}
                         />
@@ -122,7 +119,7 @@ export const SnowTabs = (props) => {
     return (
         <SnowView {...wrapperProps}>
             {isPortrait ? (
-                <SnowGrid itemsPerRow={1}>
+                <SnowGrid itemsPerRow={1} assignFocus={false}>
                     <SnowTextButton
                         parentPath={focusPath}
                         focusStart={props.focusStart}
