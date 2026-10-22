@@ -108,20 +108,31 @@ export const SnowTabs = (props) => {
 
     const totalTabs = props.headers.length
     const currentHeader = props.headers[tabIndex] ?? ''
-    const buttonTitle = `${currentHeader} (${tabIndex + 1}/${totalTabs})`
+    const indicatorTrack = Array.from({ length: totalTabs }, (unusedValue, slotIndex) => (
+        slotIndex === tabIndex ? '_' : ` ${slotIndex + 1} `
+    )).join('')
+
+    const buttonTitle = `${currentHeader}\n[ ${indicatorTrack} ]`
+
+    const portraitContentStyle = {
+        ...(SnowStyle?.component?.tabs?.panel ?? {}),
+        backgroundColor: SnowStyle?.color?.panel
+    }
 
     return (
         <SnowView {...wrapperProps}>
             {isPortrait ? (
-                <SnowTextButton
-                    parentPath={focusPath}
-                    focusStart={props.focusStart}
-                    focusKey={tabKey}
-                    xx={0}
-                    yy={0}
-                    title={buttonTitle}
-                    onPress={openTabsModal}
-                />
+                <SnowGrid itemsPerRow={1}>
+                    <SnowTextButton
+                        parentPath={focusPath}
+                        focusStart={props.focusStart}
+                        focusKey={tabKey}
+                        xx={0}
+                        yy={0}
+                        title={buttonTitle}
+                        onPress={openTabsModal}
+                    />
+                </SnowGrid>
             ) : (
                 <SnowDropdown
                     fade
@@ -137,7 +148,7 @@ export const SnowTabs = (props) => {
                     itemsPerRow={props.headers.length}
                 />
             )}
-            <SnowView style={isPortrait ? null : SnowStyle.component.tabs.panel}>
+            <SnowView style={isPortrait ? portraitContentStyle : SnowStyle.component.tabs.panel}>
                 {tabs[tabIndex]}
             </SnowView>
         </SnowView>

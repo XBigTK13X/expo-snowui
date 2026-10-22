@@ -1,6 +1,6 @@
 {
   "name": "@snowsuite/expo-snowui",
-  "version": "1.8.20",
+  "version": "1.8.24",
   "description": "GUI components and contexts shared by snowsuite apps",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -41,7 +41,7 @@
     "clean": "del-cli lib",
     "prepare": "bob build",
     "release": "release-it --only-version",
-    "push": "npm publish || true; npm publish --registry http://beast.9914.us:4873/"
+    "push": "npm publish --registry http://beast.9914.us:4873/"
   },
   "keywords": [
     "react-native",
