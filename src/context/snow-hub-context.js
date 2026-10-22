@@ -107,7 +107,7 @@ export function HubContextProvider(props) {
         prettyLog({ context: 'hub', action: 'render', hubState: hubStateRef.current })
     }
 
-    const store = React.useRef({
+    const store = React.useMemo(() => ({
         DEBUG_HUB: DEBUG,
         getHubState,
         subscribeHubState,
@@ -115,7 +115,15 @@ export function HubContextProvider(props) {
         emitHubEvent,
         onHubEvent,
         resetHub
-    }).current
+    }), [
+        DEBUG,
+        getHubState,
+        subscribeHubState,
+        sendHubData,
+        emitHubEvent,
+        onHubEvent,
+        resetHub
+    ])
 
     return (
         <HubStoreContext.Provider value={store}>
