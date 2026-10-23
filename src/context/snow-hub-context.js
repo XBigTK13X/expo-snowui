@@ -90,9 +90,11 @@ export function HubContextProvider(props) {
         if (DEBUG) {
             prettyLog({ context: 'hub', action: 'resetHub', nextInitialState })
         }
-        const resolvedState = typeof nextInitialState === 'function'
-            ? nextInitialState(hubStateRef.current)
-            : nextInitialState
+        const fallbackState = props.initialData || {}
+        const targetState = nextInitialState !== undefined ? nextInitialState : fallbackState
+        const resolvedState = typeof targetState === 'function'
+            ? targetState(hubStateRef.current)
+            : targetState
 
         hubStateRef.current = resolvedState && typeof resolvedState === 'object'
             ? { ...resolvedState }
@@ -101,7 +103,7 @@ export function HubContextProvider(props) {
         hubListenersRef.current.forEach((listener) => {
             listener()
         })
-    }, [DEBUG])
+    }, [DEBUG, props.initialData])
 
     if (DEBUG === 'verbose') {
         prettyLog({ context: 'hub', action: 'render', hubState: hubStateRef.current })
