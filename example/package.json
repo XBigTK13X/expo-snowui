@@ -1,6 +1,6 @@
 {
   "name": "expo-snowui-example",
-    "version": "1.8.26",
+  "version": "1.8.26",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -15,7 +15,7 @@
     "expo-image": "^57.0.2",
     "expo-navigation-bar": "^57.0.2",
     "expo-secure-store": "^57.0.1",
-    "expo-snowui": "workspace:*",
+    "@snowsuite/expo-snowui": "..",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
